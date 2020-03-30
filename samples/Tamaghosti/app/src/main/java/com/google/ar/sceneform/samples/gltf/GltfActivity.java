@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This is an example activity that uses the Sceneform UX package to make common AR tasks easier.
+ * This is a Buchi example activity that uses the Sceneform UX package to make common AR tasks easier.
  */
 public class GltfActivity extends AppCompatActivity {
   private static final String TAG = GltfActivity.class.getSimpleName();
