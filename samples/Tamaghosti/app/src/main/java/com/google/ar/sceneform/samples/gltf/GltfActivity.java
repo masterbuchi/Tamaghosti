@@ -101,11 +101,14 @@ public class GltfActivity extends AppCompatActivity {
 
     WeakReference<GltfActivity> weakActivity = new WeakReference<>(this);
 
+
+    // Beispieldatei aus Googledrive fuer passendes Linkformat
+      // https://drive.google.com/uc?export=download&id=
     ModelRenderable.builder()
         .setSource(
             this,
             Uri.parse(
-                "https://storage.googleapis.com/ar-answers-in-search-models/static/Tiger/model.glb"))
+                "https://drive.google.com/uc?export=download&id=1eidGtNQDjHZrFC-xQOtFoZgYu7OqMBfU"))
         .setIsFilamentGltf(true)
         .build()
         .thenAccept(
