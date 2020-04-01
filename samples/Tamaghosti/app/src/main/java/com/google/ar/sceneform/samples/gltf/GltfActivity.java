@@ -101,14 +101,15 @@ public class GltfActivity extends AppCompatActivity {
 
     WeakReference<GltfActivity> weakActivity = new WeakReference<>(this);
 
-
+// Winkemann-link:  //"https://drive.google.com/uc?export=download&id=1eidGtNQDjHZrFC-xQOtFoZgYu7OqMBfU"
     // Beispieldatei aus Googledrive fuer passendes Linkformat
       // https://drive.google.com/uc?export=download&id=
     ModelRenderable.builder()
         .setSource(
             this,
             Uri.parse(
-                "https://drive.google.com/uc?export=download&id=1eidGtNQDjHZrFC-xQOtFoZgYu7OqMBfU"))
+                    "https://drive.google.com/uc?export=download&id=1HTfJs7OFmA0AGyQcb_xdW6sV6j_UqvmK"
+               ))
         .setIsFilamentGltf(true)
         .build()
         .thenAccept(
