@@ -54,6 +54,9 @@ public class GltfActivity extends AppCompatActivity {
   private static final String TAG = GltfActivity.class.getSimpleName();
   private static final double MIN_OPENGL_VERSION = 3.0;
 
+  private int modelLimit = 1;
+  private int modelCounter = 0;
+
   private ArFragment arFragment;
   private Renderable renderable;
 
@@ -104,7 +107,8 @@ public class GltfActivity extends AppCompatActivity {
 // Winkemann-link:  //"https://drive.google.com/uc?export=download&id=1eidGtNQDjHZrFC-xQOtFoZgYu7OqMBfU"
     // Beispieldatei aus Googledrive fuer passendes Linkformat
       // https://drive.google.com/uc?export=download&id=
-    ModelRenderable.builder()
+
+      ModelRenderable.builder()
         .setSource(
             this,
             Uri.parse(
@@ -122,56 +126,73 @@ public class GltfActivity extends AppCompatActivity {
         .exceptionally(
             throwable -> {
               Toast toast =
-                  Toast.makeText(this, "Unable to load Tiger renderable", Toast.LENGTH_LONG);
+                  Toast.makeText(this, "Unable to load Model renderable", Toast.LENGTH_LONG);
               toast.setGravity(Gravity.CENTER, 0, 0);
               toast.show();
               return null;
             });
 
-    arFragment.setOnTapArPlaneListener(
-        (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
-          if (renderable == null) {
-            return;
-          }
 
-          // Create the Anchor.
-          Anchor anchor = hitResult.createAnchor();
-          AnchorNode anchorNode = new AnchorNode(anchor);
-          anchorNode.setParent(arFragment.getArSceneView().getScene());
+        arFragment.setOnTapArPlaneListener(
+                (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
+                    if (renderable == null) {
+                        return;
+                    }
 
-          // Create the transformable model and add it to the anchor.
-          TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
-          model.setParent(anchorNode);
-          model.setRenderable(renderable);
-          model.select();
+                    // Create the Anchor.
+                    Anchor anchor = hitResult.createAnchor();
+                    AnchorNode anchorNode = new AnchorNode(anchor);
+                    anchorNode.setParent(arFragment.getArSceneView().getScene());
 
-          FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
-          if (filamentAsset.getAnimator().getAnimationCount() > 0) {
-            animators.add(new AnimationInstance(filamentAsset.getAnimator(), 0, System.nanoTime()));
-          }
+                    // Create the transformable model and add it to the anchor.
+                    TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
+                    model.setParent(anchorNode);
+                    model.setRenderable(renderable);
+                    model.select();
 
-          Color color = colors.get(nextColor);
-          nextColor++;
-          for (int i = 0; i < renderable.getSubmeshCount(); ++i) {
-            Material material = renderable.getMaterial(i);
-            material.setFloat4("baseColorFactor", color);
-          }
-        });
+                    FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
+                    if (filamentAsset.getAnimator().getAnimationCount() > 0) {
+                        animators.add(new AnimationInstance(filamentAsset.getAnimator(), 0, System.nanoTime()));
+                    }
 
-    arFragment
-        .getArSceneView()
-        .getScene()
-        .addOnUpdateListener(
-            frameTime -> {
-              Long time = System.nanoTime();
-              for (AnimationInstance animator : animators) {
-                animator.animator.applyAnimation(
-                    animator.index,
-                    (float) ((time - animator.startTime) / (double) SECONDS.toNanos(1))
-                        % animator.duration);
-                animator.animator.updateBoneMatrices();
-              }
-            });
+                    Color color = colors.get(nextColor);
+                    nextColor++;
+                    for (int i = 0; i < renderable.getSubmeshCount(); ++i) {
+                        Material material = renderable.getMaterial(i);
+                        material.setFloat4("baseColorFactor", color);
+                    }
+                });
+
+
+
+
+
+
+    // Print - Test
+
+
+
+      Log.i(TAG, "This hopefully works");
+
+
+          arFragment
+                  .getArSceneView()
+                  .getScene()
+                  .addOnUpdateListener(
+                          frameTime -> {
+                              Long time = System.nanoTime();
+                              for (AnimationInstance animator : animators) {
+                                  animator.animator.applyAnimation(
+                                          animator.index,
+                                          (float) ((time - animator.startTime) / (double) SECONDS.toNanos(1))
+                                                  % animator.duration);
+                                  animator.animator.updateBoneMatrices();
+                              }
+                          });
+
+
+
+
   }
 
   /**
