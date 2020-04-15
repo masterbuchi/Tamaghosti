@@ -76,6 +76,7 @@ public class GltfActivity extends AppCompatActivity {
 
   private final Set<AnimationInstance> animators = new ArraySet<>();
 
+
   private final List<Color> colors =
       Arrays.asList(
           new Color(0, 0, 0, 1),
@@ -136,8 +137,24 @@ public class GltfActivity extends AppCompatActivity {
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
                     if (renderable == null) {
+
+                        Log.i(TAG, "Model not available");
+
                         return;
                     }
+
+                    if(modelCounter >= modelLimit) {
+
+
+                        Log.i(TAG, "Reached ModelLimit");
+
+                        return;
+
+                    }
+
+                    Log.i(TAG, "Place Model");
+
+                    modelCounter++;
 
                     // Create the Anchor.
                     Anchor anchor = hitResult.createAnchor();
