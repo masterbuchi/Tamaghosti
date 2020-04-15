@@ -16,4 +16,6 @@
 -->
 <resources>
     <string name="app_name" translation_description="App Name [CHAR LIMIT=40]">Sceneform Gltf</string>
+    <string name="model_position">Model Position</string>
+
 </resources>

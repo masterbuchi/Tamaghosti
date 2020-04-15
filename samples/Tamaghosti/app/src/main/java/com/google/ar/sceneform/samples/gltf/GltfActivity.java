@@ -29,6 +29,7 @@ import android.util.ArraySet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.filament.gltfio.Animator;
 import com.google.android.filament.gltfio.FilamentAsset;
@@ -53,6 +54,7 @@ import java.util.Set;
 public class GltfActivity extends AppCompatActivity {
   private static final String TAG = GltfActivity.class.getSimpleName();
   private static final double MIN_OPENGL_VERSION = 3.0;
+  private static final String MODEL_POSITION = "MODEL_POSITION";
 
   private int modelLimit = 1;
   private int modelCounter = 0;
@@ -160,6 +162,22 @@ public class GltfActivity extends AppCompatActivity {
                     Anchor anchor = hitResult.createAnchor();
                     AnchorNode anchorNode = new AnchorNode(anchor);
                     anchorNode.setParent(arFragment.getArSceneView().getScene());
+
+
+                    // Get Object Position
+                    float[] modelPosition = anchor.getPose().getTranslation();
+
+                    TextView textView = findViewById(R.id.modelPosition);
+
+                    for(int i = 0; i < modelPosition.length; i++) {
+
+                        Log.i(MODEL_POSITION, i + ": " + modelPosition[i]);
+
+                        textView.setText(textView.getText() + "\n" + modelPosition[i]);
+
+                    }
+
+
 
                     // Create the transformable model and add it to the anchor.
                     TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
