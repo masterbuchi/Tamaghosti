@@ -34,9 +34,14 @@ import android.widget.Toast;
 import com.google.android.filament.gltfio.Animator;
 import com.google.android.filament.gltfio.FilamentAsset;
 import com.google.ar.core.Anchor;
+import com.google.ar.core.ArCoreApk;
+import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
+import com.google.ar.core.PointCloud;
+import com.google.ar.core.Session;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.Camera;
 import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.ModelRenderable;
@@ -49,7 +54,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This is a Buchi example activity that uses the Sceneform UX package to make common AR tasks easier.
+ * This is a example activity that uses the Sceneform UX package to make common AR tasks easier.
  */
 public class GltfActivity extends AppCompatActivity {
   private static final String TAG = GltfActivity.class.getSimpleName();
@@ -102,7 +107,61 @@ public class GltfActivity extends AppCompatActivity {
       return;
     }
 
-    setContentView(R.layout.activity_ux);
+    /*
+
+    // CloudPoints
+
+
+      ArCoreApk
+
+    Context newContext = null;
+
+      if(apk.checkAvailability(newContext.CAMERA_SERVICE)) {
+
+          // Yes
+
+      }
+
+
+
+
+
+      ArCoreApk.Availability available = new ArCoreApk.Availability(Context.CAMERA_SERVICE);
+
+
+    available.isSupported(Context.CAMERA_SERVICE);
+
+
+      if(ArCoreApk.Availability.SUPPORTED_INSTALLED) {
+
+
+
+      }
+
+
+    Session session;
+
+
+      // ArCoreApk.Availability test = new ArCoreApk.Availability();
+
+    //  if () {
+
+
+      //}
+
+    //Session session = new Session(Context.CAMERA_SERVICE);
+
+//      Frame frame = session.update();
+
+      // Automatically releases point cloud resources at end of try block.
+  //    try (PointCloud pointCloud = frame.acquirePointCloud()) {
+          // Access point cloud data.
+    //  }
+
+
+      */
+
+      setContentView(R.layout.activity_ux);
     arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
     WeakReference<GltfActivity> weakActivity = new WeakReference<>(this);

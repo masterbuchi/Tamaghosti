@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
    Copyright 2018 Google LLC.
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +14,40 @@
    limitations under the License.
 -->
 <resources>
-    <string name="app_name" translation_description="App Name [CHAR LIMIT=40]">Sceneform Gltf</string>
+    <string name="app_name" translation_description="App Name [CHAR LIMIT=40]">Tamaghosti</string>
+
     <string name="model_position">Model Position</string>
+
+    <!-- MainMenuActivity Variables -->
+
+    <string name="game_title">Dragon Care</string>
+
+    <string name="new_game">New Game</string>
+    <string name="continue_game">Continue</string>
+    <string name="settings_game">Settings</string>
+
+    <string name="made_by">Made by Jule Maaß, Florian Buchholz &amp; Lukas Werdermann</string>
+
+
+    <!-- StoryActivity Variables-->
+
+    <string name="story_title">Introduction</string>
+
+    <string name="story_text">Welcome to the dragon\'s sancturary\n\n
+
+        I\'m glad you\'re here.
+        This young dragon was brought to us yesterday.  Hunters cut his wings to sell the leather on the black market.\n\n
+
+        He will never be able to hunt on his own again. Win his trust and become a dragon tamer.
+
+    </string>
+
+    <string name="story_name">Name your dragon</string>
+
+    <string name="story_continue">Continue</string>
+
+    <!-- Setting Variables -->
+
+    <string name="settings_title">Settings</string>
 
 </resources>
