@@ -29,6 +29,7 @@ import android.util.ArraySet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.filament.gltfio.Animator;
@@ -106,6 +107,14 @@ public class GltfActivity extends AppCompatActivity {
     if (!checkIsSupportedDeviceOrFinish(this)) {
       return;
     }
+
+    // UI Buttons
+
+      // Button
+
+
+
+
 
     /*
 
