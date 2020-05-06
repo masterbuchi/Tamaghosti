@@ -183,7 +183,7 @@ public class GltfActivity extends AppCompatActivity {
         .setSource(
             this,
             Uri.parse(
-                    "https://drive.google.com/uc?export=download&id=1HTfJs7OFmA0AGyQcb_xdW6sV6j_UqvmK"
+                    "https://drive.google.com/uc?export=download&id=1jtDoq7NUluO5HgguL67tHLajLhmTVC-b"
                ))
         .setIsFilamentGltf(true)
         .build()
@@ -254,8 +254,8 @@ public class GltfActivity extends AppCompatActivity {
                     model.select();
 
                     FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
-                    if (filamentAsset.getAnimator().getAnimationCount() > 0) {
-                        animators.add(new AnimationInstance(filamentAsset.getAnimator(), 0, System.nanoTime()));
+                    if (filamentAsset.getAnimator().getAnimationCount() > 2) {
+                        animators.add(new AnimationInstance(filamentAsset.getAnimator(), 2, System.nanoTime()));
                     }
 
                     Color color = colors.get(nextColor);
