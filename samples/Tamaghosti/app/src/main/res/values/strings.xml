@@ -55,5 +55,6 @@
     <string name="nav_care">Care</string>
 
     <string name="nav_train">Training</string>
+    <string name="nav_animations">Animations</string>
 
 </resources>

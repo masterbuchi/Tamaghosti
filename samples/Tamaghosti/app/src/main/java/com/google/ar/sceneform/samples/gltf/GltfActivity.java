@@ -29,6 +29,7 @@ import android.util.ArraySet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,10 +62,10 @@ public class GltfActivity extends AppCompatActivity {
   private static final String TAG = GltfActivity.class.getSimpleName();
   private static final double MIN_OPENGL_VERSION = 3.0;
   private static final String MODEL_POSITION = "MODEL_POSITION";
-
+    TransformableNode model;
   private int modelLimit = 1;
   private int modelCounter = 0;
-
+    private int animationCount = 0;
   private ArFragment arFragment;
   private Renderable renderable;
 
@@ -104,9 +105,14 @@ public class GltfActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    if (!checkIsSupportedDeviceOrFinish(this)) {
+
+
+
+
+      if (!checkIsSupportedDeviceOrFinish(this)) {
       return;
     }
+
 
     // UI Buttons
 
@@ -171,6 +177,31 @@ public class GltfActivity extends AppCompatActivity {
       */
 
       setContentView(R.layout.activity_ux);
+
+      Button changeAnimation = (Button) findViewById(R.id.animationControl);
+      Log.d("debug", "button found" + changeAnimation);
+
+      changeAnimation.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+              Log.d("animDebug", "counter before " +animationCount);
+              if (model != null) {
+                  if (animationCount >= 3) {
+                      animationCount = 0;
+                  }
+                      FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
+                      if (filamentAsset.getAnimator().getAnimationCount() >= 2) {
+                          animators.add(new AnimationInstance(filamentAsset.getAnimator(), animationCount, System.nanoTime()));
+                          Log.d("animDebug", "counter current " + animationCount);
+                      }
+
+                  }
+                  animationCount++;
+                      Log.d("animDebug", "counter after " + animationCount);
+
+          }
+      });
+
     arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
     WeakReference<GltfActivity> weakActivity = new WeakReference<>(this);
@@ -183,7 +214,8 @@ public class GltfActivity extends AppCompatActivity {
         .setSource(
             this,
             Uri.parse(
-                    "https://drive.google.com/uc?export=download&id=1jtDoq7NUluO5HgguL67tHLajLhmTVC-b"
+
+                    "https://drive.google.com/uc?export=download&id=1nykf4iGZiscHZnhJUndt7Fpdaun7bNGZ"
                ))
         .setIsFilamentGltf(true)
         .build()
@@ -204,7 +236,8 @@ public class GltfActivity extends AppCompatActivity {
             });
 
 
-        arFragment.setOnTapArPlaneListener(
+
+                  arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
                     if (renderable == null) {
 
@@ -239,7 +272,7 @@ public class GltfActivity extends AppCompatActivity {
 
                     for(int i = 0; i < modelPosition.length; i++) {
 
-                        Log.i(MODEL_POSITION, i + ": " + modelPosition[i]);
+                      //  Log.i(MODEL_POSITION, i + ": " + modelPosition[i]);
 
                         textView.setText(textView.getText() + "\n" + modelPosition[i]);
 
@@ -248,14 +281,14 @@ public class GltfActivity extends AppCompatActivity {
 
 
                     // Create the transformable model and add it to the anchor.
-                    TransformableNode model = new TransformableNode(arFragment.getTransformationSystem());
+                    model = new TransformableNode(arFragment.getTransformationSystem());
                     model.setParent(anchorNode);
                     model.setRenderable(renderable);
                     model.select();
 
                     FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
                     if (filamentAsset.getAnimator().getAnimationCount() > 2) {
-                        animators.add(new AnimationInstance(filamentAsset.getAnimator(), 2, System.nanoTime()));
+                        animators.add(new AnimationInstance(filamentAsset.getAnimator(), 0, System.nanoTime()));
                     }
 
                     Color color = colors.get(nextColor);
@@ -265,8 +298,6 @@ public class GltfActivity extends AppCompatActivity {
                         material.setFloat4("baseColorFactor", color);
                     }
                 });
-
-
 
 
 

@@ -21,6 +21,7 @@ public class StoryActivity extends AppCompatActivity {
 
         Button startGameButton = findViewById(R.id.storyButton);
 
+
         startGameButton.setOnClickListener(view -> {
 
             // Name

@@ -10,7 +10,9 @@
       android:id="@+id/ux_fragment"
       android:name="com.google.ar.sceneform.ux.ArFragment"
       android:layout_width="match_parent"
-      android:layout_height="match_parent" />
+      android:layout_height="match_parent"
+      tools:layout_editor_absoluteX="204dp"
+      tools:layout_editor_absoluteY="16dp" />
 
   <TextView
       android:id="@+id/modelPosition"
@@ -24,14 +26,24 @@
       app:layout_constraintTop_toTopOf="@+id/ux_fragment" />
 
   <android.support.design.widget.BottomNavigationView
+      android:id="@+id/bottomNavigationView"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:background="@color/cardview_shadow_start_color"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:menu="@menu/navigation"
-      />
+      app:menu="@menu/navigation" />
+
+  <Button
+      android:id="@+id/animationControl"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="24dp"
+      android:layout_marginBottom="24dp"
+      android:text="@string/nav_animations"
+      app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+      app:layout_constraintEnd_toEndOf="parent" />
 
 
 </android.support.constraint.ConstraintLayout>
