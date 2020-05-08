@@ -52,9 +52,23 @@
 
     <!-- Bottom Nav Variables -->
 
+
+
     <string name="nav_care">Care</string>
 
     <string name="nav_train">Training</string>
-    <string name="nav_animations">Animations</string>
+
+
+    <string name="nav_animations">Actions</string>
+
+    <string name="sleep">Sleep</string>
+    <!-- Needs Variables -->
+
+    <string name="lable_hunger">Hunger</string>
+    <string name="lable_social">Social</string>
+    <string name="lable_energy">Energy</string>
+    <string name="lable_training">Training</string>
+
+
 
 </resources>

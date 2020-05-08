@@ -20,10 +20,14 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.util.ArraySet;
 import android.util.Log;
@@ -31,6 +35,8 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.filament.gltfio.Animator;
@@ -68,12 +74,25 @@ public class GltfActivity extends AppCompatActivity {
     private int animationCount = 0;
   private ArFragment arFragment;
   private Renderable renderable;
+  ProgressBar prgHunger;
+  ProgressBar prgEnergy;
+    ProgressBar prgSocial;
+    ProgressBar prgTraining;
+    Button changeAnimation;
+    Button sleep;
+
+    private int hunger = 0;
+    private int energy = 80;
+    private int social = 0;
+    private int training = 0;
 
   private static class AnimationInstance {
     Animator animator;
     Long startTime;
     float duration;
     int index;
+
+
 
     AnimationInstance(Animator animator, int index, Long startTime) {
       this.animator = animator;
@@ -104,8 +123,6 @@ public class GltfActivity extends AppCompatActivity {
   // FutureReturnValueIgnored is not valid
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-
 
 
 
@@ -177,13 +194,26 @@ public class GltfActivity extends AppCompatActivity {
       */
 
       setContentView(R.layout.activity_ux);
+      setNeeds();
 
-      Button changeAnimation = (Button) findViewById(R.id.animationControl);
+
+      changeAnimation = (Button) findViewById(R.id.animationControl);
+
       Log.d("debug", "button found" + changeAnimation);
+
+        sleep = (Button) findViewById(R.id.sleepControl);
+        sleep.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sleep();
+            }
+        });
 
       changeAnimation.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
+
+              feed();
               Log.d("animDebug", "counter before " +animationCount);
               if (model != null) {
                   if (animationCount >= 3) {
@@ -357,4 +387,35 @@ public class GltfActivity extends AppCompatActivity {
     }
     return true;
   }
+public void setNeeds(){
+    prgHunger = (ProgressBar)findViewById(R.id.progressHunger);
+    prgHunger.setProgress(hunger);
+    prgEnergy = (ProgressBar)findViewById(R.id.progressEnergy);
+    prgEnergy.setProgress(energy);
+    prgSocial = (ProgressBar)findViewById(R.id.progressSocial);
+    prgSocial.setProgress(social);
+    prgTraining = (ProgressBar)findViewById(R.id.progressTraining);
+    prgTraining.setProgress(training);
+
+
 }
+    public void feed(){
+
+      hunger = hunger + 10;
+        prgHunger.setProgress(hunger);
+        getTired();
+        }
+
+        public void getTired(){
+
+      energy = energy - 10;
+      prgEnergy.setProgress(energy);
+        }
+
+        public void sleep(){
+      energy = 100;
+      prgEnergy.setProgress(energy);
+        }
+}
+
+
