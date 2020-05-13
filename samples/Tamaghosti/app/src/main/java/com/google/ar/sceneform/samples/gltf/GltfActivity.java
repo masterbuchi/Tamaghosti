@@ -301,8 +301,11 @@ public class GltfActivity extends AppCompatActivity {
         .setSource(
             this,
             Uri.parse(
+                    //emulator
+                    "https://drive.google.com/uc?export=download&id=1gH42Q27NVBXFj0DsE6HOLHbb-WvdTVKE"
+                     //tisch dino:
+                   // "https://drive.google.com/uc?export=download&id=1EPvVIBd6y1466BItENehEJ4Pil08dR7F"
 
-                    "https://drive.google.com/uc?export=download&id=1nykf4iGZiscHZnhJUndt7Fpdaun7bNGZ"
                ))
         .setIsFilamentGltf(true)
         .build()
