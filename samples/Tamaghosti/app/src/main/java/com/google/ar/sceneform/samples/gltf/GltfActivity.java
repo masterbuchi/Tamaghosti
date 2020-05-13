@@ -21,14 +21,11 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.util.ArraySet;
 import android.util.Log;
@@ -43,14 +40,9 @@ import android.widget.Toast;
 import com.google.android.filament.gltfio.Animator;
 import com.google.android.filament.gltfio.FilamentAsset;
 import com.google.ar.core.Anchor;
-import com.google.ar.core.ArCoreApk;
-import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
-import com.google.ar.core.PointCloud;
-import com.google.ar.core.Session;
 import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.Camera;
 import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.ModelRenderable;
@@ -61,7 +53,6 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import android.content.SharedPreferences;
 
 /**
  * This is a example activity that uses the Sceneform UX package to make common AR tasks easier.
@@ -83,6 +74,8 @@ public class GltfActivity extends AppCompatActivity {
 
     Button changeAnimation;
     Button sleep;
+    Button social;
+    Button training;
     ImageView plus;
 
 
@@ -218,20 +211,11 @@ public class GltfActivity extends AppCompatActivity {
       changeAnimation.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
-
-              needsControl.feed();
-              setNeeds();
-              plus = (ImageView) findViewById(R.id.plusImage);
-              plus.setVisibility(View.VISIBLE);
-
-              Handler handler = new Handler();
-              handler.postDelayed(new Runnable() {
-                  public void run() {
-                      plus.setVisibility(View.INVISIBLE);
-
-                  }
-              }, 7000);
-
+                if (needsControl.getHunger() <=90) {
+                    needsControl.feed();
+                    setNeeds();
+                    showPlus();
+                }
 
               Log.d("animDebug", "counter before " +animationCount);
               if (model != null) {
@@ -268,9 +252,44 @@ public class GltfActivity extends AppCompatActivity {
             }
         });
 
+        social = (Button) findViewById(R.id.socialControl);
+        if (needsControl.getHunger() == 100 && needsControl.getEnergy() == 100){
+         social.setVisibility(View.VISIBLE);
+      }
+        social.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (needsControl.getSocial() <= 90){
+                    needsControl.pet();
+                setNeeds();
+                showPlus();
+            }
+
+                Log.d("SocialDebug", "pressed " + needsControl.getSocial());
+            }
+        });
+
+        training = (Button) findViewById(R.id.trainingControl);
+        if (needsControl.getHunger() == 100 && needsControl.getEnergy() == 100 && needsControl.getSocial() == 100){
+            training.setVisibility(View.VISIBLE);
+        }
+      training.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+              if (needsControl.getTraining() <= 90){
+                  needsControl.train();
+                  setNeeds();
+                  showPlus();
+              }
+
+              Log.d("SocialDebug", "pressed " + needsControl.getTraining());
+          }
+      });
 
 
-    arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
+
+
+      arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
     WeakReference<GltfActivity> weakActivity = new WeakReference<>(this);
 
@@ -425,7 +444,18 @@ public class GltfActivity extends AppCompatActivity {
     }
     return true;
   }
+public void showPlus(){
+    plus = (ImageView) findViewById(R.id.plusImage);
+    plus.setVisibility(View.VISIBLE);
 
+    Handler handler = new Handler();
+    handler.postDelayed(new Runnable() {
+        public void run() {
+            plus.setVisibility(View.INVISIBLE);
+
+        }
+    }, 7000);
+}
         public void setNeeds(){
         prgHunger = (ProgressBar) findViewById(R.id.progressHunger);
         prgHunger.setProgress(needsControl.getHunger());

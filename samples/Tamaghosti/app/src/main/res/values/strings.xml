@@ -60,7 +60,8 @@
 
 
     <string name="nav_animations">Actions</string>
-
+    <string name="social">Pet</string>
+    <string name="train">Train</string>
     <string name="sleep">Sleep</string>
     <string name="wakeUp">Wake Up</string>
     <!-- Needs Variables -->

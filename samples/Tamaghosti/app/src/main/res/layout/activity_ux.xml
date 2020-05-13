@@ -12,8 +12,8 @@
       android:name="com.google.ar.sceneform.ux.ArFragment"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      tools:layout_editor_absoluteX="44dp"
-      tools:layout_editor_absoluteY="-80dp" />
+      tools:layout_editor_absoluteX="-84dp"
+      tools:layout_editor_absoluteY="152dp" />
 
   <TextView
       android:id="@+id/modelPosition"
@@ -51,9 +51,31 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginEnd="24dp"
-      android:layout_marginBottom="84dp"
+      android:layout_marginBottom="24dp"
       android:text="@string/sleep"
-      app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+      app:layout_constraintBottom_toTopOf="@+id/animationControl"
+      app:layout_constraintEnd_toEndOf="parent" />
+
+  <Button
+      android:id="@+id/trainingControl"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="24dp"
+      android:layout_marginBottom="24dp"
+      android:text="@string/train"
+      android:visibility="invisible"
+      app:layout_constraintBottom_toTopOf="@+id/socialControl"
+      app:layout_constraintEnd_toEndOf="parent" />
+
+  <Button
+      android:id="@+id/socialControl"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="24dp"
+      android:layout_marginBottom="24dp"
+      android:text="@string/social"
+      android:visibility="invisible"
+      app:layout_constraintBottom_toTopOf="@+id/sleepControl"
       app:layout_constraintEnd_toEndOf="parent" />
 
   <TextView
@@ -150,8 +172,8 @@
 
   <ImageView
       android:id="@+id/plusImage"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
+      android:layout_width="83dp"
+      android:layout_height="67dp"
       android:clickable="false"
       android:visibility="invisible"
       app:layout_constraintBottom_toBottomOf="parent"

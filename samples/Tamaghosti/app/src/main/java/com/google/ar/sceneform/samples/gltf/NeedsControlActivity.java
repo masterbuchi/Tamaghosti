@@ -26,33 +26,55 @@ public class NeedsControlActivity extends AppCompatActivity {
 
     public void feed(){
 
-        this.hunger = this.hunger + 10;
-        setHunger(this.hunger);
+        setHunger(10);
         Log.d("SleepDebug", "check Energy in feed " + energy);
         getTired();
     }
-    public void getTired(){
 
-        this.energy = this.energy - 10;
-        setEnergy(this.energy);
+    public void getTired(){
+        setEnergy( - 10);
         Log.d("SleepDebug", "check Energy in tired " + energy);
     }
 
-    public void setEnergy(int energy) {
-        this.energy = energy;
+    public void getHungry(){
+        setHunger( - 10);
     }
 
-    public void setHunger(int hunger) {
-        this.hunger = hunger;
+    public void pet(){
+        setSocial( 10);
+        getTired();
+        getHungry();
+    }
+
+    public void train(){
+        setTraining(10);
+        getTired();
+        getHungry();
+    }
+
+    public void setEnergy(int value) {
+        if (this.energy>=10 || this.energy <=90){
+        this.energy = energy + value;
+        }
+    }
+
+    public void setHunger(int value) {
+        if (this.hunger>=10 || this.hunger <=90){
+            this.hunger = hunger + value;
+        }
 
     }
 
-    public void setSocial(int social) {
-        this.social = social;
+    public void setSocial(int value) {
+        if (this.social>=10 || this.social <=90){
+            this.social = social + value;
+        }
     }
 
-    public void setTraining(int training) {
-        this.training = training;
+    public void setTraining(int value) {
+        if (this.training>=10 || this.training <=90){
+            this.training = training + value;
+        }
     }
 
     public int getEnergy() {
