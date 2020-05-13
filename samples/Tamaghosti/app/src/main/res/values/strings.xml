@@ -62,6 +62,7 @@
     <string name="nav_animations">Actions</string>
 
     <string name="sleep">Sleep</string>
+    <string name="wakeUp">Wake Up</string>
     <!-- Needs Variables -->
 
     <string name="lable_hunger">Hunger</string>

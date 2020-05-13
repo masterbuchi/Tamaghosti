@@ -20,6 +20,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.media.Image;
 import android.net.Uri;
@@ -60,6 +61,7 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import android.content.SharedPreferences;
 
 /**
  * This is a example activity that uses the Sceneform UX package to make common AR tasks easier.
@@ -74,19 +76,21 @@ public class GltfActivity extends AppCompatActivity {
     private int animationCount = 0;
   private ArFragment arFragment;
   private Renderable renderable;
-  ProgressBar prgHunger;
-  ProgressBar prgEnergy;
+    ProgressBar prgHunger;
+    ProgressBar prgEnergy;
     ProgressBar prgSocial;
     ProgressBar prgTraining;
+
     Button changeAnimation;
     Button sleep;
+    ImageView plus;
 
-    private int hunger = 0;
-    private int energy = 80;
-    private int social = 0;
-    private int training = 0;
 
-  private static class AnimationInstance {
+   NeedsControlActivity needsControl = new NeedsControlActivity();
+
+
+
+    private static class AnimationInstance {
     Animator animator;
     Long startTime;
     float duration;
@@ -124,6 +128,17 @@ public class GltfActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+      Intent in = getIntent();
+      final int hValue = in.getIntExtra("hungerValue", 0);
+      needsControl.setHunger(hValue);
+      final int slValue = in.getIntExtra("sleepValue", 0);
+      needsControl.setEnergy(slValue);
+      final int soValue = in.getIntExtra("socialValue", 0);
+      needsControl.setSocial(soValue);
+      final int tValue = in.getIntExtra("trainingValue", 0);
+      needsControl.setTraining(tValue);
+
+      Log.d("SleepOverviewDebug", "current sleepValue1 " + needsControl.getEnergy());
 
 
       if (!checkIsSupportedDeviceOrFinish(this)) {
@@ -193,44 +208,67 @@ public class GltfActivity extends AppCompatActivity {
 
       */
 
+
+
       setContentView(R.layout.activity_ux);
-      setNeeds();
+     setNeeds();
 
 
       changeAnimation = (Button) findViewById(R.id.animationControl);
-
-      Log.d("debug", "button found" + changeAnimation);
-
-        sleep = (Button) findViewById(R.id.sleepControl);
-        sleep.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sleep();
-            }
-        });
-
       changeAnimation.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
 
-              feed();
+              needsControl.feed();
+              setNeeds();
+              plus = (ImageView) findViewById(R.id.plusImage);
+              plus.setVisibility(View.VISIBLE);
+
+              Handler handler = new Handler();
+              handler.postDelayed(new Runnable() {
+                  public void run() {
+                      plus.setVisibility(View.INVISIBLE);
+
+                  }
+              }, 7000);
+
+
               Log.d("animDebug", "counter before " +animationCount);
               if (model != null) {
                   if (animationCount >= 3) {
                       animationCount = 0;
                   }
-                      FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
-                      if (filamentAsset.getAnimator().getAnimationCount() >= 2) {
-                          animators.add(new AnimationInstance(filamentAsset.getAnimator(), animationCount, System.nanoTime()));
-                          Log.d("animDebug", "counter current " + animationCount);
-                      }
-
+                  FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
+                  if (filamentAsset.getAnimator().getAnimationCount() >= 2) {
+                      animators.add(new AnimationInstance(filamentAsset.getAnimator(), animationCount, System.nanoTime()));
+                      Log.d("animDebug", "counter current " + animationCount);
                   }
-                  animationCount++;
-                      Log.d("animDebug", "counter after " + animationCount);
+
+              }
+              animationCount++;
+              Log.d("animDebug", "counter after " + animationCount);
 
           }
       });
+
+
+
+        sleep = (Button) findViewById(R.id.sleepControl);
+        sleep.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("SleepOverviewDebug", "current sleepValue2 " + needsControl.getEnergy());
+
+                Intent intent = new Intent(GltfActivity.this, SleepActivity.class);
+                intent.putExtra("hungerValue", needsControl.getHunger());
+                intent.putExtra("sleepValue", needsControl.getEnergy());
+                intent.putExtra("socialValue", needsControl.getSocial());
+                intent.putExtra("trainingValue", needsControl.getTraining());
+                startActivity(intent);
+            }
+        });
+
+
 
     arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
@@ -387,34 +425,16 @@ public class GltfActivity extends AppCompatActivity {
     }
     return true;
   }
-public void setNeeds(){
-    prgHunger = (ProgressBar)findViewById(R.id.progressHunger);
-    prgHunger.setProgress(hunger);
-    prgEnergy = (ProgressBar)findViewById(R.id.progressEnergy);
-    prgEnergy.setProgress(energy);
-    prgSocial = (ProgressBar)findViewById(R.id.progressSocial);
-    prgSocial.setProgress(social);
-    prgTraining = (ProgressBar)findViewById(R.id.progressTraining);
-    prgTraining.setProgress(training);
 
-
-}
-    public void feed(){
-
-      hunger = hunger + 10;
-        prgHunger.setProgress(hunger);
-        getTired();
-        }
-
-        public void getTired(){
-
-      energy = energy - 10;
-      prgEnergy.setProgress(energy);
-        }
-
-        public void sleep(){
-      energy = 100;
-      prgEnergy.setProgress(energy);
+        public void setNeeds(){
+        prgHunger = (ProgressBar) findViewById(R.id.progressHunger);
+        prgHunger.setProgress(needsControl.getHunger());
+        prgEnergy = (ProgressBar) findViewById(R.id.progressEnergy);
+        prgEnergy.setProgress(needsControl.getEnergy());
+        prgSocial = (ProgressBar) findViewById(R.id.progressSocial);
+        prgSocial.setProgress(needsControl.getSocial());
+        prgTraining = (ProgressBar) findViewById(R.id.progressTraining);
+        prgTraining.setProgress(needsControl.getTraining());
         }
 }
 

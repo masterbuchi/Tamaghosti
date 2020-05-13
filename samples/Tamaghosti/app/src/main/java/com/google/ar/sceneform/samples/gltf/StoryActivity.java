@@ -43,6 +43,7 @@ public class StoryActivity extends AppCompatActivity {
             } else {
 
                 // Save name
+
                 SharedPreferences preferences = getApplicationContext().getSharedPreferences("preferences", MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
 
@@ -57,6 +58,10 @@ public class StoryActivity extends AppCompatActivity {
 
                 // Open GLTFActivity
                 Intent intent = new Intent(StoryActivity.this, GltfActivity.class);
+               intent.putExtra("hungerValue", 50);
+                intent.putExtra("sleepValue", 50);
+                intent.putExtra("socialValue", 50);
+                intent.putExtra("trainingValue", 50);
                 startActivity(intent);
 
             }
