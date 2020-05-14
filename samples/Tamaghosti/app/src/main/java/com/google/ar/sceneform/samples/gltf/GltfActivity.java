@@ -139,66 +139,29 @@ public class GltfActivity extends AppCompatActivity {
     }
 
 
-    // UI Buttons
-
-      // Button
-
-
-
-
 
     /*
 
     // CloudPoints
 
-
-      ArCoreApk
-
     Context newContext = null;
-
       if(apk.checkAvailability(newContext.CAMERA_SERVICE)) {
-
           // Yes
-
-      }
-
-
-
-
-
+     }
       ArCoreApk.Availability available = new ArCoreApk.Availability(Context.CAMERA_SERVICE);
-
-
     available.isSupported(Context.CAMERA_SERVICE);
-
-
       if(ArCoreApk.Availability.SUPPORTED_INSTALLED) {
-
-
-
       }
-
-
     Session session;
-
-
       // ArCoreApk.Availability test = new ArCoreApk.Availability();
-
     //  if () {
-
-
       //}
-
     //Session session = new Session(Context.CAMERA_SERVICE);
-
 //      Frame frame = session.update();
-
       // Automatically releases point cloud resources at end of try block.
   //    try (PointCloud pointCloud = frame.acquirePointCloud()) {
           // Access point cloud data.
     //  }
-
-
       */
 
 

@@ -1,7 +1,6 @@
 package com.google.ar.sceneform.samples.gltf;
 
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +16,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import org.w3c.dom.Text;
 
 import java.util.Timer;
@@ -28,9 +30,15 @@ import static java.lang.Thread.sleep;
 public class SleepActivity extends AppCompatActivity {
     private int energy;
     ProgressBar prgEnergy;
+    private Calendar currentTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sleep);
         Intent in = getIntent();
@@ -46,32 +54,32 @@ public class SleepActivity extends AppCompatActivity {
         Log.d("NeedsDebug", "energy first: " + energy);
 
 
-
-
-
-
         Handler handler1 = new Handler();
-        for (int a = energy; a < 100; a++) {
 
-            handler1.postDelayed(new Runnable() {
+        currentTime = Calendar.getInstance();
+        Calendar updateTime = currentTime;
+        updateTime.add(Calendar.SECOND, 1);
 
-                @Override
-                public void run() {
-                    energy ++;
-                    if (energy == 100){
-                        handler1.removeCallbacksAndMessages(null);
+
+
+        handler1.post(new Runnable() {
+            @Override
+            public void run() {
+                Calendar currentTime;
+
+                while (energy<=100) {
+                    currentTime = Calendar.getInstance();
+                    if (currentTime.getTimeInMillis() >= updateTime.getTimeInMillis()) {
+                        energy ++;
+                        prgEnergy.setProgress(energy);
+                        updateTime.add(Calendar.SECOND, 1);
+                        Log.d("Time", sdf.format(updateTime.getTime()));
                     }
-                    prgEnergy.setProgress(energy);
-                    Log.d("NeedsDebug", "energy inside: " + energy);
                 }
-            }, 1000*a);
 
-            Log.d("NeedsDebug", "energy third: " + energy);
-
-        }
-
-
-
+                handler1.removeCallbacksAndMessages(null);
+            }
+        });
 
 
         Button wakeUp = (Button) findViewById(R.id.wkaeUpControl);
@@ -88,8 +96,8 @@ public class SleepActivity extends AppCompatActivity {
             }
         });
 
-}
 
+    }
 
 
 }
