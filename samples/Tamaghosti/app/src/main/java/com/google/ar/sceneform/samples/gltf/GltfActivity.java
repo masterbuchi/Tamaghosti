@@ -85,6 +85,10 @@ public class GltfActivity extends AppCompatActivity {
     private volatile boolean stopThread = false;
     public volatile FilamentAsset filamentAsset;
     public static volatile int vIndex;
+    public int idle_index = 2;
+    public int eat_index = 0;
+    public int walk_index = 3;
+    public int getPet_index = 1;
 
     NeedsControlActivity needsControl = new NeedsControlActivity();
 
@@ -197,71 +201,12 @@ public class GltfActivity extends AppCompatActivity {
                     showPlus();
                     if (model != null) {
                         //Change Animation mit Handler
-                        ChangeAnimationMethod(0);
+                        ChangeAnimationMethod(eat_index);
                         // if certain duration needed:
-                        float duration = filamentAsset.getAnimator().getAnimationDuration(0);
+                        float duration = filamentAsset.getAnimator().getAnimationDuration(eat_index);
                         startThread(null, duration);
                     }
                 }
-
-
-                /* Chaos zum animationswechsel
-              SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:sss");
-              Log.d("ANIMATION", "start eating ");
-              //Play eat animation
-              if (model != null) {
-                  FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
-                  if (filamentAsset.getAnimator().getAnimationCount() >= 2) {
-                     // float duration = filamentAsset.getAnimator().getAnimationDuration(0);
-                      float duration = 30.70f;
-                        float d = duration * 100;
-                        int e = (int) d;
-                      Log.d("ANIMATION", "duration in int " +e);
-
-
-                      Calendar cTime = Calendar.getInstance();
-                      Calendar dTime = cTime;
-                      Log.d("ANIMATION", "duration  " +d);
-                      Log.d("ANIMATION", "current time " +cTime);
-
-                      dTime.add(Calendar.MILLISECOND, e);
-
-
-                      Log.d("ANIMATION", "update time " +cTime);
-
-
-
-
-                      Handler handler1 = new Handler();
-                          handler1.post(new Runnable() {
-
-                              @Override
-                              public void run() {
-                                  while (true) {
-                                      animators.add(new AnimationInstance(filamentAsset.getAnimator(), 0, System.nanoTime()));
-                                      Log.d("ANIMATION", "new thread huh: ");
-                                  }
-                              }
-                          });
-
-
-                      /*while (cTime.getTimeInMillis() <= dTime.getTimeInMillis()){
-                          cTime = Calendar.getInstance();
-
-                          Log.d("ANIMATION", "still eating " + cTime);
-
-                      }
-
-                      handler1.removeCallbacksAndMessages(null);
-                      Log.d("ANIMATION", "finished now ide pls " + System.nanoTime());
-                      animators.add(new AnimationInstance(filamentAsset.getAnimator(), 1, System.nanoTime()));
-
-                      //filamentAsset.getAnimator().applyAnimation(0, duration);
-                  }
-              }
-              */
-
-
 
             }
         });
@@ -297,7 +242,7 @@ public class GltfActivity extends AppCompatActivity {
                 }
                 if (model != null) {
                     //Change Animation mit Handler
-                    ChangeAnimationMethod(2);
+                    ChangeAnimationMethod(getPet_index);
 
 
                 }
@@ -335,8 +280,9 @@ public class GltfActivity extends AppCompatActivity {
                 .setSource(
                         this,
                         Uri.parse(
-                                //emulator
-                                "https://drive.google.com/uc?export=download&id=11kkfeLIKct6D-0LJQb81WfrC8IxtOTdz"
+
+                                //emulator:
+                                "https://drive.google.com/uc?export=download&id=1qK99AbYEh6scsrVEVo0zEdAjhO1aSEnc"
                                 //tisch dino:
 
 
@@ -417,8 +363,10 @@ public class GltfActivity extends AppCompatActivity {
 
                    // Oben deklariert FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
                     filamentAsset = model.getRenderableInstance().getFilamentAsset();
-                    if (filamentAsset.getAnimator().getAnimationCount() > 2) {
-                        animators.add(new AnimationInstance(filamentAsset.getAnimator(), 1, System.nanoTime()));
+                    if (filamentAsset.getAnimator().getAnimationCount() > 3) {
+                        animators.add(new AnimationInstance(filamentAsset.getAnimator(), idle_index, System.nanoTime()));
+
+
                     }
 
                     Color color = colors.get(nextColor);
@@ -427,37 +375,19 @@ public class GltfActivity extends AppCompatActivity {
                         Material material = renderable.getMaterial(i);
                         material.setFloat4("baseColorFactor", color);
                     }
+                    updateAnimation();
+                    Log.d("DURATION", "just once huh : ");
                 });
 
 
-        // Print - Test
 
 
 
-        updateAnimation();
 
 
 
-    }
-//Animation siehe https://blog.flexiple.com/build-your-first-android-ar-app-using-arcore-and-sceneform/
-    public void updateAnimation(){
 
-        arFragment
-                .getArSceneView()
-                .getScene()
-                .addOnUpdateListener(
-                        frameTime -> {
-                            Long time = System.nanoTime();
-                            for (AnimationInstance animator : animators) {
-                                animator.animator.applyAnimation(
 
-                                        animator.index = vIndex,
-                                        (float) ((time - animator.startTime) / (double) SECONDS.toNanos(1))
-                                                % animator.duration);
-                                animator.animator.updateBoneMatrices();
-
-                            }
-                        });
     }
 
     /**
@@ -569,10 +499,10 @@ public class GltfActivity extends AppCompatActivity {
 
     public void ChangeAnimationMethod(int index) {
         vIndex = index;
-        if (filamentAsset.getAnimator().getAnimationCount() >= 2) {
+        if (filamentAsset.getAnimator().getAnimationCount() >= 3) {
             animators.add(new AnimationInstance(filamentAsset.getAnimator(), vIndex, System.nanoTime()));
             Log.d("ANIMATION", "Animation changed to : " + filamentAsset.getAnimator().getAnimationName(vIndex));
-            updateAnimation();
+            //updateAnimation();
 
         }
     }
@@ -625,7 +555,7 @@ public class GltfActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ChangeAnimationMethod(1);
+                    ChangeAnimationMethod(idle_index);
                     mainAction.setText("eat again");
                     mainAction.setEnabled(true);
 
@@ -634,6 +564,28 @@ public class GltfActivity extends AppCompatActivity {
             }
         }
 
+    //Animation siehe https://blog.flexiple.com/build-your-first-android-ar-app-using-arcore-and-sceneform/
+    public void updateAnimation(){
+
+        arFragment
+                .getArSceneView()
+                .getScene()
+                .addOnUpdateListener(
+                        frameTime -> {
+                            Long time = System.nanoTime();
+                            for (AnimationInstance animator : animators) {
+                                animator.animator.applyAnimation(
+
+                                        animator.index = vIndex,
+                                        (float) ((time - animator.startTime) / (double) SECONDS.toNanos(1))
+                                                % animator.duration);
+                                animator.animator.updateBoneMatrices();
+                                Log.d("DURATION", "Duration animation : " + filamentAsset.getAnimator().getAnimationName(vIndex));
+                                Log.d("DURATION", "Duration animator : " + animator.duration);
+                                Log.d("DURATION", "Duration time : " + (time - animator.startTime) / (double) SECONDS.toNanos(1) % animator.duration);
+                            }
+                        });
+    }
 
 
 
