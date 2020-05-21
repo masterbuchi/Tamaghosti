@@ -86,6 +86,8 @@ public class GltfActivity extends AppCompatActivity {
     private Handler mainHandler = new Handler();
     //volatile == immer aktuellsten wert, nicht cash
     private volatile boolean stopThread = false;
+    public volatile FilamentAsset filamentAsset;
+    public static volatile int vIndex;
 
     NeedsControlActivity needsControl = new NeedsControlActivity();
 
@@ -94,14 +96,14 @@ public class GltfActivity extends AppCompatActivity {
         Animator animator;
         Long startTime;
         float duration;
-        int index;
+        int index = vIndex;
 
 
         AnimationInstance(Animator animator, int index, Long startTime) {
             this.animator = animator;
             this.startTime = startTime;
             this.duration = animator.getAnimationDuration(index);
-            this.index = index;
+            vIndex = index;
         }
     }
 
@@ -138,6 +140,7 @@ public class GltfActivity extends AppCompatActivity {
         needsControl.setTraining(tValue);
 
         Log.d("SleepOverviewDebug", "current sleepValue1 " + needsControl.getEnergy());
+
 
 
 
@@ -390,6 +393,7 @@ public class GltfActivity extends AppCompatActivity {
 
                     TextView textView = findViewById(R.id.modelPosition);
 
+
                     for (int i = 0; i < modelPosition.length; i++) {
 
                         //  Log.i(MODEL_POSITION, i + ": " + modelPosition[i]);
@@ -400,12 +404,14 @@ public class GltfActivity extends AppCompatActivity {
 
 
                     // Create the transformable model and add it to the anchor.
+                    // Transformable makes it possible to scale and drag the model
                     model = new TransformableNode(arFragment.getTransformationSystem());
                     model.setParent(anchorNode);
                     model.setRenderable(renderable);
                     model.select();
 
-                    FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
+                   // Oben deklariert FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
+                    filamentAsset = model.getRenderableInstance().getFilamentAsset();
                     if (filamentAsset.getAnimator().getAnimationCount() > 2) {
                         animators.add(new AnimationInstance(filamentAsset.getAnimator(), 1, System.nanoTime()));
                     }
@@ -424,6 +430,13 @@ public class GltfActivity extends AppCompatActivity {
 
         Log.i(TAG, "This hopefully works");
 
+        updateAnimation();
+
+
+
+    }
+
+    public void updateAnimation(){
 
         arFragment
                 .getArSceneView()
@@ -433,14 +446,15 @@ public class GltfActivity extends AppCompatActivity {
                             Long time = System.nanoTime();
                             for (AnimationInstance animator : animators) {
                                 animator.animator.applyAnimation(
-                                        animator.index,
+
+                                        animator.index = vIndex,
                                         (float) ((time - animator.startTime) / (double) SECONDS.toNanos(1))
                                                 % animator.duration);
                                 animator.animator.updateBoneMatrices();
+                                Log.d("ANIMATION", "ANimation in updateANimation vIndex: " + filamentAsset.getAnimator().getAnimationName(vIndex));
+                                Log.d("ANIMATION", "ANimation in updateANimation index : " + filamentAsset.getAnimator().getAnimationName(  animator.index));
                             }
                         });
-
-
     }
 
     /**
@@ -498,10 +512,11 @@ public class GltfActivity extends AppCompatActivity {
 
 
     public void ChangeAnimationMethod(int index) {
-        FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
+        vIndex = index;
         if (filamentAsset.getAnimator().getAnimationCount() >= 2) {
-            animators.add(new AnimationInstance(filamentAsset.getAnimator(), index, System.nanoTime()));
-            Log.d("ANIMATION", "Animation changed to : " + filamentAsset.getAnimator().getAnimationName(index));
+            animators.add(new AnimationInstance(filamentAsset.getAnimator(), vIndex, System.nanoTime()));
+            Log.d("ANIMATION", "Animation changed to : " + filamentAsset.getAnimator().getAnimationName(vIndex));
+            updateAnimation();
 
         }
     }
@@ -520,13 +535,23 @@ public class GltfActivity extends AppCompatActivity {
         ExampleRunnable(int seconds) {
             this.seconds = seconds;
         }
-
+        int checkDuration;
         @Override
         public void run() {
             for (int i = 0; i < seconds; i++) {
+                checkDuration = i;
                 if (stopThread)
                     return;
                 Log.d("ANIMATION", "new thread count: " + i);
+                Log.d("ANIMATION", "Animation changed to : " + filamentAsset.getAnimator().getAnimationName(vIndex));
+                changeAnimation.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        changeAnimation.setText("HI "+ checkDuration);
+
+
+                    }
+                });
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -556,7 +581,7 @@ public class GltfActivity extends AppCompatActivity {
                             Log.d("ANIMATION", "Old animation again AGAIN: ");
                         }
                     });
-                    Log.d("ANIMATION", "Old animation again: ");
+
                 }
             });
             }
