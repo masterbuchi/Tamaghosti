@@ -34,6 +34,7 @@ public class SleepActivity extends AppCompatActivity {
     private Calendar currentTime;
     public volatile int safeEnergy;
     private volatile boolean stopThread = false;
+    TextView progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,7 @@ public class SleepActivity extends AppCompatActivity {
         this.energy = slValue;
         prgEnergy = (ProgressBar) findViewById(R.id.progressEnergy2);
         prgEnergy.setProgress((int) slValue);
+        progress = (TextView) findViewById(R.id.sleepProgress);
 
         Log.d("SLEEP", "energy first: " + energy);
 
@@ -102,18 +104,22 @@ public class SleepActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            for (int a = energy; a < 100; a++) {
+            for (int a = energy; a <= 100; a++) {
                 if (stopThread)
                     return;
-                if (energy >= 100)
+                if (energy > 100)
                     return;
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         prgEnergy.setProgress(energy);
+                        progress.setText(energy + "%");
+                        if (energy % 10 == 0)
+                            safeEnergy = energy;
+                        Log.d("SLEEP", "progress in 10er steps: " + safeEnergy);
                         Log.d("SLEEP", "progress is growing: " + energy);
                         energy ++;
-                        safeEnergy = energy;
+
                     }
                 });
 

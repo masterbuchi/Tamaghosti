@@ -37,12 +37,13 @@
       app:menu="@menu/navigation" />
 
   <Button
-      android:id="@+id/animationControl"
+      android:id="@+id/mainActionControl"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginEnd="24dp"
       android:layout_marginBottom="24dp"
-      android:text="@string/nav_animations"
+      android:editable="false"
+      android:text="@string/nav_actions"
       app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
       app:layout_constraintEnd_toEndOf="parent" />
 
@@ -53,7 +54,7 @@
       android:layout_marginEnd="24dp"
       android:layout_marginBottom="24dp"
       android:text="@string/sleep"
-      app:layout_constraintBottom_toTopOf="@+id/animationControl"
+      app:layout_constraintBottom_toTopOf="@+id/mainActionControl"
       app:layout_constraintEnd_toEndOf="parent" />
 
   <Button
@@ -183,6 +184,22 @@
       app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintVertical_bias="0.29000002"
       app:srcCompat="@android:drawable/ic_input_add" />
+
+  <CheckedTextView
+      android:id="@+id/hintView"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="60dp"
+      android:autoText="false"
+      android:background="#B2FD7A08"
+      android:checkMarkTint="#FFFFFF"
+      android:clickable="false"
+      android:text="CheckedTextView"
+      android:textAlignment="center"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.498"
+      app:layout_constraintStart_toStartOf="parent" />
 
 
 </android.support.constraint.ConstraintLayout>

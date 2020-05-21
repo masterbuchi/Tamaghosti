@@ -15,7 +15,6 @@
  */
 package com.google.ar.sceneform.samples.gltf;
 
-import static android.os.SystemClock.elapsedRealtime;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import android.app.Activity;
@@ -27,7 +26,6 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.util.ArraySet;
 import android.util.Log;
@@ -35,6 +33,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -54,9 +53,7 @@ import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
@@ -77,8 +74,8 @@ public class GltfActivity extends AppCompatActivity {
     ProgressBar prgEnergy;
     ProgressBar prgSocial;
     ProgressBar prgTraining;
-
-    Button changeAnimation;
+    CheckedTextView hint;
+    Button mainAction;
     Button sleep;
     Button social;
     Button training;
@@ -178,23 +175,36 @@ public class GltfActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_ux);
         setNeeds();
+        hint  = findViewById(R.id.hintView);
+        hintControl(0);
 
+        mainAction = (Button) findViewById(R.id.mainActionControl);
+        sleep = (Button) findViewById(R.id.sleepControl);
+        social = (Button) findViewById(R.id.socialControl);
+        training = (Button) findViewById(R.id.trainingControl);
+        mainAction.setEnabled(false);
+        sleep.setEnabled(false);
+        social.setEnabled(false);
+        training.setEnabled(false);
 
-        changeAnimation = (Button) findViewById(R.id.animationControl);
-        changeAnimation.setOnClickListener(new View.OnClickListener() {
+        //Eat animation, hunger + 10, sleep -10
+        mainAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (needsControl.getHunger() <= 90) {
                     needsControl.feed();
                     setNeeds();
                     showPlus();
+                    if (model != null) {
+                        //Change Animation mit Handler
+                        ChangeAnimationMethod(0);
+                        // if certain duration needed:
+                        float duration = filamentAsset.getAnimator().getAnimationDuration(0);
+                        startThread(null, duration);
+                    }
                 }
 
-                if (model != null) {
-                    //Change Animation mit Handler
-                    ChangeAnimationMethod(0);
-                    startThread(null);
-                }
+
                 /* Chaos zum animationswechsel
               SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:sss");
               Log.d("ANIMATION", "start eating ");
@@ -252,28 +262,13 @@ public class GltfActivity extends AppCompatActivity {
               */
 
 
-//Change Animation old
-              /*
-              Log.d("animDebug", "counter before " +animationCount);
-              if (model != null) {
-                  if (animationCount >= 3) {
-                      animationCount = 0;
-                  }
-                  FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
-                  if (filamentAsset.getAnimator().getAnimationCount() >= 2) {
-                      animators.add(new AnimationInstance(filamentAsset.getAnimator(), animationCount, System.nanoTime()));
-                      Log.d("animDebug", "counter current " + animationCount);
-                  }
 
-              }
-              animationCount++;
-              Log.d("animDebug", "counter after " + animationCount);
-*/
             }
         });
 
+// if (model != null) noch nicht überall implementiert, um tests zu beschleunigen
 
-        sleep = (Button) findViewById(R.id.sleepControl);
+
         sleep.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -288,8 +283,8 @@ public class GltfActivity extends AppCompatActivity {
             }
         });
 
-        social = (Button) findViewById(R.id.socialControl);
-        if (needsControl.getHunger() == 100 && needsControl.getEnergy() == 100) {
+
+        if (needsControl.getHunger() == 100 && needsControl.getEnergy() >= 80) {
             social.setVisibility(View.VISIBLE);
         }
         social.setOnClickListener(new View.OnClickListener() {
@@ -300,13 +295,18 @@ public class GltfActivity extends AppCompatActivity {
                     setNeeds();
                     showPlus();
                 }
+                if (model != null) {
+                    //Change Animation mit Handler
+                    ChangeAnimationMethod(2);
 
+
+                }
                 Log.d("SocialDebug", "pressed " + needsControl.getSocial());
             }
         });
 
-        training = (Button) findViewById(R.id.trainingControl);
-        if (needsControl.getHunger() == 100 && needsControl.getEnergy() == 100 && needsControl.getSocial() == 100) {
+
+        if (needsControl.getHunger() >= 80 && needsControl.getEnergy() >= 80 && needsControl.getSocial() == 100) {
             training.setVisibility(View.VISIBLE);
         }
         training.setOnClickListener(new View.OnClickListener() {
@@ -377,7 +377,12 @@ public class GltfActivity extends AppCompatActivity {
                         return;
 
                     }
-
+                    Log.d("HINT", "hint control 20 should be called");
+                    hintControl(20);
+                    mainAction.setEnabled(true);
+                    sleep.setEnabled(true);
+                    social.setEnabled(true);
+                    training.setEnabled(true);
                     Log.i(TAG, "Place Model");
 
                     modelCounter++;
@@ -428,14 +433,13 @@ public class GltfActivity extends AppCompatActivity {
         // Print - Test
 
 
-        Log.i(TAG, "This hopefully works");
 
         updateAnimation();
 
 
 
     }
-
+//Animation siehe https://blog.flexiple.com/build-your-first-android-ar-app-using-arcore-and-sceneform/
     public void updateAnimation(){
 
         arFragment
@@ -451,8 +455,7 @@ public class GltfActivity extends AppCompatActivity {
                                         (float) ((time - animator.startTime) / (double) SECONDS.toNanos(1))
                                                 % animator.duration);
                                 animator.animator.updateBoneMatrices();
-                                Log.d("ANIMATION", "ANimation in updateANimation vIndex: " + filamentAsset.getAnimator().getAnimationName(vIndex));
-                                Log.d("ANIMATION", "ANimation in updateANimation index : " + filamentAsset.getAnimator().getAnimationName(  animator.index));
+
                             }
                         });
     }
@@ -485,6 +488,59 @@ public class GltfActivity extends AppCompatActivity {
         }
         return true;
     }
+
+    public void hintControl(int c){
+        //hint is Checked text view and can disappear when checked. not implememnted yet
+        int count = c;
+        switch(c){
+            case 0:
+                hint.setText("call your dragon by tapping on plane");
+
+                break;
+            case 1:
+                hint.setText("*name* is hungry, to feed him hit *ACTIONS*");
+
+                break;
+            case 2:
+                hint.setText("*name* seems tired");
+
+                break;
+            case 3:
+                hint.setText("*name* seems sad, give him some love");
+
+                break;
+
+            case 4:
+                hint.setText("*name* needs some training");
+
+                break;
+            case 20:
+                //Control by needs
+                if (needsControl.getHunger() <= 50) {
+                    hintControl(1);
+                } else if (needsControl.getEnergy() <= 20) {
+                    hintControl(2);
+                }  else if (needsControl.getSocial() <= 20) {
+                    hintControl(3);
+                 }else if (needsControl.getTraining() <= 20) {
+                    hintControl(4);
+                } else hintControl(21);
+                break;
+            case 21:
+                hint.setText("care for your dragon");
+
+                break;
+            default:
+                hint.setText("care for your dragon");
+
+                break;
+        }
+
+    }
+
+
+
+
 
     public void showPlus() {
         plus = (ImageView) findViewById(R.id.plusImage);
@@ -521,71 +577,64 @@ public class GltfActivity extends AppCompatActivity {
         }
     }
 
-    public void startThread(View view){
+    public void startThread(View view, float duration){
         stopThread = false;
-        ExampleRunnable runnable = new ExampleRunnable(10);
+        float d = duration * 1000;
+        int e = (int) d;
+        Log.d("ANIMATION", "duration in millis " +e);
+        ExampleRunnable runnable = new ExampleRunnable(e);
         new Thread(runnable).start();
     }
     public void stopThread(View view) {
         stopThread = true;
     }
 
+    //Handler siehe       //siehe  https://codinginflow.com/tutorials/android/starting-a-background-thread
     class ExampleRunnable implements Runnable {
-        int seconds;
+        int milliseconds;
         ExampleRunnable(int seconds) {
-            this.seconds = seconds;
+            this.milliseconds = seconds;
         }
         int checkDuration;
         @Override
         public void run() {
-            for (int i = 0; i < seconds; i++) {
-                checkDuration = i;
+
+
                 if (stopThread)
                     return;
-                Log.d("ANIMATION", "new thread count: " + i);
-                Log.d("ANIMATION", "Animation changed to : " + filamentAsset.getAnimator().getAnimationName(vIndex));
-                changeAnimation.post(new Runnable() {
+                Log.d("ANIMATION", "new thread count: " + milliseconds);
+
+                mainAction.post(new Runnable() {
                     @Override
                     public void run() {
-                        changeAnimation.setText("HI "+ checkDuration);
+                        mainAction.setText("Duration "+ milliseconds);
+                        mainAction.setEnabled(false);
 
 
                     }
                 });
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(milliseconds);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }
 
-                /*Handler threadHandler = new Handler(Looper.getMainLooper());
-                threadHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        ChangeAnimationMethod(1);
-                        Log.d("ANIMATION", "Old animation again: ");
-                    }
-                });*/
 
-          // Unnötig verschachtelt siehe  https://codinginflow.com/tutorials/android/starting-a-background-thread wies richtig geht, aber das ist die einzige version die ein mal funktioneirt hat
+
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     ChangeAnimationMethod(1);
-                    changeAnimation.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            changeAnimation.setText("HI");
-                            ChangeAnimationMethod(1);
-                            Log.d("ANIMATION", "Old animation again AGAIN: ");
-                        }
-                    });
+                    mainAction.setText("eat again");
+                    mainAction.setEnabled(true);
 
                 }
             });
             }
         }
+
+
 
 
 }

@@ -59,7 +59,8 @@
     <string name="nav_train">Training</string>
 
 
-    <string name="nav_animations">Actions</string>
+    <string name="sleep_progress">progress</string>
+    <string name="nav_actions">Actions</string>
     <string name="social">Pet</string>
     <string name="train">Train</string>
     <string name="sleep">Sleep</string>

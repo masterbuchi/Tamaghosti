@@ -60,8 +60,8 @@ public class StoryActivity extends AppCompatActivity {
                 Intent intent = new Intent(StoryActivity.this, GltfActivity.class);
                intent.putExtra("hungerValue", 50);
                 intent.putExtra("sleepValue", 50);
-                intent.putExtra("socialValue", 50);
-                intent.putExtra("trainingValue", 50);
+                intent.putExtra("socialValue", 10);
+                intent.putExtra("trainingValue", 0);
                 startActivity(intent);
 
             }
