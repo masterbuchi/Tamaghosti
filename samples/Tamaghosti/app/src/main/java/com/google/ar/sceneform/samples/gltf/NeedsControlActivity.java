@@ -54,26 +54,26 @@ public class NeedsControlActivity extends AppCompatActivity {
 
     public void setEnergy(int value) {
         if (this.energy>=10 || this.energy <=90){
-        this.energy = energy + value;
+        this.energy += value;
         }
     }
 
     public void setHunger(int value) {
         if (this.hunger>=10 || this.hunger <=90){
-            this.hunger = hunger + value;
+            this.hunger += value;
         }
 
     }
 
     public void setSocial(int value) {
         if (this.social>=10 || this.social <=90){
-            this.social = social + value;
+            this.social += value;
         }
     }
 
     public void setTraining(int value) {
         if (this.training>=10 || this.training <=90){
-            this.training = training + value;
+            this.training += value;
         }
     }
 
