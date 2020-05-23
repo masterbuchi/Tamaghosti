@@ -12,5 +12,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         //TODO: Add Settings Options
 
+        // Active/Deactivate Hints
+
     }
 }

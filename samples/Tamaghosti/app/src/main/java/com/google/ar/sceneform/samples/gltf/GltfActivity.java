@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
@@ -90,8 +91,14 @@ public class GltfActivity extends AppCompatActivity {
     public int walk_index = 3;
     public int getPet_index = 1;
 
-    NeedsControlActivity needsControl = new NeedsControlActivity();
+    Context context;
 
+    NeedsController needsControl = new NeedsController();
+
+    // Local Storage to save variables, not suitable for large amount of data
+    private SharedPreferences mPreferences;
+
+    private String mDragonName;
 
     private static class AnimationInstance {
         Animator animator;
@@ -140,42 +147,19 @@ public class GltfActivity extends AppCompatActivity {
         final int tValue = in.getIntExtra("trainingValue", 0);
         needsControl.setTraining(tValue);
 
+
+
+        context = getApplicationContext();
+
+        mPreferences  = getApplicationContext().getSharedPreferences("preferences", MODE_PRIVATE);
+        mDragonName = mPreferences.getString("dragon_name", null);
+
+
         Log.d("SleepOverviewDebug", "current sleepValue1 " + needsControl.getEnergy());
-
-
-
-
 
         if (!checkIsSupportedDeviceOrFinish(this)) {
             return;
         }
-
-
-
-    /*
-
-    // CloudPoints
-
-    Context newContext = null;
-      if(apk.checkAvailability(newContext.CAMERA_SERVICE)) {
-          // Yes
-     }
-      ArCoreApk.Availability available = new ArCoreApk.Availability(Context.CAMERA_SERVICE);
-    available.isSupported(Context.CAMERA_SERVICE);
-      if(ArCoreApk.Availability.SUPPORTED_INSTALLED) {
-      }
-    Session session;
-      // ArCoreApk.Availability test = new ArCoreApk.Availability();
-    //  if () {
-      //}
-    //Session session = new Session(Context.CAMERA_SERVICE);
-//      Frame frame = session.update();
-      // Automatically releases point cloud resources at end of try block.
-  //    try (PointCloud pointCloud = frame.acquirePointCloud()) {
-          // Access point cloud data.
-    //  }
-      */
-
 
         setContentView(R.layout.activity_ux);
         setNeeds();
@@ -254,6 +238,7 @@ public class GltfActivity extends AppCompatActivity {
         if (needsControl.getHunger() >= 80 && needsControl.getEnergy() >= 80 && needsControl.getSocial() == 100) {
             training.setVisibility(View.VISIBLE);
         }
+
         training.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -276,7 +261,7 @@ public class GltfActivity extends AppCompatActivity {
         // Beispieldatei aus Googledrive fuer passendes Linkformat
         // https://drive.google.com/uc?export=download&id=
 
-        ModelRenderable.builder()
+        /*ModelRenderable.builder()
                 .setSource(
                         this,
                         Uri.parse(
@@ -306,23 +291,28 @@ public class GltfActivity extends AppCompatActivity {
                         });
 
 
+         */
+
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
+
+                    Toast.makeText(context, "Tapped", Toast.LENGTH_SHORT).show();
+
                     if (renderable == null) {
 
                         Log.i(TAG, "Model not available");
 
                         return;
-                    }
 
-                    if (modelCounter >= modelLimit) {
-
+                    } else if (modelCounter >= modelLimit) {
 
                         Log.i(TAG, "Reached ModelLimit");
 
                         return;
 
                     }
+
+
                     Log.d("HINT", "hint control 20 should be called");
                     hintControl(20);
                     mainAction.setEnabled(true);
@@ -340,14 +330,13 @@ public class GltfActivity extends AppCompatActivity {
 
 
                     // Get Object Position
+
                     float[] modelPosition = anchor.getPose().getTranslation();
 
                     TextView textView = findViewById(R.id.modelPosition);
 
 
                     for (int i = 0; i < modelPosition.length; i++) {
-
-                        //  Log.i(MODEL_POSITION, i + ": " + modelPosition[i]);
 
                         textView.setText(textView.getText() + "\n" + modelPosition[i]);
 
@@ -377,6 +366,9 @@ public class GltfActivity extends AppCompatActivity {
                     }
                     updateAnimation();
                     Log.d("DURATION", "just once huh : ");
+
+
+
                 });
 
 
@@ -419,29 +411,29 @@ public class GltfActivity extends AppCompatActivity {
         return true;
     }
 
-    public void hintControl(int c){
+    public void hintControl(int value){
         //hint is Checked text view and can disappear when checked. not implememnted yet
-        int count = c;
-        switch(c){
+
+        switch(value){
             case 0:
                 hint.setText("call your dragon by tapping on plane");
 
                 break;
             case 1:
-                hint.setText("*name* is hungry, to feed him hit *ACTIONS*");
+                hint.setText(mDragonName + " is hungry, to feed him hit *ACTIONS*");
 
                 break;
             case 2:
-                hint.setText("*name* seems tired");
+                hint.setText(mDragonName + " seems tired");
 
                 break;
             case 3:
-                hint.setText("*name* seems sad, give him some love");
+                hint.setText(mDragonName + " seems sad, give him some love");
 
                 break;
 
             case 4:
-                hint.setText("*name* needs some training");
+                hint.setText(mDragonName + " needs some training");
 
                 break;
             case 20:

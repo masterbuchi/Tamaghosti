@@ -7,15 +7,7 @@ import android.util.Log;
 import android.widget.ProgressBar;
 
 
-public class NeedsControlActivity extends AppCompatActivity {
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-    }
+public class NeedsController {
 
 
     private int hunger;
