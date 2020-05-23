@@ -261,7 +261,7 @@ public class GltfActivity extends AppCompatActivity {
         // Beispieldatei aus Googledrive fuer passendes Linkformat
         // https://drive.google.com/uc?export=download&id=
 
-        /*ModelRenderable.builder()
+        ModelRenderable.builder()
                 .setSource(
                         this,
                         Uri.parse(
@@ -291,12 +291,14 @@ public class GltfActivity extends AppCompatActivity {
                         });
 
 
-         */
+
 
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
 
                     Toast.makeText(context, "Tapped", Toast.LENGTH_SHORT).show();
+
+                    Log.i("Button: ", "CLICKED!");
 
                     if (renderable == null) {
 
@@ -367,9 +369,7 @@ public class GltfActivity extends AppCompatActivity {
                     updateAnimation();
                     Log.d("DURATION", "just once huh : ");
 
-
-
-                });
+         });
 
 
 
