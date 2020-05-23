@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
@@ -61,6 +62,7 @@ import java.util.Set;
  * This is a example activity that uses the Sceneform UX package to make common AR tasks easier.
  */
 public class GltfActivity extends AppCompatActivity {
+
     private static final String TAG = GltfActivity.class.getSimpleName();
     private static final double MIN_OPENGL_VERSION = 3.0;
     private static final String MODEL_POSITION = "MODEL_POSITION";
@@ -93,6 +95,11 @@ public class GltfActivity extends AppCompatActivity {
     Button training;
     ImageView plus;
     NeedsControlActivity needsControl = new NeedsControlActivity();
+    private AppAnchorState appAnchorState = AppAnchorState.NONE;
+    private Anchor anchor;
+    // Cloud Anchor auf dem selben Gerät
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor editor;
     private boolean modelSet = false;
     private int animationCount = 0;
     private ArFragment arFragment;
@@ -138,6 +145,11 @@ public class GltfActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        // Cloud Anchor on same device
+        prefs = getSharedPreferences("AnchorId", MODE_PRIVATE);
+        editor = prefs.edit();
+
         Intent in = getIntent();
         final int hValue = in.getIntExtra("hungerValue", 0);
         needsControl.setHunger(hValue);
@@ -158,6 +170,8 @@ public class GltfActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_ux);
         setNeeds();
+
+
         hint = findViewById(R.id.hintView);
         hintControl(0);
 
@@ -254,15 +268,7 @@ public class GltfActivity extends AppCompatActivity {
 
         ModelRenderable.builder()
                 .setSource(
-                        this,
-                        Uri.parse(
-
-                                //emulator:
-                                "https://drive.google.com/uc?export=download&id=1qK99AbYEh6scsrVEVo0zEdAjhO1aSEnc"
-                                //tisch dino:
-
-
-                        ))
+                        this, R.raw.dino)
                 .setIsFilamentGltf(true)
                 .build()
                 .thenAccept(
@@ -274,10 +280,9 @@ public class GltfActivity extends AppCompatActivity {
                         })
                 .exceptionally(
                         throwable -> {
-                            Toast toast =
-                                    Toast.makeText(this, "Unable to load Model renderable", Toast.LENGTH_LONG);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
+
+                            showToast("Drache konnte nicht geladen werden");
+
                             return null;
                         });
 
@@ -285,12 +290,13 @@ public class GltfActivity extends AppCompatActivity {
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
                     if (renderable == null) {
-                        Log.d(TAG, "Drache nicht verfuegbar");
+                        showToast("Drachendatei ist nicht verfügbar");
+
                         return;
                     }
 
                     if (modelSet) {
-                        Log.d(TAG, "Drache bereits gesetzt");
+                        showToast("Drache bereits gesetzt");
                         return;
                     }
 
@@ -301,12 +307,16 @@ public class GltfActivity extends AppCompatActivity {
                     sleep.setEnabled(true);
                     social.setEnabled(true);
                     training.setEnabled(true);
-                    Log.d(TAG, "Place Model");
 
+                    showToast("Drache gesetzt. Hosting...");
+                    modelSet = true;
 
 
                     // Create the Anchor.
-                    Anchor anchor = hitResult.createAnchor();
+
+                    anchor = arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
+                    appAnchorState = AppAnchorState.HOSTING;
+
                     AnchorNode anchorNode = new AnchorNode(anchor);
                     anchorNode.setParent(arFragment.getArSceneView().getScene());
 
@@ -344,48 +354,86 @@ public class GltfActivity extends AppCompatActivity {
                     updateAnimation();
                     Log.d("DURATION", "just once huh : ");
 
-                    modelSet = true;
+
                 });
 
 
+        // Cloud Anchor Sachen
+        arFragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
+
+            if (appAnchorState != AppAnchorState.HOSTING)
+                return;
+            Anchor.CloudAnchorState cloudAnchorState = anchor.getCloudAnchorState();
+
+            if (cloudAnchorState.isError()) {
+                showToast(cloudAnchorState.toString());
+            } else if (cloudAnchorState == Anchor.CloudAnchorState.SUCCESS) {
+                appAnchorState = AppAnchorState.HOSTED;
+
+                String anchorId = anchor.getCloudAnchorId();
+                editor.putString("anchorId", anchorId);
+                editor.apply();
+                showToast("Anchor hosted sucessfully. Anchor Id: " + anchorId);
+            }
+
+        });
+
+        Button resolve = findViewById(R.id.resolve);
+        resolve.setOnClickListener(view -> {
+            String anchorId = prefs.getString("anchorId","null");
+            if (anchorId.equals("null")) {
+                showToast("No anchor found");
+                return;
+            }
+
+            Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
+            showToast("Hat geklappt");
+        });
+
+    }
+
+    private void showToast(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
     public void hintControl(int c) {
-        //hint is Checked text view and can disappear when checked. not implememnted yet
+        //hint is Checked text view and can disappear when checked. not implemented yet
         int count = c;
         switch (c) {
             case 0:
-                hint.setText("call your dragon by tapping on plane");
+                showToast("Call your Dragon by tapping on plane");
+
                 break;
             case 1:
-                hint.setText("*name* is hungry, to feed him hit *ACTIONS*");
+                showToast("*name* is hungry, to feed him hit *ACTIONS*");
+
                 break;
             case 2:
-                hint.setText("*name* seems tired");
+                showToast("*name* seems tired");
+
                 break;
             case 3:
-                hint.setText("*name* seems sad, give him some love");
+                showToast("*name* seems sad, give him some love");
+
                 break;
             case 4:
-                hint.setText("*name* needs some training");
+                showToast("*name* needs some training");
+
                 break;
             case 20:
                 //Control by needs
                 if (needsControl.getHunger() <= 50) {
-                    hintControl(1);
+                    hintControl(1); break;
                 } else if (needsControl.getEnergy() <= 20) {
-                    hintControl(2);
+                    hintControl(2); break;
                 } else if (needsControl.getSocial() <= 20) {
-                    hintControl(3);
+                    hintControl(3); break;
                 } else if (needsControl.getTraining() <= 20) {
-                    hintControl(4);
-                } else hintControl(21);
-                break;
-            case 21:
-                hint.setText("care for your dragon");
-                break;
-            default:
-                hint.setText("care for your dragon");
+                    hintControl(4); break;
+                }
+
+                default:
+                showToast("care for your dragon");
                 break;
         }
 
@@ -461,6 +509,12 @@ public class GltfActivity extends AppCompatActivity {
                         });
     }
 
+    private enum AppAnchorState {
+        NONE,
+        HOSTING,
+        HOSTED
+    }
+
     private static class AnimationInstance {
         Animator animator;
         Long startTime;
@@ -476,7 +530,7 @@ public class GltfActivity extends AppCompatActivity {
         }
     }
 
-    //Handler siehe       //siehe  https://codinginflow.com/tutorials/android/starting-a-background-thread
+    //Handler siehe  https://codinginflow.com/tutorials/android/starting-a-background-thread
     class ExampleRunnable implements Runnable {
         int milliseconds;
         int checkDuration;
