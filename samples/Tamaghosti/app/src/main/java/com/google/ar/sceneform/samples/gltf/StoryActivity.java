@@ -21,6 +21,9 @@ public class StoryActivity extends AppCompatActivity {
 
         Button startGameButton = findViewById(R.id.storyButton);
 
+        PersistenceManager persistenceManager = new PersistenceManager(getApplicationContext());
+
+
 
         startGameButton.setOnClickListener(view -> {
 
@@ -42,23 +45,12 @@ public class StoryActivity extends AppCompatActivity {
 
             } else {
 
-                // Save name
+                persistenceManager.saveString("dragon_name", nameField.getText().toString());
+                persistenceManager.saveBoolean("first_start", false);
 
-                SharedPreferences preferences = getApplicationContext().getSharedPreferences("preferences", MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-
-                editor.putString("dragon_name", nameField.getText().toString());
-
-                // Change first start to false -> Continue Button will be available next start
-                editor.putBoolean("first_start", false);
-
-                editor.commit();
-
-
-
-                // Open GLTFActivity
+                // Open GLTFActivity -- Start Values
                 Intent intent = new Intent(StoryActivity.this, GltfActivity.class);
-               intent.putExtra("hungerValue", 50);
+                intent.putExtra("hungerValue", 50);
                 intent.putExtra("sleepValue", 50);
                 intent.putExtra("socialValue", 10);
                 intent.putExtra("trainingValue", 0);

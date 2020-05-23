@@ -22,14 +22,18 @@ public class MainMenuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
-        // Mode Private: Nur die App kann auf die Daten zugreifen
-        SharedPreferences preferences = getApplicationContext().getSharedPreferences("preferences", MODE_PRIVATE);
+        PersistenceManager persistenceManager = new PersistenceManager(getApplicationContext());
 
-        SharedPreferences.Editor editor = preferences.edit();
+        // Mode Private: Nur die App kann auf die Daten zugreifen
+        //SharedPreferences preferences = getApplicationContext().getSharedPreferences("preferences", MODE_PRIVATE);
+
+        //SharedPreferences.Editor editor = preferences.edit();
 
 
         // Def-value: Value to return if this preference does not exist
-        boolean firstStart = preferences.getBoolean("first_start", true);
+        boolean firstStart = persistenceManager.getBoolean("first_start", true);
+
+        //preferences.getBoolean("first_start", true);
 
 
         if(!firstStart) {
@@ -68,14 +72,5 @@ public class MainMenuActivity extends AppCompatActivity {
         });
 
     }
-
-    public static int dpToPixel(float dp, Context context){
-
-        int result = (int) (dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT));
-
-        return result;
-
-    }
-
 
 }

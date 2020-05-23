@@ -95,10 +95,9 @@ public class GltfActivity extends AppCompatActivity {
 
     NeedsController needsControl = new NeedsController();
 
-    // Local Storage to save variables, not suitable for large amount of data
-    private SharedPreferences mPreferences;
 
     private String mDragonName;
+    private PersistenceManager persistenceManager;
 
     private static class AnimationInstance {
         Animator animator;
@@ -147,12 +146,11 @@ public class GltfActivity extends AppCompatActivity {
         final int tValue = in.getIntExtra("trainingValue", 0);
         needsControl.setTraining(tValue);
 
-
-
         context = getApplicationContext();
 
-        mPreferences  = getApplicationContext().getSharedPreferences("preferences", MODE_PRIVATE);
-        mDragonName = mPreferences.getString("dragon_name", null);
+        persistenceManager = new PersistenceManager(getApplicationContext());
+
+        mDragonName = persistenceManager.getString("dragon_name", null);
 
 
         Log.d("SleepOverviewDebug", "current sleepValue1 " + needsControl.getEnergy());
