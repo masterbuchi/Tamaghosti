@@ -30,7 +30,7 @@ public class StoryActivity extends AppCompatActivity {
             String name = nameField.getText().toString();
 
             // Input abfangen
-            if(name.length() == 0) {
+            if (name.length() == 0) {
 
                 Context context = getApplicationContext();
                 CharSequence text = "Don't forget to name your dragon!";
@@ -55,10 +55,9 @@ public class StoryActivity extends AppCompatActivity {
                 editor.commit();
 
 
-
                 // Open GLTFActivity
                 Intent intent = new Intent(StoryActivity.this, GltfActivity.class);
-               intent.putExtra("hungerValue", 50);
+                intent.putExtra("hungerValue", 50);
                 intent.putExtra("sleepValue", 50);
                 intent.putExtra("socialValue", 10);
                 intent.putExtra("trainingValue", 0);
