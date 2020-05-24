@@ -46,6 +46,7 @@ import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.HitTestResult;
 import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.ModelRenderable;
@@ -62,7 +63,31 @@ import java.util.Set;
 /**
  * This is a example activity that uses the Sceneform UX package to make common AR tasks easier.
  */
+
+
 public class GltfActivity extends AppCompatActivity {
+
+
+    private enum AppAnchorState {
+        NONE,
+        HOSTING,
+        HOSTED
+    }
+
+    private static class AnimationInstance {
+        Animator animator;
+        Long startTime;
+        float duration;
+        int index = vIndex;
+
+
+        AnimationInstance(Animator animator, int index, Long startTime) {
+            this.animator = animator;
+            this.startTime = startTime;
+            this.duration = animator.getAnimationDuration(index);
+            vIndex = index;
+        }
+    }
 
     private static final String TAG = GltfActivity.class.getSimpleName();
     private static final double MIN_OPENGL_VERSION = 3.0;
@@ -96,12 +121,10 @@ public class GltfActivity extends AppCompatActivity {
     ImageView plus;
 
 
-
     NeedsController needsControl = new NeedsController();
 
     private String mDragonName;
     private PersistenceManager persistenceManager;
-
 
 
     private AppAnchorState appAnchorState = AppAnchorState.NONE;
@@ -187,7 +210,7 @@ public class GltfActivity extends AppCompatActivity {
         setNeeds();
 
 
-         hintControl(0);
+        hintControl(0);
 
         mainAction = (Button) findViewById(R.id.mainActionControl);
         sleep = (Button) findViewById(R.id.sleepControl);
@@ -296,25 +319,19 @@ public class GltfActivity extends AppCompatActivity {
                 .exceptionally(
                         throwable -> {
 
-                            showToast("Drache konnte nicht geladen werden");
+                            showToast("while loading an error occurred.");
 
                             return null;
                         });
 
 
-
-
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
-
                     showToast("Tapped");
-
                     if (renderable == null) {
-                        showToast("Drachendatei ist nicht verfügbar");
-
+                        showToast("model failed to load");
                         return;
                     }
-
                     if (modelSet) {
                         showToast("Drache bereits gesetzt");
                         return;
@@ -328,44 +345,19 @@ public class GltfActivity extends AppCompatActivity {
                     social.setEnabled(true);
                     training.setEnabled(true);
 
-                    showToast("Drache gesetzt. Hosting...");
+                    showToast(mDragonName + " woke up. Hosting...");
                     modelSet = true;
 
 
                     // Create the Anchor.
+                    AnchorNode anchorNode = createAnchor(hitResult);
 
-                    anchor = arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
-                    appAnchorState = AppAnchorState.HOSTING;
+                    // Update Model Position
+                    updateModelPosition();
 
-                    AnchorNode anchorNode = new AnchorNode(anchor);
-                    anchorNode.setParent(arFragment.getArSceneView().getScene());
+                    // Create the transformable model and add it to the anchorNode.
+                    createModel(anchorNode);
 
-
-                    // Get Object Position
-
-                    float[] modelPosition = anchor.getPose().getTranslation();
-
-                    TextView textView = findViewById(R.id.modelPosition);
-
-
-                    for (float v : modelPosition) {
-                        //  Log.i(MODEL_POSITION, i + ": " + modelPosition[i]);
-                        textView.setText(textView.getText() + "\n" + v);
-                    }
-
-                    // Create the transformable model and add it to the anchor.
-                    // Transformable makes it possible to scale and drag the model
-                    model = new TransformableNode(arFragment.getTransformationSystem());
-
-                    // Deaktiviert Roation und Translation des Drachen
-                    model.getTranslationController().setEnabled(false);
-                    model.getRotationController().setEnabled(false);
-
-                    //     model.getScaleController().setEnabled(false);
-
-                    model.setParent(anchorNode);
-                    model.setRenderable(renderable);
-                    model.select();
 
                     // Oben deklariert FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
                     filamentAsset = model.getRenderableInstance().getFilamentAsset();
@@ -379,9 +371,8 @@ public class GltfActivity extends AppCompatActivity {
                         Material material = renderable.getMaterial(i);
                         material.setFloat4("baseColorFactor", color);
                     }
-                    updateAnimation();
-                    Log.d("DURATION", "just once huh : ");
 
+                    updateAnimation();
 
                 });
 
@@ -408,7 +399,7 @@ public class GltfActivity extends AppCompatActivity {
 
         Button resolve = findViewById(R.id.resolve);
         resolve.setOnClickListener(view -> {
-            String anchorId = prefs.getString("anchorId","null");
+            String anchorId = prefs.getString("anchorId", "null");
             if (anchorId.equals("null")) {
                 showToast("No anchor found");
                 return;
@@ -420,16 +411,54 @@ public class GltfActivity extends AppCompatActivity {
 
     }
 
+    private AnchorNode createAnchor(HitResult hitResult) {
+        anchor = arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
+        appAnchorState = AppAnchorState.HOSTING;
+
+        AnchorNode anchorNode = new AnchorNode(anchor);
+        anchorNode.setParent(arFragment.getArSceneView().getScene());
+
+        return anchorNode;
+    }
+
+    private void createModel(AnchorNode anchorNode) {
+        // Transformable makes it possible to scale and drag the model
+        model = new TransformableNode(arFragment.getTransformationSystem());
+
+        // Deaktiviert Roation und Translation des Drachen
+        model.getTranslationController().setEnabled(false);
+        model.getRotationController().setEnabled(false);
+        //     model.getScaleController().setEnabled(false);
+
+        model.setParent(anchorNode);
+        model.setRenderable(renderable);
+        model.select();
+
+    }
+
+
+    private void updateModelPosition() {
+        float[] modelPosition = anchor.getPose().getTranslation();
+
+        TextView textView = findViewById(R.id.modelPosition);
+
+
+        for (float v : modelPosition) {
+            //  Log.i(MODEL_POSITION, i + ": " + modelPosition[i]);
+            textView.setText(textView.getText() + "\n" + v);
+        }
+    }
+
     private void showToast(String s) {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
-    public void hintControl(int value){
+    public void hintControl(int value) {
         //hint is Checked text view and can disappear when checked. not implememnted yet
 
-        switch(value){
+        switch (value) {
             case 0:
-                showToast("Call your Dragon by tapping on plane");
+                showToast("Call " + mDragonName + " by tapping on plane");
 
                 break;
             case 1:
@@ -451,16 +480,20 @@ public class GltfActivity extends AppCompatActivity {
             case 20:
                 //Control by needs
                 if (needsControl.getHunger() <= 50) {
-                    hintControl(1); break;
+                    hintControl(1);
+                    break;
                 } else if (needsControl.getEnergy() <= 20) {
-                    hintControl(2); break;
+                    hintControl(2);
+                    break;
                 } else if (needsControl.getSocial() <= 20) {
-                    hintControl(3); break;
+                    hintControl(3);
+                    break;
                 } else if (needsControl.getTraining() <= 20) {
-                    hintControl(4); break;
+                    hintControl(4);
+                    break;
                 }
 
-                default:
+            default:
                 showToast("care for your dragon");
                 break;
         }
@@ -537,26 +570,6 @@ public class GltfActivity extends AppCompatActivity {
                         });
     }
 
-    private enum AppAnchorState {
-        NONE,
-        HOSTING,
-        HOSTED
-    }
-
-    private static class AnimationInstance {
-        Animator animator;
-        Long startTime;
-        float duration;
-        int index = vIndex;
-
-
-        AnimationInstance(Animator animator, int index, Long startTime) {
-            this.animator = animator;
-            this.startTime = startTime;
-            this.duration = animator.getAnimationDuration(index);
-            vIndex = index;
-        }
-    }
 
     //Handler siehe  https://codinginflow.com/tutorials/android/starting-a-background-thread
     class ExampleRunnable implements Runnable {
