@@ -71,7 +71,8 @@
     <string name="lable_social">Social</string>
     <string name="lable_energy">Energy</string>
     <string name="lable_training">Training</string>
-
+    <string name="resolve">Resolve</string>
+    <string name="plus_sign">Plus Sign</string>
 
 
 </resources>

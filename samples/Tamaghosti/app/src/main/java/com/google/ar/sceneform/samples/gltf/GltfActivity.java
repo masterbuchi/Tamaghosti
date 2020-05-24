@@ -52,6 +52,7 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
+import com.google.ar.sceneform.ux.FootprintSelectionVisualizer;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -347,9 +348,9 @@ public class GltfActivity extends AppCompatActivity {
                     TextView textView = findViewById(R.id.modelPosition);
 
 
-                    for (int i = 0; i < modelPosition.length; i++) {
+                    for (float v : modelPosition) {
                         //  Log.i(MODEL_POSITION, i + ": " + modelPosition[i]);
-                        textView.setText(textView.getText() + "\n" + modelPosition[i]);
+                        textView.setText(textView.getText() + "\n" + v);
                     }
 
                     // Create the transformable model and add it to the anchor.
