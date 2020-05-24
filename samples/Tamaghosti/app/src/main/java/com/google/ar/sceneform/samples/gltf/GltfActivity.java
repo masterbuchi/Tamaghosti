@@ -88,7 +88,6 @@ public class GltfActivity extends AppCompatActivity {
     ProgressBar prgEnergy;
     ProgressBar prgSocial;
     ProgressBar prgTraining;
-    CheckedTextView hint;
     Button mainAction;
     Button sleep;
     Button social;
@@ -96,7 +95,7 @@ public class GltfActivity extends AppCompatActivity {
     ImageView plus;
 
 
-    Context context;
+
     NeedsController needsControl = new NeedsController();
 
     private String mDragonName;
@@ -106,14 +105,18 @@ public class GltfActivity extends AppCompatActivity {
 
     private AppAnchorState appAnchorState = AppAnchorState.NONE;
     private Anchor anchor;
+
     // Cloud Anchor auf dem selben Gerät
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
+
+
     private boolean modelSet = false;
     private int animationCount = 0;
     private ArFragment arFragment;
     private Renderable renderable;
     private Handler mainHandler = new Handler();
+
     //volatile == immer aktuellsten wert, nicht cache
     private volatile boolean stopThread = false;
     private int nextColor = 0;
@@ -169,10 +172,7 @@ public class GltfActivity extends AppCompatActivity {
         final int tValue = in.getIntExtra("trainingValue", 0);
         needsControl.setTraining(tValue);
 
-        context = getApplicationContext();
-
         persistenceManager = new PersistenceManager(getApplicationContext());
-
         mDragonName = persistenceManager.getString("dragon_name", null);
 
 
@@ -186,8 +186,7 @@ public class GltfActivity extends AppCompatActivity {
         setNeeds();
 
 
-        hint = findViewById(R.id.hintView);
-        hintControl(0);
+         hintControl(0);
 
         mainAction = (Button) findViewById(R.id.mainActionControl);
         sleep = (Button) findViewById(R.id.sleepControl);
@@ -307,9 +306,7 @@ public class GltfActivity extends AppCompatActivity {
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
 
-                    Toast.makeText(context, "Tapped", Toast.LENGTH_SHORT).show();
-
-                    Log.i("Button: ", "CLICKED!");
+                    showToast("Tapped");
 
                     if (renderable == null) {
                         showToast("Drachendatei ist nicht verfügbar");
@@ -428,19 +425,19 @@ public class GltfActivity extends AppCompatActivity {
 
                 break;
             case 1:
-                hint.setText(mDragonName + " is hungry, to feed him hit *ACTIONS*");
+                showToast(mDragonName + " is hungry, to feed him hit *ACTIONS*");
 
                 break;
             case 2:
-                hint.setText(mDragonName + " seems tired");
+                showToast(mDragonName + " seems tired");
 
                 break;
             case 3:
-                hint.setText(mDragonName + " seems sad, give him some love");
+                showToast(mDragonName + " seems sad, give him some love");
 
                 break;
             case 4:
-                hint.setText(mDragonName + " needs some training");
+                showToast(mDragonName + " needs some training");
 
                 break;
             case 20:
@@ -476,13 +473,13 @@ public class GltfActivity extends AppCompatActivity {
     }
 
     public void setNeeds() {
-        prgHunger = (ProgressBar) findViewById(R.id.progressHunger);
+        prgHunger = findViewById(R.id.progressHunger);
         prgHunger.setProgress(needsControl.getHunger());
-        prgEnergy = (ProgressBar) findViewById(R.id.progressEnergy);
+        prgEnergy = findViewById(R.id.progressEnergy);
         prgEnergy.setProgress(needsControl.getEnergy());
-        prgSocial = (ProgressBar) findViewById(R.id.progressSocial);
+        prgSocial = findViewById(R.id.progressSocial);
         prgSocial.setProgress(needsControl.getSocial());
-        prgTraining = (ProgressBar) findViewById(R.id.progressTraining);
+        prgTraining = findViewById(R.id.progressTraining);
         prgTraining.setProgress(needsControl.getTraining());
     }
 
