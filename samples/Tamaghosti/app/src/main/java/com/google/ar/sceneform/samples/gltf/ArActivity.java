@@ -28,7 +28,6 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.MovementMethod;
 import android.util.ArraySet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -51,7 +50,6 @@ import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
-import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.lang.ref.WeakReference;
 import java.util.Set;
@@ -96,7 +94,7 @@ public class ArActivity extends AppCompatActivity {
     public int eat_index = 0;
     public int walk_index = 3;
     public int getPet_index = 1;
-    TransformableNode model;
+    DragonNode model;
     ProgressBar prgHunger;
     ProgressBar prgEnergy;
     ProgressBar prgSocial;
@@ -451,7 +449,7 @@ public class ArActivity extends AppCompatActivity {
 
     private void createModel(AnchorNode anchorNode) {
         // Transformable makes it possible to scale and drag the model
-        model = new TransformableNode(arFragment.getTransformationSystem());
+        model = new DragonNode(arFragment.getTransformationSystem());
 
         // Deactivate Rotation and Translation
         model.getTranslationController().setEnabled(false);
