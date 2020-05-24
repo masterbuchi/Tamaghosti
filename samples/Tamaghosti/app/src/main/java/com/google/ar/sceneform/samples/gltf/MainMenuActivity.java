@@ -36,7 +36,7 @@ public class MainMenuActivity extends AppCompatActivity {
         //preferences.getBoolean("first_start", true);
 
 
-        if(!firstStart) {
+        if (!firstStart) {
 
             // Make Continue Button visible
             ConstraintLayout layout = findViewById(R.id.mainMenuLayout);

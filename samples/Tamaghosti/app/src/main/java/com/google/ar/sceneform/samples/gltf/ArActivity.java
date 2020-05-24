@@ -22,7 +22,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
@@ -30,11 +29,9 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.ArraySet;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -46,14 +43,12 @@ import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.HitTestResult;
 import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
-import com.google.ar.sceneform.ux.FootprintSelectionVisualizer;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -65,7 +60,7 @@ import java.util.Set;
  */
 
 
-public class GltfActivity extends AppCompatActivity {
+public class ArActivity extends AppCompatActivity {
 
 
     private enum AppAnchorState {
@@ -89,7 +84,7 @@ public class GltfActivity extends AppCompatActivity {
         }
     }
 
-    private static final String TAG = GltfActivity.class.getSimpleName();
+    private static final String TAG = ArActivity.class.getSimpleName();
     private static final double MIN_OPENGL_VERSION = 3.0;
     private static final String MODEL_POSITION = "MODEL_POSITION";
     public static volatile int vIndex;
@@ -212,6 +207,128 @@ public class GltfActivity extends AppCompatActivity {
 
         hintControl(0);
 
+
+        setButtonListeners();
+
+
+
+        arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
+
+        WeakReference<ArActivity> weakActivity = new WeakReference<>(this);
+
+        // Winkemann-link:  //"https://drive.google.com/uc?export=download&id=1eidGtNQDjHZrFC-xQOtFoZgYu7OqMBfU"
+        // Beispieldatei aus Googledrive fuer passendes Linkformat
+        // https://drive.google.com/uc?export=download&id=
+
+        ModelRenderable.builder()
+                .setSource(
+                        this, R.raw.dino)
+                .setIsFilamentGltf(true)
+                .build()
+                .thenAccept(
+                        modelRenderable -> {
+                            ArActivity activity = weakActivity.get();
+                            if (activity != null) {
+                                activity.renderable = modelRenderable;
+                            }
+                        })
+                .exceptionally(
+                        throwable -> {
+
+                            showToast("while loading an error occurred.");
+
+                            return null;
+                        });
+
+
+        arFragment.setOnTapArPlaneListener(
+                (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
+                    showToast("Tapped");
+                    if (renderable == null) {
+                        showToast("model failed to load");
+                        return;
+                    } else if (modelSet) {
+                        showToast("Drache bereits gesetzt");
+                        return;
+                    }
+
+                    hintControl(20);
+                    mainAction.setEnabled(true);
+                    sleep.setEnabled(true);
+                    social.setEnabled(true);
+                    training.setEnabled(true);
+
+                    showToast(mDragonName + " woke up. Hosting...");
+                    modelSet = true;
+
+
+                    // Create the Anchor.
+                    AnchorNode anchorNode = createAnchor(hitResult);
+
+
+
+                    // Create the transformable model and add it to the anchorNode.
+                    createModel(anchorNode);
+
+
+                    // Oben deklariert FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
+                    filamentAsset = model.getRenderableInstance().getFilamentAsset();
+                    if (filamentAsset.getAnimator().getAnimationCount() > 3) {
+                        animators.add(new AnimationInstance(filamentAsset.getAnimator(), idle_index, System.nanoTime()));
+                    }
+
+                    Color color = colors.get(nextColor);
+                    nextColor++;
+                    for (int i = 0; i < renderable.getSubmeshCount(); ++i) {
+                        Material material = renderable.getMaterial(i);
+                        material.setFloat4("baseColorFactor", color);
+                    }
+
+
+                    // Update Model Position
+                    updateModelPosition();
+
+                    // Update the Animation of the Model
+                    updateAnimation();
+
+                });
+
+
+        // Cloud Anchor Sachen
+        arFragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
+
+            if (appAnchorState != AppAnchorState.HOSTING)
+                return;
+            Anchor.CloudAnchorState cloudAnchorState = anchor.getCloudAnchorState();
+
+            if (cloudAnchorState.isError()) {
+                showToast(cloudAnchorState.toString());
+            } else if (cloudAnchorState == Anchor.CloudAnchorState.SUCCESS) {
+                appAnchorState = AppAnchorState.HOSTED;
+
+                String anchorId = anchor.getCloudAnchorId();
+                editor.putString("anchorId", anchorId);
+                editor.apply();
+                showToast("Anchor hosted sucessfully. Anchor Id: " + anchorId);
+            }
+
+        });
+
+        Button resolve = findViewById(R.id.resolve);
+        resolve.setOnClickListener(view -> {
+            String anchorId = prefs.getString("anchorId", "null");
+            if (anchorId.equals("null")) {
+                showToast("No anchor found");
+                return;
+            }
+
+            Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
+            showToast("Hat geklappt");
+        });
+
+    }
+
+    private void setButtonListeners() {
         mainAction = (Button) findViewById(R.id.mainActionControl);
         sleep = (Button) findViewById(R.id.sleepControl);
         social = (Button) findViewById(R.id.socialControl);
@@ -249,7 +366,7 @@ public class GltfActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Log.d("SleepOverviewDebug", "current sleepValue2 " + needsControl.getEnergy());
 
-                Intent intent = new Intent(GltfActivity.this, SleepActivity.class);
+                Intent intent = new Intent(ArActivity.this, SleepActivity.class);
                 intent.putExtra("hungerValue", needsControl.getHunger());
                 intent.putExtra("sleepValue", needsControl.getEnergy());
                 intent.putExtra("socialValue", needsControl.getSocial());
@@ -294,121 +411,6 @@ public class GltfActivity extends AppCompatActivity {
                 Log.d("SocialDebug", "pressed " + needsControl.getTraining());
             }
         });
-
-
-        arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
-
-        WeakReference<GltfActivity> weakActivity = new WeakReference<>(this);
-
-        // Winkemann-link:  //"https://drive.google.com/uc?export=download&id=1eidGtNQDjHZrFC-xQOtFoZgYu7OqMBfU"
-        // Beispieldatei aus Googledrive fuer passendes Linkformat
-        // https://drive.google.com/uc?export=download&id=
-
-        ModelRenderable.builder()
-                .setSource(
-                        this, R.raw.dino)
-                .setIsFilamentGltf(true)
-                .build()
-                .thenAccept(
-                        modelRenderable -> {
-                            GltfActivity activity = weakActivity.get();
-                            if (activity != null) {
-                                activity.renderable = modelRenderable;
-                            }
-                        })
-                .exceptionally(
-                        throwable -> {
-
-                            showToast("while loading an error occurred.");
-
-                            return null;
-                        });
-
-
-        arFragment.setOnTapArPlaneListener(
-                (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
-                    showToast("Tapped");
-                    if (renderable == null) {
-                        showToast("model failed to load");
-                        return;
-                    }
-                    if (modelSet) {
-                        showToast("Drache bereits gesetzt");
-                        return;
-                    }
-
-
-                    Log.d("HINT", "hint control 20 should be called");
-                    hintControl(20);
-                    mainAction.setEnabled(true);
-                    sleep.setEnabled(true);
-                    social.setEnabled(true);
-                    training.setEnabled(true);
-
-                    showToast(mDragonName + " woke up. Hosting...");
-                    modelSet = true;
-
-
-                    // Create the Anchor.
-                    AnchorNode anchorNode = createAnchor(hitResult);
-
-                    // Update Model Position
-                    updateModelPosition();
-
-                    // Create the transformable model and add it to the anchorNode.
-                    createModel(anchorNode);
-
-
-                    // Oben deklariert FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
-                    filamentAsset = model.getRenderableInstance().getFilamentAsset();
-                    if (filamentAsset.getAnimator().getAnimationCount() > 3) {
-                        animators.add(new AnimationInstance(filamentAsset.getAnimator(), idle_index, System.nanoTime()));
-                    }
-
-                    Color color = colors.get(nextColor);
-                    nextColor++;
-                    for (int i = 0; i < renderable.getSubmeshCount(); ++i) {
-                        Material material = renderable.getMaterial(i);
-                        material.setFloat4("baseColorFactor", color);
-                    }
-
-                    updateAnimation();
-
-                });
-
-
-        // Cloud Anchor Sachen
-        arFragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
-
-            if (appAnchorState != AppAnchorState.HOSTING)
-                return;
-            Anchor.CloudAnchorState cloudAnchorState = anchor.getCloudAnchorState();
-
-            if (cloudAnchorState.isError()) {
-                showToast(cloudAnchorState.toString());
-            } else if (cloudAnchorState == Anchor.CloudAnchorState.SUCCESS) {
-                appAnchorState = AppAnchorState.HOSTED;
-
-                String anchorId = anchor.getCloudAnchorId();
-                editor.putString("anchorId", anchorId);
-                editor.apply();
-                showToast("Anchor hosted sucessfully. Anchor Id: " + anchorId);
-            }
-
-        });
-
-        Button resolve = findViewById(R.id.resolve);
-        resolve.setOnClickListener(view -> {
-            String anchorId = prefs.getString("anchorId", "null");
-            if (anchorId.equals("null")) {
-                showToast("No anchor found");
-                return;
-            }
-
-            Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
-            showToast("Hat geklappt");
-        });
-
     }
 
     private AnchorNode createAnchor(HitResult hitResult) {
@@ -425,7 +427,7 @@ public class GltfActivity extends AppCompatActivity {
         // Transformable makes it possible to scale and drag the model
         model = new TransformableNode(arFragment.getTransformationSystem());
 
-        // Deaktiviert Roation und Translation des Drachen
+        // Deactivate Rotation and Translation
         model.getTranslationController().setEnabled(false);
         model.getRotationController().setEnabled(false);
         //     model.getScaleController().setEnabled(false);
@@ -494,7 +496,7 @@ public class GltfActivity extends AppCompatActivity {
                 }
 
             default:
-                showToast("care for your dragon");
+                showToast("Care for " + mDragonName);
                 break;
         }
 
