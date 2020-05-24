@@ -94,7 +94,16 @@ public class GltfActivity extends AppCompatActivity {
     Button social;
     Button training;
     ImageView plus;
-    NeedsControlActivity needsControl = new NeedsControlActivity();
+
+
+    Context context;
+    NeedsController needsControl = new NeedsController();
+
+    private String mDragonName;
+    private PersistenceManager persistenceManager;
+
+
+
     private AppAnchorState appAnchorState = AppAnchorState.NONE;
     private Anchor anchor;
     // Cloud Anchor auf dem selben Gerät
