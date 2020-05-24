@@ -17,6 +17,7 @@ package com.google.ar.sceneform.samples.gltf;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -27,6 +28,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.MovementMethod;
 import android.util.ArraySet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -36,6 +38,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.animation.LinearInterpolator;
+
 
 import com.google.android.filament.gltfio.Animator;
 import com.google.android.filament.gltfio.FilamentAsset;
@@ -128,6 +132,13 @@ public class ArActivity extends AppCompatActivity {
     private volatile boolean stopThread = false;
     private int nextColor = 0;
 
+
+    // Movement Transition
+    boolean transitionStart;
+    AnchorNode moveAnchorNode;
+    Vector3 currentPos;
+    Vector3 endPose;
+
     /**
      * Returns false and displays an error message if Sceneform can not run, true if Sceneform can run
      * on this device.
@@ -199,7 +210,6 @@ public class ArActivity extends AppCompatActivity {
         setButtonListeners();
 
 
-
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
         WeakReference<ArActivity> weakActivity = new WeakReference<>(this);
@@ -240,9 +250,15 @@ public class ArActivity extends AppCompatActivity {
 
 
                     if (modelSet) {
-                        changePositionOfModel(hitResult);
-                        showToast("Position of Dragon changed");
-                     }
+
+                       /* if (!transitionStart) {
+                            startTransition(hitResult);
+                        }
+*/
+
+                       changePositionOfModel(hitResult);
+                        //showToast("Position of Dragon changed");
+                    }
 
 
                     if (model == null) {
@@ -284,6 +300,7 @@ public class ArActivity extends AppCompatActivity {
         // Cloud Anchor Sachen
         arFragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
 
+
             if (appAnchorState != AppAnchorState.HOSTING)
                 return;
             Anchor.CloudAnchorState cloudAnchorState = anchor.getCloudAnchorState();
@@ -301,6 +318,7 @@ public class ArActivity extends AppCompatActivity {
 
         });
 
+
         Button resolve = findViewById(R.id.resolve);
         resolve.setOnClickListener(view -> {
             String anchorId = prefs.getString("anchorId", "null");
@@ -312,6 +330,27 @@ public class ArActivity extends AppCompatActivity {
             Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
             showToast("Hat geklappt");
         });
+
+    }
+
+    private void startTransition(HitResult hitResult) {
+
+
+        transitionStart = true;
+        moveAnchorNode = new AnchorNode(hitResult.createAnchor());
+        moveAnchorNode.setParent(arFragment.getArSceneView().getScene());
+        endPose = moveAnchorNode.getWorldPosition();
+
+        ObjectAnimator animator = new ObjectAnimator();
+        animator.setTarget(model);
+        animator.setPropertyName("translation");
+        animator.setFloatValues(model.getWorldPosition().x, endPose.x);
+        animator.setDuration(1000);
+        animator.setInterpolator(new LinearInterpolator());
+        animator.start();
+
+        showToast("Position changing to " + endPose.x);
+
 
     }
 
@@ -426,16 +465,14 @@ public class ArActivity extends AppCompatActivity {
     }
 
     private void changePositionOfModel(HitResult hitResult) {
-        AnchorNode moveAnchorNode = new AnchorNode(hitResult.createAnchor());
-        moveAnchorNode.setParent(arFragment.getArSceneView().getScene());
-        Vector3 movePosition = moveAnchorNode.getWorldPosition();
+        AnchorNode instantMoveAnchorNode = new AnchorNode(hitResult.createAnchor());
+        instantMoveAnchorNode.setParent(arFragment.getArSceneView().getScene());
+        Vector3 movePosition = instantMoveAnchorNode.getWorldPosition();
         model.setWorldPosition(movePosition);
 
         /*showToast(String.valueOf(movePosition.x));
         showToast(String.valueOf(movePosition.y));
         showToast(String.valueOf(movePosition.z));*/
-
-
     }
 
 
