@@ -43,6 +43,7 @@ import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.ModelRenderable;
@@ -86,19 +87,10 @@ public class ArActivity extends AppCompatActivity {
 
     private static final String TAG = ArActivity.class.getSimpleName();
     private static final double MIN_OPENGL_VERSION = 3.0;
-    private static final String MODEL_POSITION = "MODEL_POSITION";
+
     public static volatile int vIndex;
     private final Set<AnimationInstance> animators = new ArraySet<>();
-    private final List<Color> colors =
-            Arrays.asList(
-                    new Color(0, 0, 0, 1),
-                    new Color(1, 0, 0, 1),
-                    new Color(0, 1, 0, 1),
-                    new Color(0, 0, 1, 1),
-                    new Color(1, 1, 0, 1),
-                    new Color(0, 1, 1, 1),
-                    new Color(1, 0, 1, 1),
-                    new Color(1, 1, 1, 1));
+
     public volatile FilamentAsset filamentAsset;
     public int idle_index = 2;
     public int eat_index = 0;
@@ -244,31 +236,51 @@ public class ArActivity extends AppCompatActivity {
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
                     showToast("Tapped");
+
                     if (renderable == null) {
                         showToast("model failed to load");
                         return;
-                    } else if (modelSet) {
-                        showToast("Drache bereits gesetzt");
-                        return;
                     }
 
-                    hintControl(20);
-                    mainAction.setEnabled(true);
-                    sleep.setEnabled(true);
-                    social.setEnabled(true);
-                    training.setEnabled(true);
 
-                    showToast(mDragonName + " woke up. Hosting...");
-                    modelSet = true;
+                    if (modelSet) {
+                         showToast("Drache bereits gesetzt");
 
 
-                    // Create the Anchor.
-                    AnchorNode anchorNode = createAnchor(hitResult);
+                        AnchorNode moveAnchorNode = new AnchorNode(hitResult.createAnchor());
+
+                        moveAnchorNode.setParent(arFragment.getArSceneView().getScene());
+
+                        Vector3 movePosition = moveAnchorNode.getWorldPosition();
+
+                        showToast(String.valueOf(movePosition.x));
+                        showToast(String.valueOf(movePosition.y));
+                        showToast(String.valueOf(movePosition.z));
+
+                        model.setWorldPosition(movePosition);
+
+                     }
 
 
+                    if (model == null) {
 
-                    // Create the transformable model and add it to the anchorNode.
-                    createModel(anchorNode);
+                        hintControl(20);
+                        mainAction.setEnabled(true);
+                        sleep.setEnabled(true);
+                        social.setEnabled(true);
+                        training.setEnabled(true);
+
+                        showToast(mDragonName + " woke up. Hosting...");
+                        modelSet = true;
+
+
+                        // Create the Anchor.
+                        AnchorNode anchorNode = createAnchor(hitResult);
+
+
+                        // Create the transformable model and add it to the anchorNode.
+                        createModel(anchorNode);
+                    }
 
 
                     // Oben deklariert FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
@@ -276,14 +288,6 @@ public class ArActivity extends AppCompatActivity {
                     if (filamentAsset.getAnimator().getAnimationCount() > 3) {
                         animators.add(new AnimationInstance(filamentAsset.getAnimator(), idle_index, System.nanoTime()));
                     }
-
-                    Color color = colors.get(nextColor);
-                    nextColor++;
-                    for (int i = 0; i < renderable.getSubmeshCount(); ++i) {
-                        Material material = renderable.getMaterial(i);
-                        material.setFloat4("baseColorFactor", color);
-                    }
-
 
                     // Update Model Position
                     updateModelPosition();
@@ -440,20 +444,26 @@ public class ArActivity extends AppCompatActivity {
 
 
     private void updateModelPosition() {
-        float[] modelPosition = anchor.getPose().getTranslation();
-
+        Vector3 modelPosition = model.getWorldPosition();
         TextView textView = findViewById(R.id.modelPosition);
+        textView.setText("");
+        textView.setText(String.valueOf(modelPosition.x) + "\n" + String.valueOf(modelPosition.y) + "\n" + String.valueOf(modelPosition.z));
+    }
 
-
+    /*private void updateModelPosition() {
+        float[] modelPosition = anchor.getPose().getTranslation();
+        TextView textView = findViewById(R.id.modelPosition);
+        textView.setText("");
         for (float v : modelPosition) {
             //  Log.i(MODEL_POSITION, i + ": " + modelPosition[i]);
             textView.setText(textView.getText() + "\n" + v);
         }
-    }
+    }*/
 
     private void showToast(String s) {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
+
 
     public void hintControl(int value) {
         //hint is Checked text view and can disappear when checked. not implememnted yet
