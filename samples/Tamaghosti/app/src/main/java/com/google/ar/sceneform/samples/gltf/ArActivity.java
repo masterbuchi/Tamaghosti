@@ -44,16 +44,12 @@ import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.Color;
-import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -244,21 +240,8 @@ public class ArActivity extends AppCompatActivity {
 
 
                     if (modelSet) {
-                         showToast("Drache bereits gesetzt");
-
-
-                        AnchorNode moveAnchorNode = new AnchorNode(hitResult.createAnchor());
-
-                        moveAnchorNode.setParent(arFragment.getArSceneView().getScene());
-
-                        Vector3 movePosition = moveAnchorNode.getWorldPosition();
-
-                        showToast(String.valueOf(movePosition.x));
-                        showToast(String.valueOf(movePosition.y));
-                        showToast(String.valueOf(movePosition.z));
-
-                        model.setWorldPosition(movePosition);
-
+                        changePositionOfModel(hitResult);
+                        showToast("Position of Dragon changed");
                      }
 
 
@@ -290,7 +273,7 @@ public class ArActivity extends AppCompatActivity {
                     }
 
                     // Update Model Position
-                    updateModelPosition();
+                    updateModelPositionWindow();
 
                     // Update the Animation of the Model
                     updateAnimation();
@@ -442,23 +425,27 @@ public class ArActivity extends AppCompatActivity {
 
     }
 
+    private void changePositionOfModel(HitResult hitResult) {
+        AnchorNode moveAnchorNode = new AnchorNode(hitResult.createAnchor());
+        moveAnchorNode.setParent(arFragment.getArSceneView().getScene());
+        Vector3 movePosition = moveAnchorNode.getWorldPosition();
+        model.setWorldPosition(movePosition);
 
-    private void updateModelPosition() {
+        /*showToast(String.valueOf(movePosition.x));
+        showToast(String.valueOf(movePosition.y));
+        showToast(String.valueOf(movePosition.z));*/
+
+
+    }
+
+
+    private void updateModelPositionWindow() {
         Vector3 modelPosition = model.getWorldPosition();
         TextView textView = findViewById(R.id.modelPosition);
         textView.setText("");
         textView.setText(String.valueOf(modelPosition.x) + "\n" + String.valueOf(modelPosition.y) + "\n" + String.valueOf(modelPosition.z));
     }
 
-    /*private void updateModelPosition() {
-        float[] modelPosition = anchor.getPose().getTranslation();
-        TextView textView = findViewById(R.id.modelPosition);
-        textView.setText("");
-        for (float v : modelPosition) {
-            //  Log.i(MODEL_POSITION, i + ": " + modelPosition[i]);
-            textView.setText(textView.getText() + "\n" + v);
-        }
-    }*/
 
     private void showToast(String s) {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
