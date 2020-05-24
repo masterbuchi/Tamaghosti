@@ -355,6 +355,13 @@ public class GltfActivity extends AppCompatActivity {
                     // Create the transformable model and add it to the anchor.
                     // Transformable makes it possible to scale and drag the model
                     model = new TransformableNode(arFragment.getTransformationSystem());
+
+                    // Deaktiviert Roation und Translation des Drachen
+                    model.getTranslationController().setEnabled(false);
+                    model.getRotationController().setEnabled(false);
+
+                    //     model.getScaleController().setEnabled(false);
+
                     model.setParent(anchorNode);
                     model.setRenderable(renderable);
                     model.select();

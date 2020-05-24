@@ -7,35 +7,6 @@
     tools:context=".GltfActivity">
 
 
-  <fragment
-      android:id="@+id/ux_fragment"
-      android:name="com.google.ar.sceneform.ux.ArFragment"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      tools:layout_editor_absoluteX="-84dp"
-      tools:layout_editor_absoluteY="152dp" />
-
-  <TextView
-      android:id="@+id/modelPosition"
-      android:layout_width="98dp"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="8dp"
-      android:layout_marginTop="8dp"
-      android:text="@string/model_position"
-      android:textColor="@android:color/holo_red_dark"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@+id/ux_fragment" />
-
-  <android.support.design.widget.BottomNavigationView
-      android:id="@+id/bottomNavigationView"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:background="@color/cardview_shadow_start_color"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:menu="@menu/navigation" />
-
   <Button
       android:id="@+id/mainActionControl"
       android:layout_width="wrap_content"
@@ -79,97 +50,15 @@
       app:layout_constraintBottom_toTopOf="@+id/sleepControl"
       app:layout_constraintEnd_toEndOf="parent" />
 
-  <TextView
-      android:id="@+id/lableHunger"
+  <Button
+      android:id="@+id/resolve"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginTop="8dp"
-      android:layout_marginEnd="8dp"
-      android:text="@string/lable_hunger"
-      app:layout_constraintEnd_toEndOf="parent"
+      android:layout_marginStart="8dp"
+      android:layout_marginTop="80dp"
+      android:text="Resolve"
+      app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
-
-  <TextView
-      android:id="@+id/lableSocial"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="8dp"
-      android:layout_marginEnd="8dp"
-      android:text="@string/lable_social"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/lableEnergy2" />
-
-  <TextView
-      android:id="@+id/lableTraining"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="8dp"
-      android:layout_marginEnd="8dp"
-      android:text="@string/lable_training"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/lableSocial" />
-
-  <TextView
-      android:id="@+id/lableEnergy2"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="8dp"
-      android:layout_marginEnd="8dp"
-      android:text="@string/lable_energy"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/lableHunger" />
-
-  <ProgressBar
-      android:id="@+id/progressHunger"
-      style="?android:attr/progressBarStyleHorizontal"
-      android:layout_width="157dp"
-      android:layout_height="16dp"
-      android:layout_marginTop="8dp"
-      android:layout_marginEnd="70dp"
-      android:background="#00F8F8F8"
-      android:foregroundTint="#00ED1B1B"
-      android:indeterminateTint="#FBFBFB"
-      android:max="100"
-      android:progress="50"
-      android:progressTint="#80CBC4"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
-
-  <ProgressBar
-      android:id="@+id/progressEnergy"
-      style="?android:attr/progressBarStyleHorizontal"
-      android:layout_width="157dp"
-      android:layout_height="16dp"
-      android:layout_marginTop="12dp"
-      android:layout_marginEnd="70dp"
-      android:max="100"
-      android:progress="50"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/progressHunger" />
-
-  <ProgressBar
-      android:id="@+id/progressTraining"
-      style="?android:attr/progressBarStyleHorizontal"
-      android:layout_width="157dp"
-      android:layout_height="16dp"
-      android:layout_marginTop="12dp"
-      android:layout_marginEnd="70dp"
-      android:max="100"
-      android:progress="0"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/progressSocial" />
-
-  <ProgressBar
-      android:id="@+id/progressSocial"
-      style="?android:attr/progressBarStyleHorizontal"
-      android:layout_width="157dp"
-      android:layout_height="16dp"
-      android:layout_marginTop="12dp"
-      android:layout_marginEnd="70dp"
-      android:max="100"
-      android:progress="0"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/progressEnergy" />
 
   <ImageView
       android:id="@+id/plusImage"
@@ -185,29 +74,126 @@
       app:layout_constraintVertical_bias="0.29000002"
       app:srcCompat="@android:drawable/ic_input_add" />
 
-  <CheckedTextView
-      android:id="@+id/hintView"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="60dp"
-      android:autoText="false"
-      android:background="#B2FD7A08"
-      android:checkMarkTint="#FFFFFF"
-      android:clickable="false"
-      android:text="CheckedTextView"
-      android:textAlignment="center"
-      app:layout_constraintBottom_toBottomOf="parent"
+  <ProgressBar
+      android:id="@+id/progressHunger"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="157dp"
+      android:layout_height="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginEnd="104dp"
+      android:background="#00F8F8F8"
+      android:foregroundTint="#00ED1B1B"
+      android:indeterminateTint="#FBFBFB"
+      android:max="100"
+      android:progress="50"
+      android:progressTint="#80CBC4"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.498"
-      app:layout_constraintStart_toStartOf="parent" />
+      app:layout_constraintTop_toTopOf="parent" />
 
-  <Button
-      android:id="@+id/resolve"
+  <ProgressBar
+      android:id="@+id/progressEnergy"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="157dp"
+      android:layout_height="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginEnd="104dp"
+      android:max="100"
+      android:progress="50"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/progressHunger" />
+
+  <ProgressBar
+      android:id="@+id/progressTraining"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="157dp"
+      android:layout_height="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginEnd="104dp"
+      android:max="100"
+      android:progress="0"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/progressSocial" />
+
+  <ProgressBar
+      android:id="@+id/progressSocial"
+      style="?android:attr/progressBarStyleHorizontal"
+      android:layout_width="157dp"
+      android:layout_height="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginEnd="104dp"
+      android:max="100"
+      android:progress="0"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/progressEnergy" />
+
+  <TextView
+      android:id="@+id/modelPosition"
+      android:layout_width="98dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:layout_marginTop="8dp"
+      android:text="@string/model_position"
+      android:textColor="@android:color/holo_red_dark"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="@+id/ux_fragment" />
+
+  <TextView
+      android:id="@+id/lableHunger"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Resolve"
-      tools:layout_editor_absoluteX="14dp"
-      tools:layout_editor_absoluteY="143dp" />
+      android:layout_marginTop="16dp"
+      android:layout_marginEnd="36dp"
+      android:text="@string/lable_hunger"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  <TextView
+      android:id="@+id/lableSocial"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="12dp"
+      android:layout_marginEnd="44dp"
+      android:text="@string/lable_social"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/lableEnergy2" />
+
+  <TextView
+      android:id="@+id/lableTraining"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="12dp"
+      android:layout_marginEnd="32dp"
+      android:text="@string/lable_training"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/lableSocial" />
+
+  <TextView
+      android:id="@+id/lableEnergy2"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="12dp"
+      android:layout_marginEnd="40dp"
+      android:text="@string/lable_energy"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/lableHunger" />
+
+  <android.support.design.widget.BottomNavigationView
+      android:id="@+id/bottomNavigationView"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@color/cardview_shadow_start_color"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:menu="@menu/navigation" />
+
+  <fragment
+      android:id="@+id/ux_fragment"
+      android:name="com.google.ar.sceneform.ux.ArFragment"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      tools:layout_editor_absoluteX="-84dp"
+      tools:layout_editor_absoluteY="152dp" />
 
 
 </android.support.constraint.ConstraintLayout>
