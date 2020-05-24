@@ -33,7 +33,7 @@ public class StoryActivity extends AppCompatActivity {
             String name = nameField.getText().toString();
 
             // Input abfangen
-            if(name.length() == 0) {
+            if (name.length() == 0) {
 
                 Context context = getApplicationContext();
                 CharSequence text = "Don't forget to name your dragon!";
@@ -49,6 +49,20 @@ public class StoryActivity extends AppCompatActivity {
                 persistenceManager.saveBoolean("first_start", false);
 
                 // Open GLTFActivity -- Start Values
+                // Save name
+
+                SharedPreferences preferences = getApplicationContext().getSharedPreferences("preferences", MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+
+                editor.putString("dragon_name", nameField.getText().toString());
+
+                // Change first start to false -> Continue Button will be available next start
+                editor.putBoolean("first_start", false);
+
+                editor.commit();
+
+
+                // Open GLTFActivity
                 Intent intent = new Intent(StoryActivity.this, GltfActivity.class);
                 intent.putExtra("hungerValue", 50);
                 intent.putExtra("sleepValue", 50);

@@ -66,7 +66,13 @@ public class ArFragment extends BaseArFragment {
 
   @Override
   protected Config getSessionConfiguration(Session session) {
-    return new Config(session);
+    Config config = new Config(session);
+    config.setCloudAnchorMode(Config.CloudAnchorMode.ENABLED);
+    config.setFocusMode(Config.FocusMode.AUTO);
+    session.configure(config);
+
+    this.getArSceneView().setupSession(session);
+    return config;
   }
 
   

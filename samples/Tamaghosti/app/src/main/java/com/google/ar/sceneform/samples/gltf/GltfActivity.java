@@ -62,61 +62,12 @@ import java.util.Set;
  * This is a example activity that uses the Sceneform UX package to make common AR tasks easier.
  */
 public class GltfActivity extends AppCompatActivity {
+
     private static final String TAG = GltfActivity.class.getSimpleName();
     private static final double MIN_OPENGL_VERSION = 3.0;
     private static final String MODEL_POSITION = "MODEL_POSITION";
-    TransformableNode model;
-    private int modelLimit = 1;
-    private int modelCounter = 0;
-    private int animationCount = 0;
-    private ArFragment arFragment;
-    private Renderable renderable;
-    ProgressBar prgHunger;
-    ProgressBar prgEnergy;
-    ProgressBar prgSocial;
-    ProgressBar prgTraining;
-    CheckedTextView hint;
-    Button mainAction;
-    Button sleep;
-    Button social;
-    Button training;
-    ImageView plus;
-    private Handler mainHandler = new Handler();
-    //volatile == immer aktuellsten wert, nicht cash
-    private volatile boolean stopThread = false;
-    public volatile FilamentAsset filamentAsset;
     public static volatile int vIndex;
-    public int idle_index = 2;
-    public int eat_index = 0;
-    public int walk_index = 3;
-    public int getPet_index = 1;
-
-    Context context;
-
-    NeedsController needsControl = new NeedsController();
-
-
-    private String mDragonName;
-    private PersistenceManager persistenceManager;
-
-    private static class AnimationInstance {
-        Animator animator;
-        Long startTime;
-        float duration;
-        int index = vIndex;
-
-
-        AnimationInstance(Animator animator, int index, Long startTime) {
-            this.animator = animator;
-            this.startTime = startTime;
-            this.duration = animator.getAnimationDuration(index);
-            vIndex = index;
-        }
-    }
-
     private final Set<AnimationInstance> animators = new ArraySet<>();
-
-
     private final List<Color> colors =
             Arrays.asList(
                     new Color(0, 0, 0, 1),
@@ -127,7 +78,65 @@ public class GltfActivity extends AppCompatActivity {
                     new Color(0, 1, 1, 1),
                     new Color(1, 0, 1, 1),
                     new Color(1, 1, 1, 1));
+    public volatile FilamentAsset filamentAsset;
+    public int idle_index = 2;
+    public int eat_index = 0;
+    public int walk_index = 3;
+    public int getPet_index = 1;
+    TransformableNode model;
+    ProgressBar prgHunger;
+    ProgressBar prgEnergy;
+    ProgressBar prgSocial;
+    ProgressBar prgTraining;
+    CheckedTextView hint;
+    Button mainAction;
+    Button sleep;
+    Button social;
+    Button training;
+    ImageView plus;
+    NeedsControlActivity needsControl = new NeedsControlActivity();
+    private AppAnchorState appAnchorState = AppAnchorState.NONE;
+    private Anchor anchor;
+    // Cloud Anchor auf dem selben Gerät
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor editor;
+    private boolean modelSet = false;
+    private int animationCount = 0;
+    private ArFragment arFragment;
+    private Renderable renderable;
+    private Handler mainHandler = new Handler();
+    //volatile == immer aktuellsten wert, nicht cache
+    private volatile boolean stopThread = false;
     private int nextColor = 0;
+
+    /**
+     * Returns false and displays an error message if Sceneform can not run, true if Sceneform can run
+     * on this device.
+     *
+     * <p>Sceneform requires Android N on the device as well as OpenGL 3.0 capabilities.
+     *
+     * <p>Finishes the activity if Sceneform can not run
+     */
+    public static boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
+        if (Build.VERSION.SDK_INT < VERSION_CODES.N) {
+            Log.e(TAG, "Sceneform requires Android N or later");
+            Toast.makeText(activity, "Sceneform requires Android N or later", Toast.LENGTH_LONG).show();
+            activity.finish();
+            return false;
+        }
+        String openGlVersionString =
+                ((ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE))
+                        .getDeviceConfigurationInfo()
+                        .getGlEsVersion();
+        if (Double.parseDouble(openGlVersionString) < MIN_OPENGL_VERSION) {
+            Log.e(TAG, "Sceneform requires OpenGL ES 3.0 later");
+            Toast.makeText(activity, "Sceneform requires OpenGL ES 3.0 or later", Toast.LENGTH_LONG)
+                    .show();
+            activity.finish();
+            return false;
+        }
+        return true;
+    }
 
     @Override
     @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
@@ -135,6 +144,11 @@ public class GltfActivity extends AppCompatActivity {
     // FutureReturnValueIgnored is not valid
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        // Cloud Anchor on same device
+        prefs = getSharedPreferences("AnchorId", MODE_PRIVATE);
+        editor = prefs.edit();
 
         Intent in = getIntent();
         final int hValue = in.getIntExtra("hungerValue", 0);
@@ -161,7 +175,9 @@ public class GltfActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_ux);
         setNeeds();
-        hint  = findViewById(R.id.hintView);
+
+
+        hint = findViewById(R.id.hintView);
         hintControl(0);
 
         mainAction = (Button) findViewById(R.id.mainActionControl);
@@ -225,8 +241,6 @@ public class GltfActivity extends AppCompatActivity {
                 if (model != null) {
                     //Change Animation mit Handler
                     ChangeAnimationMethod(getPet_index);
-
-
                 }
                 Log.d("SocialDebug", "pressed " + needsControl.getSocial());
             }
@@ -245,7 +259,6 @@ public class GltfActivity extends AppCompatActivity {
                     setNeeds();
                     showPlus();
                 }
-
                 Log.d("SocialDebug", "pressed " + needsControl.getTraining());
             }
         });
@@ -255,21 +268,13 @@ public class GltfActivity extends AppCompatActivity {
 
         WeakReference<GltfActivity> weakActivity = new WeakReference<>(this);
 
-// Winkemann-link:  //"https://drive.google.com/uc?export=download&id=1eidGtNQDjHZrFC-xQOtFoZgYu7OqMBfU"
+        // Winkemann-link:  //"https://drive.google.com/uc?export=download&id=1eidGtNQDjHZrFC-xQOtFoZgYu7OqMBfU"
         // Beispieldatei aus Googledrive fuer passendes Linkformat
         // https://drive.google.com/uc?export=download&id=
 
         ModelRenderable.builder()
                 .setSource(
-                        this,
-                        Uri.parse(
-
-                                //emulator:
-                                "https://drive.google.com/uc?export=download&id=1qK99AbYEh6scsrVEVo0zEdAjhO1aSEnc"
-                                //tisch dino:
-
-
-                        ))
+                        this, R.raw.dino)
                 .setIsFilamentGltf(true)
                 .build()
                 .thenAccept(
@@ -281,10 +286,9 @@ public class GltfActivity extends AppCompatActivity {
                         })
                 .exceptionally(
                         throwable -> {
-                            Toast toast =
-                                    Toast.makeText(this, "Unable to load Model renderable", Toast.LENGTH_LONG);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
+
+                            showToast("Drache konnte nicht geladen werden");
+
                             return null;
                         });
 
@@ -299,17 +303,14 @@ public class GltfActivity extends AppCompatActivity {
                     Log.i("Button: ", "CLICKED!");
 
                     if (renderable == null) {
-
-                        Log.i(TAG, "Model not available");
-
-                        return;
-
-                    } else if (modelCounter >= modelLimit) {
-
-                        Log.i(TAG, "Reached ModelLimit");
+                        showToast("Drachendatei ist nicht verfügbar");
 
                         return;
+                    }
 
+                    if (modelSet) {
+                        showToast("Drache bereits gesetzt");
+                        return;
                     }
 
 
@@ -319,12 +320,16 @@ public class GltfActivity extends AppCompatActivity {
                     sleep.setEnabled(true);
                     social.setEnabled(true);
                     training.setEnabled(true);
-                    Log.i(TAG, "Place Model");
 
-                    modelCounter++;
+                    showToast("Drache gesetzt. Hosting...");
+                    modelSet = true;
+
 
                     // Create the Anchor.
-                    Anchor anchor = hitResult.createAnchor();
+
+                    anchor = arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
+                    appAnchorState = AppAnchorState.HOSTING;
+
                     AnchorNode anchorNode = new AnchorNode(anchor);
                     anchorNode.setParent(arFragment.getArSceneView().getScene());
 
@@ -337,11 +342,9 @@ public class GltfActivity extends AppCompatActivity {
 
 
                     for (int i = 0; i < modelPosition.length; i++) {
-
+                        //  Log.i(MODEL_POSITION, i + ": " + modelPosition[i]);
                         textView.setText(textView.getText() + "\n" + modelPosition[i]);
-
                     }
-
 
                     // Create the transformable model and add it to the anchor.
                     // Transformable makes it possible to scale and drag the model
@@ -350,12 +353,10 @@ public class GltfActivity extends AppCompatActivity {
                     model.setRenderable(renderable);
                     model.select();
 
-                   // Oben deklariert FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
+                    // Oben deklariert FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
                     filamentAsset = model.getRenderableInstance().getFilamentAsset();
                     if (filamentAsset.getAnimator().getAnimationCount() > 3) {
                         animators.add(new AnimationInstance(filamentAsset.getAnimator(), idle_index, System.nanoTime()));
-
-
                     }
 
                     Color color = colors.get(nextColor);
@@ -367,46 +368,46 @@ public class GltfActivity extends AppCompatActivity {
                     updateAnimation();
                     Log.d("DURATION", "just once huh : ");
 
-         });
+
+                });
 
 
+        // Cloud Anchor Sachen
+        arFragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
 
+            if (appAnchorState != AppAnchorState.HOSTING)
+                return;
+            Anchor.CloudAnchorState cloudAnchorState = anchor.getCloudAnchorState();
 
+            if (cloudAnchorState.isError()) {
+                showToast(cloudAnchorState.toString());
+            } else if (cloudAnchorState == Anchor.CloudAnchorState.SUCCESS) {
+                appAnchorState = AppAnchorState.HOSTED;
 
+                String anchorId = anchor.getCloudAnchorId();
+                editor.putString("anchorId", anchorId);
+                editor.apply();
+                showToast("Anchor hosted sucessfully. Anchor Id: " + anchorId);
+            }
 
+        });
 
+        Button resolve = findViewById(R.id.resolve);
+        resolve.setOnClickListener(view -> {
+            String anchorId = prefs.getString("anchorId","null");
+            if (anchorId.equals("null")) {
+                showToast("No anchor found");
+                return;
+            }
 
-
+            Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
+            showToast("Hat geklappt");
+        });
 
     }
 
-    /**
-     * Returns false and displays an error message if Sceneform can not run, true if Sceneform can run
-     * on this device.
-     *
-     * <p>Sceneform requires Android N on the device as well as OpenGL 3.0 capabilities.
-     *
-     * <p>Finishes the activity if Sceneform can not run
-     */
-    public static boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
-        if (Build.VERSION.SDK_INT < VERSION_CODES.N) {
-            Log.e(TAG, "Sceneform requires Android N or later");
-            Toast.makeText(activity, "Sceneform requires Android N or later", Toast.LENGTH_LONG).show();
-            activity.finish();
-            return false;
-        }
-        String openGlVersionString =
-                ((ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE))
-                        .getDeviceConfigurationInfo()
-                        .getGlEsVersion();
-        if (Double.parseDouble(openGlVersionString) < MIN_OPENGL_VERSION) {
-            Log.e(TAG, "Sceneform requires OpenGL ES 3.0 later");
-            Toast.makeText(activity, "Sceneform requires OpenGL ES 3.0 or later", Toast.LENGTH_LONG)
-                    .show();
-            activity.finish();
-            return false;
-        }
-        return true;
+    private void showToast(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
     public void hintControl(int value){
@@ -414,7 +415,7 @@ public class GltfActivity extends AppCompatActivity {
 
         switch(value){
             case 0:
-                hint.setText("call your dragon by tapping on plane");
+                showToast("Call your Dragon by tapping on plane");
 
                 break;
             case 1:
@@ -429,7 +430,6 @@ public class GltfActivity extends AppCompatActivity {
                 hint.setText(mDragonName + " seems sad, give him some love");
 
                 break;
-
             case 4:
                 hint.setText(mDragonName + " needs some training");
 
@@ -437,30 +437,21 @@ public class GltfActivity extends AppCompatActivity {
             case 20:
                 //Control by needs
                 if (needsControl.getHunger() <= 50) {
-                    hintControl(1);
+                    hintControl(1); break;
                 } else if (needsControl.getEnergy() <= 20) {
-                    hintControl(2);
-                }  else if (needsControl.getSocial() <= 20) {
-                    hintControl(3);
-                 }else if (needsControl.getTraining() <= 20) {
-                    hintControl(4);
-                } else hintControl(21);
-                break;
-            case 21:
-                hint.setText("care for your dragon");
+                    hintControl(2); break;
+                } else if (needsControl.getSocial() <= 20) {
+                    hintControl(3); break;
+                } else if (needsControl.getTraining() <= 20) {
+                    hintControl(4); break;
+                }
 
-                break;
-            default:
-                hint.setText("care for your dragon");
-
+                default:
+                showToast("care for your dragon");
                 break;
         }
 
     }
-
-
-
-
 
     public void showPlus() {
         plus = (ImageView) findViewById(R.id.plusImage);
@@ -486,7 +477,6 @@ public class GltfActivity extends AppCompatActivity {
         prgTraining.setProgress(needsControl.getTraining());
     }
 
-
     public void ChangeAnimationMethod(int index) {
         vIndex = index;
         if (filamentAsset.getAnimator().getAnimationCount() >= 3) {
@@ -497,65 +487,21 @@ public class GltfActivity extends AppCompatActivity {
         }
     }
 
-    public void startThread(View view, float duration){
+    public void startThread(View view, float duration) {
         stopThread = false;
         float d = duration * 1000;
         int e = (int) d;
-        Log.d("ANIMATION", "duration in millis " +e);
+        Log.d("ANIMATION", "duration in millis " + e);
         ExampleRunnable runnable = new ExampleRunnable(e);
         new Thread(runnable).start();
     }
+
     public void stopThread(View view) {
         stopThread = true;
     }
 
-    //Handler siehe       //siehe  https://codinginflow.com/tutorials/android/starting-a-background-thread
-    class ExampleRunnable implements Runnable {
-        int milliseconds;
-        ExampleRunnable(int seconds) {
-            this.milliseconds = seconds;
-        }
-        int checkDuration;
-        @Override
-        public void run() {
-
-
-                if (stopThread)
-                    return;
-                Log.d("ANIMATION", "new thread count: " + milliseconds);
-
-                mainAction.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mainAction.setText("Duration "+ milliseconds);
-                        mainAction.setEnabled(false);
-
-
-                    }
-                });
-                try {
-                    Thread.sleep(milliseconds);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-
-
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ChangeAnimationMethod(idle_index);
-                    mainAction.setText("eat again");
-                    mainAction.setEnabled(true);
-
-                }
-            });
-            }
-        }
-
     //Animation siehe https://blog.flexiple.com/build-your-first-android-ar-app-using-arcore-and-sceneform/
-    public void updateAnimation(){
+    public void updateAnimation() {
 
         arFragment
                 .getArSceneView()
@@ -577,6 +523,71 @@ public class GltfActivity extends AppCompatActivity {
                         });
     }
 
+    private enum AppAnchorState {
+        NONE,
+        HOSTING,
+        HOSTED
+    }
+
+    private static class AnimationInstance {
+        Animator animator;
+        Long startTime;
+        float duration;
+        int index = vIndex;
+
+
+        AnimationInstance(Animator animator, int index, Long startTime) {
+            this.animator = animator;
+            this.startTime = startTime;
+            this.duration = animator.getAnimationDuration(index);
+            vIndex = index;
+        }
+    }
+
+    //Handler siehe  https://codinginflow.com/tutorials/android/starting-a-background-thread
+    class ExampleRunnable implements Runnable {
+        int milliseconds;
+        int checkDuration;
+
+        ExampleRunnable(int seconds) {
+            this.milliseconds = seconds;
+        }
+
+        @Override
+        public void run() {
+
+
+            if (stopThread)
+                return;
+            Log.d("ANIMATION", "new thread count: " + milliseconds);
+
+            mainAction.post(new Runnable() {
+                @Override
+                public void run() {
+                    mainAction.setText("Duration " + milliseconds);
+                    mainAction.setEnabled(false);
+
+
+                }
+            });
+            try {
+                Thread.sleep(milliseconds);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ChangeAnimationMethod(idle_index);
+                    mainAction.setText("eat again");
+                    mainAction.setEnabled(true);
+
+                }
+            });
+        }
+    }
 
 
 }
