@@ -45,26 +45,25 @@ public class StoryActivity extends AppCompatActivity {
                 persistenceManager.saveString("dragon_name", nameField.getText().toString());
                 persistenceManager.saveBoolean("first_start", false);
 
-                // Open GLTFActivity -- Start Values
-                // Save name
 
-                SharedPreferences preferences = getApplicationContext().getSharedPreferences("preferences", MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
+                // Save for the first time
+                int hungerValue = 50;
+                int sleepValue = 50;
+                int socialValue = 10;
+                int trainingValue = 0;
 
-                editor.putString("dragon_name", nameField.getText().toString());
-
-                // Change first start to false -> Continue Button will be available next start
-                editor.putBoolean("first_start", false);
-
-                editor.commit();
-
+                persistenceManager.saveInt("hunger", hungerValue);
+                persistenceManager.saveInt("sleep", sleepValue);
+                persistenceManager.saveInt("social", socialValue);
+                persistenceManager.saveInt("training", trainingValue);
 
                 // Open GLTFActivity
                 Intent intent = new Intent(StoryActivity.this, ArActivity.class);
-                intent.putExtra("hungerValue", 50);
-                intent.putExtra("sleepValue", 50);
-                intent.putExtra("socialValue", 10);
-                intent.putExtra("trainingValue", 0);
+                intent.putExtra("hungerValue", hungerValue);
+                intent.putExtra("sleepValue", sleepValue);
+                intent.putExtra("socialValue", socialValue);
+                intent.putExtra("trainingValue", trainingValue);
+
                 startActivity(intent);
 
             }

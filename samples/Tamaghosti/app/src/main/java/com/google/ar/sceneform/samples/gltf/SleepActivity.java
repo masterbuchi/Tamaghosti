@@ -25,11 +25,15 @@ public class SleepActivity extends AppCompatActivity {
     private volatile boolean stopThread = false;
     TextView progress;
 
+
+    PersistenceManager persistenceManager = new PersistenceManager(getApplicationContext());
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+
 
 
         super.onCreate(savedInstanceState);
@@ -65,6 +69,7 @@ public class SleepActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 stopThread(null);
+
                 Log.d("SLEEP", "safeEnergy end: " + safeEnergy);
                 Intent intent = new Intent(SleepActivity.this, ArActivity.class);
                 intent.putExtra("hungerValue", hValue);
@@ -108,6 +113,8 @@ public class SleepActivity extends AppCompatActivity {
                         Log.d("SLEEP", "progress in 10er steps: " + safeEnergy);
                         Log.d("SLEEP", "progress is growing: " + energy);
                         energy ++;
+
+                        persistenceManager.saveInt("sleep", safeEnergy);
 
                     }
                 });

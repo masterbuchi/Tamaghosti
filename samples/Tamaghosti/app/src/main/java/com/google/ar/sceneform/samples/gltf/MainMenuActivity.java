@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 public class MainMenuActivity extends AppCompatActivity {
 
@@ -33,21 +34,25 @@ public class MainMenuActivity extends AppCompatActivity {
         // Def-value: Value to return if this preference does not exist
         boolean firstStart = persistenceManager.getBoolean("first_start", true);
 
-        //preferences.getBoolean("first_start", true);
-
-
         if (!firstStart) {
 
-            // Make Continue Button visible
-            ConstraintLayout layout = findViewById(R.id.mainMenuLayout);
-
-            Button continueGameButton = findViewById(R.id.newGameButton);
+            Button continueGameButton = findViewById(R.id.continueGameButton);
 
             continueGameButton.setVisibility(View.VISIBLE);
 
             continueGameButton.setOnClickListener(view -> {
 
-                //TODO: Add game logic
+                Toast.makeText(getApplicationContext(), "Tapped", Toast.LENGTH_SHORT);
+
+                // Load
+                Intent intent = new Intent(MainMenuActivity.this, ArActivity.class);
+
+                intent.putExtra("hungerValue", persistenceManager.getInt("hunger", 0));
+                intent.putExtra("sleepValue", persistenceManager.getInt("sleep", 0));
+                intent.putExtra("socialValue", persistenceManager.getInt("social", 0));
+                intent.putExtra("trainingValue", persistenceManager.getInt("training", 0));
+
+                startActivity(intent);
 
             });
 

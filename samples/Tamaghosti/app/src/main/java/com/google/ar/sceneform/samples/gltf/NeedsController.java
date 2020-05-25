@@ -1,5 +1,6 @@
 package com.google.ar.sceneform.samples.gltf;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,33 +16,58 @@ public class NeedsController {
     private int social;
     private int training;
 
+    private PersistenceManager persistenceManager;
 
-    public void feed(){
+
+    public void feed(Context context){
 
         setHunger(10);
+
+        persistenceManager = new PersistenceManager(context);
+        persistenceManager.saveInt("hunger", hunger);
+
         Log.d("SleepDebug", "check Energy in feed " + energy);
-        getTired();
+        getTired(context);
     }
 
-    public void getTired(){
+    public void getTired(Context context){
         setEnergy( - 10);
+
+        persistenceManager = new PersistenceManager(context);
+        persistenceManager.saveInt("sleep", energy);
+
         Log.d("SleepDebug", "check Energy in tired " + energy);
     }
 
-    public void getHungry(){
+    public void getHungry(Context context){
+
         setHunger( - 10);
+
+        persistenceManager = new PersistenceManager(context);
+        persistenceManager.saveInt("hunger", hunger);
+
+
     }
 
-    public void pet(){
+    public void pet(Context context){
         setSocial( 10);
-        getTired();
-        getHungry();
+
+        persistenceManager = new PersistenceManager(context);
+        persistenceManager.saveInt("social", social);
+
+        getTired(context);
+        getHungry(context);
     }
 
-    public void train(){
+    public void train(Context context){
+
         setTraining(10);
-        getTired();
-        getHungry();
+
+        persistenceManager = new PersistenceManager(context);
+        persistenceManager.saveInt("training", training);
+
+        getTired(context);
+        getHungry(context);
     }
 
     public void setEnergy(int value) {

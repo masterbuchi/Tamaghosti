@@ -179,14 +179,17 @@ public class ArActivity extends AppCompatActivity {
         editor = prefs.edit();
 
         Intent in = getIntent();
+
         final int hValue = in.getIntExtra("hungerValue", 0);
-        needsControl.setHunger(hValue);
         final int slValue = in.getIntExtra("sleepValue", 0);
-        needsControl.setEnergy(slValue);
         final int soValue = in.getIntExtra("socialValue", 0);
-        needsControl.setSocial(soValue);
         final int tValue = in.getIntExtra("trainingValue", 0);
+
+        needsControl.setHunger(hValue);
+        needsControl.setEnergy(slValue);
+        needsControl.setSocial(soValue);
         needsControl.setTraining(tValue);
+
 
         persistenceManager = new PersistenceManager(getApplicationContext());
         mDragonName = persistenceManager.getString("dragon_name", null);
@@ -367,7 +370,7 @@ public class ArActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (needsControl.getHunger() <= 90) {
-                    needsControl.feed();
+                    needsControl.feed(getApplicationContext());
                     setNeeds();
                     showPlus();
                     if (model != null) {
@@ -407,7 +410,7 @@ public class ArActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (needsControl.getSocial() <= 90) {
-                    needsControl.pet();
+                    needsControl.pet(getApplicationContext());
                     setNeeds();
                     showPlus();
                 }
@@ -428,7 +431,7 @@ public class ArActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (needsControl.getTraining() <= 90) {
-                    needsControl.train();
+                    needsControl.train(getApplicationContext());
                     setNeeds();
                     showPlus();
                 }
