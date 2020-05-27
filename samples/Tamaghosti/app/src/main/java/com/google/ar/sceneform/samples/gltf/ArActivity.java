@@ -224,7 +224,14 @@ public class ArActivity extends AppCompatActivity {
                     if (dragonSet) {
                         // Create the Anchor.
                         AnchorNode moveToNode = createAnchor(hitResult);
-                        if (dragon.moveTo(moveToNode)) showToast("Dragon is moving.");
+
+                        double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2));
+
+                        showToast("Distance: " + Double.toString(distance));
+
+                        double time = dragon.moveTo(moveToNode, distance);
+
+                            showToast("Time: " +Double.toString(time));
 
 
                     }
@@ -250,7 +257,6 @@ public class ArActivity extends AppCompatActivity {
                 showToast(cloudAnchorState.toString());
             } else if (cloudAnchorState == Anchor.CloudAnchorState.SUCCESS) {
                 appAnchorState = AppAnchorState.HOSTED;
-
                 String anchorId = anchor.getCloudAnchorId();
                 editor.putString("anchorId", anchorId);
                 editor.apply();

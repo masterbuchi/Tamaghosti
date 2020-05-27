@@ -118,7 +118,7 @@ public class Dragon extends TransformableNode {
         updateAnimation(2);
     }
 
-    boolean moveTo(AnchorNode newPos) {
+    double moveTo(AnchorNode newPos, double distance) {
 
         objectAnimation = new ObjectAnimator();
         objectAnimation.setAutoCancel(true);
@@ -133,8 +133,13 @@ public class Dragon extends TransformableNode {
         // This makes the animation linear (smooth and uniform).
         objectAnimation.setInterpolator(new LinearInterpolator());
 
+
+
+
+        double time = distance/0.01333f;
+
         // Duration in ms of the animation.
-        objectAnimation.setDuration(3750);
+        objectAnimation.setDuration((long) (distance/0.01333f)*1000);
         updateAnimation(3);
         objectAnimation.start();
 
@@ -165,7 +170,7 @@ public class Dragon extends TransformableNode {
         });
 
 
-        return true;
+        return time;
     }
 
 
