@@ -15,8 +15,6 @@
  */
 package com.google.ar.sceneform.samples.gltf;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -28,7 +26,6 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.ArraySet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -40,8 +37,6 @@ import android.widget.Toast;
 import android.view.animation.LinearInterpolator;
 
 
-import com.google.android.filament.gltfio.Animator;
-import com.google.android.filament.gltfio.FilamentAsset;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
@@ -52,7 +47,6 @@ import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 
 import java.lang.ref.WeakReference;
-import java.util.Set;
 
 /**
  * This is a example activity that uses the Sceneform UX package to make common AR tasks easier.
@@ -68,33 +62,14 @@ public class ArActivity extends AppCompatActivity {
         HOSTED
     }
 
-    private static class AnimationInstance {
-        Animator animator;
-        Long startTime;
-        float duration;
-        int index = vIndex;
 
-
-        AnimationInstance(Animator animator, int index, Long startTime) {
-            this.animator = animator;
-            this.startTime = startTime;
-            this.duration = animator.getAnimationDuration(index);
-            vIndex = index;
-        }
-    }
 
     private static final String TAG = ArActivity.class.getSimpleName();
     private static final double MIN_OPENGL_VERSION = 3.0;
 
-    public static volatile int vIndex;
-    private final Set<AnimationInstance> animators = new ArraySet<>();
 
-    public volatile FilamentAsset filamentAsset;
-    public int idle_index = 2;
-    public int eat_index = 0;
-    public int walk_index = 3;
-    public int getPet_index = 1;
-    DragonNode model;
+
+    Dragon dragon;
     ProgressBar prgHunger;
     ProgressBar prgEnergy;
     ProgressBar prgSocial;
@@ -120,7 +95,7 @@ public class ArActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
 
 
-    private boolean modelSet = false;
+    private boolean dragonSet = false;
     private int animationCount = 0;
     private ArFragment arFragment;
     private Renderable renderable;
@@ -250,19 +225,13 @@ public class ArActivity extends AppCompatActivity {
                     }
 
 
-                    if (modelSet) {
-
-                       /* if (!transitionStart) {
-                            startTransition(hitResult);
-                        }
-*/
-
+                    if (dragonSet) {
                        changePositionOfModel(hitResult);
                         //showToast("Position of Dragon changed");
                     }
 
 
-                    if (model == null) {
+                    if (dragon == null) {
 
                         hintControl(20);
                         mainAction.setEnabled(true);
@@ -271,7 +240,7 @@ public class ArActivity extends AppCompatActivity {
                         training.setEnabled(true);
 
                         showToast(mDragonName + " woke up. Hosting...");
-                        modelSet = true;
+                        dragonSet = true;
 
 
                         // Create the Anchor.
@@ -282,18 +251,14 @@ public class ArActivity extends AppCompatActivity {
                         createModel(anchorNode);
                     }
 
+                    dragon.setDragonAnimation();
 
-                    // Oben deklariert FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
-                    filamentAsset = model.getRenderableInstance().getFilamentAsset();
-                    if (filamentAsset.getAnimator().getAnimationCount() > 3) {
-                        animators.add(new AnimationInstance(filamentAsset.getAnimator(), idle_index, System.nanoTime()));
-                    }
 
                     // Update Model Position
-                    updateModelPositionWindow();
+                    updateCurrentDragonPositionWindow();
 
                     // Update the Animation of the Model
-                    updateAnimation();
+                    dragon.updateAnimation(arFragment);
 
                 });
 
@@ -343,9 +308,9 @@ public class ArActivity extends AppCompatActivity {
         endPose = moveAnchorNode.getWorldPosition();
 
         ObjectAnimator animator = new ObjectAnimator();
-        animator.setTarget(model);
+        animator.setTarget(dragon);
         animator.setPropertyName("translation");
-        animator.setFloatValues(model.getWorldPosition().x, endPose.x);
+        animator.setFloatValues(dragon.getWorldPosition().x, endPose.x);
         animator.setDuration(1000);
         animator.setInterpolator(new LinearInterpolator());
         animator.start();
@@ -373,11 +338,11 @@ public class ArActivity extends AppCompatActivity {
                     needsControl.feed(getApplicationContext());
                     setNeeds();
                     showPlus();
-                    if (model != null) {
+                    if (dragon != null) {
                         //Change Animation mit Handler
-                        ChangeAnimationMethod(eat_index);
+                        dragon.changeAnimationMethod(dragon.eat_index);
                         // if certain duration needed:
-                        float duration = filamentAsset.getAnimator().getAnimationDuration(eat_index);
+                        float duration = dragon.getFilamentAsset().getAnimator().getAnimationDuration(dragon.eat_index);
                         startThread(null, duration);
                     }
                 }
@@ -414,9 +379,9 @@ public class ArActivity extends AppCompatActivity {
                     setNeeds();
                     showPlus();
                 }
-                if (model != null) {
+                if (dragon != null) {
                     //Change Animation mit Handler
-                    ChangeAnimationMethod(getPet_index);
+                    dragon.changeAnimationMethod(dragon.getPet_index);
                 }
                 Log.d("SocialDebug", "pressed " + needsControl.getSocial());
             }
@@ -452,16 +417,16 @@ public class ArActivity extends AppCompatActivity {
 
     private void createModel(AnchorNode anchorNode) {
         // Transformable makes it possible to scale and drag the model
-        model = new DragonNode(arFragment.getTransformationSystem());
+        dragon = new Dragon(arFragment.getTransformationSystem());
 
         // Deactivate Rotation and Translation
-        model.getTranslationController().setEnabled(false);
-        model.getRotationController().setEnabled(false);
+        dragon.getTranslationController().setEnabled(false);
+        dragon.getRotationController().setEnabled(false);
         //     model.getScaleController().setEnabled(false);
 
-        model.setParent(anchorNode);
-        model.setRenderable(renderable);
-        model.select();
+        dragon.setParent(anchorNode);
+        dragon.setRenderable(renderable);
+        dragon.select();
 
     }
 
@@ -469,7 +434,7 @@ public class ArActivity extends AppCompatActivity {
         AnchorNode instantMoveAnchorNode = new AnchorNode(hitResult.createAnchor());
         instantMoveAnchorNode.setParent(arFragment.getArSceneView().getScene());
         Vector3 movePosition = instantMoveAnchorNode.getWorldPosition();
-        model.setWorldPosition(movePosition);
+        dragon.setWorldPosition(movePosition);
 
         /*showToast(String.valueOf(movePosition.x));
         showToast(String.valueOf(movePosition.y));
@@ -477,8 +442,8 @@ public class ArActivity extends AppCompatActivity {
     }
 
 
-    private void updateModelPositionWindow() {
-        Vector3 modelPosition = model.getWorldPosition();
+    private void updateCurrentDragonPositionWindow() {
+        Vector3 modelPosition = dragon.getWorldPosition();
         TextView textView = findViewById(R.id.modelPosition);
         textView.setText("");
         textView.setText(String.valueOf(modelPosition.x) + "\n" + String.valueOf(modelPosition.y) + "\n" + String.valueOf(modelPosition.z));
@@ -561,15 +526,7 @@ public class ArActivity extends AppCompatActivity {
         prgTraining.setProgress(needsControl.getTraining());
     }
 
-    public void ChangeAnimationMethod(int index) {
-        vIndex = index;
-        if (filamentAsset.getAnimator().getAnimationCount() >= 3) {
-            animators.add(new AnimationInstance(filamentAsset.getAnimator(), vIndex, System.nanoTime()));
-            Log.d("ANIMATION", "Animation changed to : " + filamentAsset.getAnimator().getAnimationName(vIndex));
-            //updateAnimation();
 
-        }
-    }
 
     public void startThread(View view, float duration) {
         stopThread = false;
@@ -585,27 +542,7 @@ public class ArActivity extends AppCompatActivity {
     }
 
     //Animation siehe https://blog.flexiple.com/build-your-first-android-ar-app-using-arcore-and-sceneform/
-    public void updateAnimation() {
 
-        arFragment
-                .getArSceneView()
-                .getScene()
-                .addOnUpdateListener(
-                        frameTime -> {
-                            Long time = System.nanoTime();
-                            for (AnimationInstance animator : animators) {
-                                animator.animator.applyAnimation(
-
-                                        animator.index = vIndex,
-                                        (float) ((time - animator.startTime) / (double) SECONDS.toNanos(1))
-                                                % animator.duration);
-                                animator.animator.updateBoneMatrices();
-                                Log.d("DURATION", "Duration animation : " + filamentAsset.getAnimator().getAnimationName(vIndex));
-                                Log.d("DURATION", "Duration animator : " + animator.duration);
-                                Log.d("DURATION", "Duration time : " + (time - animator.startTime) / (double) SECONDS.toNanos(1) % animator.duration);
-                            }
-                        });
-    }
 
 
     //Handler siehe  https://codinginflow.com/tutorials/android/starting-a-background-thread
@@ -644,7 +581,7 @@ public class ArActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ChangeAnimationMethod(idle_index);
+                    dragon.changeAnimationMethod(dragon.idle_index);
                     mainAction.setText("eat again");
                     mainAction.setEnabled(true);
 
