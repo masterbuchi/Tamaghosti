@@ -7,14 +7,15 @@ import android.view.animation.LinearInterpolator;
 
 import com.google.android.filament.gltfio.Animator;
 import com.google.android.filament.gltfio.FilamentAsset;
+import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.QuaternionEvaluator;
 import com.google.ar.sceneform.math.Vector3;
+import com.google.ar.sceneform.math.Vector3Evaluator;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 import com.google.ar.sceneform.ux.TransformationSystem;
-import androidx.dynamicanimation.animation.DynamicAnimation;
 
 
 import java.util.Set;
@@ -51,6 +52,8 @@ public class Dragon extends TransformableNode {
 
 
     private ObjectAnimator orbitAnimation = null;
+
+    private ObjectAnimator objectAnimation = null;
 
     // Rotating test
     private float degreesPerSecond = 90.0f;
@@ -135,7 +138,7 @@ public class Dragon extends TransformableNode {
 
     @Override
     public void onActivate() {
-        startAnimation();
+       // startAnimation();
     }
 
 
@@ -151,7 +154,66 @@ public class Dragon extends TransformableNode {
     }
 
 
-    //DynamicAnimation dynamicMovement;
+    boolean moveTo(AnchorNode newPos) {
+
+
+        objectAnimation = new ObjectAnimator();
+        objectAnimation.setAutoCancel(true);
+        objectAnimation.setTarget(this);
+
+        // All the positions should be world positions
+        // The first position is the start, and the second is the end.
+        objectAnimation.setObjectValues(this.getWorldPosition(), newPos.getWorldPosition());
+
+        // Use setWorldPosition to position andy.
+        objectAnimation.setPropertyName("worldPosition");
+
+        // The Vector3Evaluator is used to evaluator 2 vector3 and return the next
+        // vector3.  The default is to use lerp.
+        objectAnimation.setEvaluator(new Vector3Evaluator());
+        // This makes the animation linear (smooth and uniform).
+        objectAnimation.setInterpolator(new LinearInterpolator());
+        // Duration in ms of the animation.
+        objectAnimation.setDuration(5000);
+        objectAnimation.start();
+
+        return true;
+    }
+
+
+
+
+
+
+   /* public boolean moveTo(AnchorNode newPos) {
+
+
+        float velocityStart = 1;
+        float friction = 1;
+
+
+        //newPos.getWorldPosition : new Position the Dragon goes to
+        //this.getWorldPosition : current Position of the dragon
+        float distanceInX = Math.abs(newPos.getWorldPosition().x - this.getWorldPosition().x);
+        float distanceInY = Math.abs(newPos.getWorldPosition().y - this.getWorldPosition().y);
+
+
+            FlingAnimation flingX = new FlingAnimation(, DynamicAnimation.TRANSLATION_X);
+            flingX.setStartVelocity(velocityStart)
+                    //.setMinValue(MIN_TRANSLATION) // minimum translationX property
+                    //.setMaxValue(maxTranslationX)  // maximum translationX property
+                    .setFriction(friction)
+                    .start();
+
+        FlingAnimation flingY = new FlingAnimation(mViewTobeFlung, DynamicAnimation.TRANSLATION_Y);
+        flingY.setStartVelocity(velocityStart)
+                //.setMinValue(MIN_TRANSLATION) // minimum translationX property
+                //.setMaxValue(maxTranslationX)  // maximum translationX property
+                .setFriction(friction)
+                .start();
+
+        return true;
+    }*/
 
 
 

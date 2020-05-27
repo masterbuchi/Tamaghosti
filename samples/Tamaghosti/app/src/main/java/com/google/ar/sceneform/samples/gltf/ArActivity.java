@@ -25,7 +25,9 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -63,10 +65,8 @@ public class ArActivity extends AppCompatActivity {
     }
 
 
-
     private static final String TAG = ArActivity.class.getSimpleName();
     private static final double MIN_OPENGL_VERSION = 3.0;
-
 
 
     Dragon dragon;
@@ -226,7 +226,10 @@ public class ArActivity extends AppCompatActivity {
 
 
                     if (dragonSet) {
-                       changePositionOfModel(hitResult);
+                        // Create the Anchor.
+                        AnchorNode moveToNode = createAnchor(hitResult);
+                        if (dragon.moveTo(moveToNode)) showToast("Dragon is moving.");
+                        //changePositionOfModel(hitResult);
                         //showToast("Position of Dragon changed");
                     }
 
@@ -251,11 +254,12 @@ public class ArActivity extends AppCompatActivity {
                         createModel(anchorNode);
                     }
 
+
                     dragon.setDragonAnimation();
 
 
                     // Update Model Position
-                    updateCurrentDragonPositionWindow();
+                    //updateCurrentDragonPositionWindow();
 
                     // Update the Animation of the Model
                     dragon.updateAnimation(arFragment);
@@ -299,26 +303,6 @@ public class ArActivity extends AppCompatActivity {
 
     }
 
-    private void startTransition(HitResult hitResult) {
-
-
-        transitionStart = true;
-        moveAnchorNode = new AnchorNode(hitResult.createAnchor());
-        moveAnchorNode.setParent(arFragment.getArSceneView().getScene());
-        endPose = moveAnchorNode.getWorldPosition();
-
-        ObjectAnimator animator = new ObjectAnimator();
-        animator.setTarget(dragon);
-        animator.setPropertyName("translation");
-        animator.setFloatValues(dragon.getWorldPosition().x, endPose.x);
-        animator.setDuration(1000);
-        animator.setInterpolator(new LinearInterpolator());
-        animator.start();
-
-        showToast("Position changing to " + endPose.x);
-
-
-    }
 
     private void setButtonListeners() {
         mainAction = findViewById(R.id.mainActionControl);
@@ -527,7 +511,6 @@ public class ArActivity extends AppCompatActivity {
     }
 
 
-
     public void startThread(View view, float duration) {
         stopThread = false;
         float d = duration * 1000;
@@ -542,7 +525,6 @@ public class ArActivity extends AppCompatActivity {
     }
 
     //Animation siehe https://blog.flexiple.com/build-your-first-android-ar-app-using-arcore-and-sceneform/
-
 
 
     //Handler siehe  https://codinginflow.com/tutorials/android/starting-a-background-thread
