@@ -225,7 +225,17 @@ public class ArActivity extends AppCompatActivity {
                         // Create the Anchor.
                         AnchorNode moveToNode = createAnchor(hitResult);
 
+                        Vector3 rotationVect = new Vector3 (moveToNode.getWorldPosition().x -dragon.getWorldPosition().x,
+                                moveToNode.getWorldPosition().y -dragon.getWorldPosition().y,
+                                moveToNode.getWorldPosition().z -dragon.getWorldPosition().z);
+
+
                         double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2));
+                      //  double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
+
+                        Vector3  normVect = rotationVect.normalized();
+
+
 
                         showToast("Distance: " + Double.toString(distance));
 

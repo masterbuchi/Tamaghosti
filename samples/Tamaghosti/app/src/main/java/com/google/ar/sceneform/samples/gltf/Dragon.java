@@ -83,6 +83,12 @@ public class Dragon extends TransformableNode {
     public void onUpdate(FrameTime frameTime) {
         super.onUpdate(frameTime);
 
+       /* if (this!=null) {
+            Quaternion q1 = this.getLocalRotation();
+            Quaternion q2 = Quaternion.axisAngle(new Vector3(0, 1f, 0f), 2f);
+            this.setLocalRotation(Quaternion.multiply(q1, q2));
+        }*/
+
     }
 
 
@@ -133,15 +139,16 @@ public class Dragon extends TransformableNode {
         // This makes the animation linear (smooth and uniform).
         objectAnimation.setInterpolator(new LinearInterpolator());
 
-
-
-
         double time = distance/0.01333f;
 
         // Duration in ms of the animation.
         objectAnimation.setDuration((long) (distance/0.01333f)*1000);
         updateAnimation(3);
         objectAnimation.start();
+
+
+
+
 
 
 
