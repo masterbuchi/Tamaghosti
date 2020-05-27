@@ -1,7 +1,6 @@
 package com.google.ar.sceneform.samples.gltf;
 
 import android.animation.ObjectAnimator;
-import android.support.v4.app.Fragment;
 import android.util.ArraySet;
 import android.util.Log;
 import android.view.animation.LinearInterpolator;
@@ -15,6 +14,7 @@ import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 import com.google.ar.sceneform.ux.TransformationSystem;
+import androidx.dynamicanimation.animation.DynamicAnimation;
 
 
 import java.util.Set;
@@ -33,7 +33,6 @@ public class Dragon extends TransformableNode {
         Long startTime;
         float duration;
         int index = vIndex;
-
 
         AnimationInstance(Animator animator, int index, Long startTime) {
             this.animator = animator;
@@ -172,17 +171,11 @@ public class Dragon extends TransformableNode {
             orientations[i] = Quaternion.multiply(baseOrientation, orientation);
         }
 
-        Quaternion[] moveorientations = new Quaternion[4];
-
-
-
-
-        ObjectAnimator movementAnimation = new ObjectAnimator();
 
 
         ObjectAnimator orbitAnimation = new ObjectAnimator();
         // Cast to Object[] to make sure the varargs overload is called.
-        orbitAnimation.setObjectValues((Object[]) orientations);
+        orbitAnimation.setObjectValues(orientations);
 
         // Next, give it the localRotation property.
         orbitAnimation.setPropertyName("localRotation");

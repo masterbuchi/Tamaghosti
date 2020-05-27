@@ -1,11 +1,9 @@
 package com.google.ar.sceneform.samples.gltf;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.ProgressBar;
 
 
 public class NeedsController {

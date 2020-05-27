@@ -3,7 +3,7 @@ package com.google.ar.sceneform.samples.gltf;
 
 import android.content.Intent;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -45,9 +45,9 @@ public class SleepActivity extends AppCompatActivity {
         final int tValue = in.getIntExtra("trainingValue", 0);
         Log.d("SLEEP", "sleep value: " + slValue);
         this.energy = slValue;
-        prgEnergy = (ProgressBar) findViewById(R.id.progressEnergy2);
-        prgEnergy.setProgress((int) slValue);
-        progress = (TextView) findViewById(R.id.sleepProgress);
+        prgEnergy = findViewById(R.id.progressEnergy2);
+        prgEnergy.setProgress(slValue);
+        progress = findViewById(R.id.sleepProgress);
 
         Log.d("SLEEP", "energy first: " + energy);
 
@@ -64,7 +64,7 @@ public class SleepActivity extends AppCompatActivity {
 
 
 
-        Button wakeUp = (Button) findViewById(R.id.wkaeUpControl);
+        Button wakeUp = findViewById(R.id.wkaeUpControl);
         wakeUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,7 +84,7 @@ public class SleepActivity extends AppCompatActivity {
     }
     public void startThread(View view){
         stopThread = false;
-        ExampleRunnable runnable = new ExampleRunnable(energy);;
+        ExampleRunnable runnable = new ExampleRunnable(energy);
         new Thread(runnable).start();
     }
     public void stopThread(View view) {

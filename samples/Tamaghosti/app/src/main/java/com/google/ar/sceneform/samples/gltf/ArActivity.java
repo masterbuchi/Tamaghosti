@@ -25,7 +25,7 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -321,10 +321,10 @@ public class ArActivity extends AppCompatActivity {
     }
 
     private void setButtonListeners() {
-        mainAction = (Button) findViewById(R.id.mainActionControl);
-        sleep = (Button) findViewById(R.id.sleepControl);
-        social = (Button) findViewById(R.id.socialControl);
-        training = (Button) findViewById(R.id.trainingControl);
+        mainAction = findViewById(R.id.mainActionControl);
+        sleep = findViewById(R.id.sleepControl);
+        social = findViewById(R.id.socialControl);
+        training = findViewById(R.id.trainingControl);
         mainAction.setEnabled(false);
         sleep.setEnabled(false);
         social.setEnabled(false);
@@ -446,7 +446,7 @@ public class ArActivity extends AppCompatActivity {
         Vector3 modelPosition = dragon.getWorldPosition();
         TextView textView = findViewById(R.id.modelPosition);
         textView.setText("");
-        textView.setText(String.valueOf(modelPosition.x) + "\n" + String.valueOf(modelPosition.y) + "\n" + String.valueOf(modelPosition.z));
+        textView.setText(modelPosition.x + "\n" + modelPosition.y + "\n" + modelPosition.z);
     }
 
 
@@ -503,7 +503,7 @@ public class ArActivity extends AppCompatActivity {
     }
 
     public void showPlus() {
-        plus = (ImageView) findViewById(R.id.plusImage);
+        plus = findViewById(R.id.plusImage);
         plus.setVisibility(View.VISIBLE);
 
         Handler handler = new Handler();

@@ -1,19 +1,12 @@
 package com.google.ar.sceneform.samples.gltf;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.support.annotation.IdRes;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.IdRes;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class MainMenuActivity extends AppCompatActivity {
