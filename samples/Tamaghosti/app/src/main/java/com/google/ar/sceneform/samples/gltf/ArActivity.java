@@ -15,7 +15,6 @@
  */
 package com.google.ar.sceneform.samples.gltf;
 
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -36,7 +35,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.animation.LinearInterpolator;
 
 
 import com.google.ar.core.Anchor;
@@ -59,9 +57,9 @@ public class ArActivity extends AppCompatActivity {
 
 
     private enum AppAnchorState {
-        NONE,
+        HOSTED,
         HOSTING,
-        HOSTED
+        NONE
     }
 
 
@@ -227,33 +225,14 @@ public class ArActivity extends AppCompatActivity {
                         // Create the Anchor.
                         AnchorNode moveToNode = createAnchor(hitResult);
                         if (dragon.moveTo(moveToNode)) showToast("Dragon is moving.");
-                        //changePositionOfModel(hitResult);
-                        //showToast("Position of Dragon changed");
-                    }
 
+
+                    }
 
                     if (dragon == null) {
 
-                        hintControl(20);
-                        mainAction.setEnabled(true);
-                        sleep.setEnabled(true);
-                        social.setEnabled(true);
-                        training.setEnabled(true);
+                        createDragon(hitResult);
 
-                        showToast(mDragonName + " woke up. Hosting...");
-                        dragonSet = true;
-
-
-                        // Create the Anchor.
-                        AnchorNode anchorNode = createAnchor(hitResult);
-
-
-                        // Create the transformable model and add it to the anchorNode.
-                        createModel(anchorNode);
-
-                        dragon.setDragonAnimations();
-                        dragon.updateAnimation(idle_index);
-                        updateCurrentDragonPositionWindow();
                     }
 
 
@@ -295,6 +274,29 @@ public class ArActivity extends AppCompatActivity {
 
     }
 
+    private void createDragon(HitResult hitResult) {
+        hintControl(20);
+        mainAction.setEnabled(true);
+        sleep.setEnabled(true);
+        social.setEnabled(true);
+        training.setEnabled(true);
+
+        showToast(mDragonName + " woke up. Hosting...");
+        dragonSet = true;
+
+
+        // Create the Anchor.
+        AnchorNode anchorNode = createAnchor(hitResult);
+
+
+        // Create the transformable model and add it to the anchorNode.
+        createDragonNode(anchorNode);
+        //Load all Animations of the Model into the Dragon
+        dragon.setDragonAnimations();
+        //Update current Position window of Dragon
+        updateCurrentDragonPositionWindow();
+    }
+
 
     private void setButtonListeners() {
         mainAction = findViewById(R.id.mainActionControl);
@@ -317,11 +319,10 @@ public class ArActivity extends AppCompatActivity {
                     if (dragon != null) {
                         //Change Animation mit Handler
 
-
                         dragon.updateAnimation(eat_index);
 
                         // if certain duration needed:
-                        float duration = dragon.getFilamentAsset().getAnimator().getAnimationDuration(1);
+                        float duration = dragon.getFilamentAsset().getAnimator().getAnimationDuration(0);
                         startThread(null, duration);
                     }
                 }
@@ -393,7 +394,7 @@ public class ArActivity extends AppCompatActivity {
         return anchorNode;
     }
 
-    private void createModel(AnchorNode anchorNode) {
+    private void createDragonNode(AnchorNode anchorNode) {
         // Transformable makes it possible to scale and drag the model
         dragon = new Dragon(arFragment);
 
@@ -410,14 +411,14 @@ public class ArActivity extends AppCompatActivity {
 
 
     private void updateCurrentDragonPositionWindow() {
-        Vector3 modelPosition = dragon.getWorldPosition();
+        Vector3 dragonPosition = dragon.getWorldPosition();
         TextView textView = findViewById(R.id.modelPosition);
         textView.setText("");
-        textView.setText(modelPosition.x + "\n" + modelPosition.y + "\n" + modelPosition.z);
+        textView.setText(dragonPosition.x + "\n" + dragonPosition.y + "\n" + dragonPosition.z);
     }
 
 
-    private void showToast(String s) {
+    public void showToast(String s) {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 

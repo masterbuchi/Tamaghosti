@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.util.ArraySet;
 import android.util.Log;
 import android.view.animation.LinearInterpolator;
+import android.widget.TextView;
 
 import com.google.android.filament.gltfio.Animator;
 import com.google.android.filament.gltfio.FilamentAsset;
@@ -20,6 +21,8 @@ import com.google.ar.sceneform.ux.TransformationSystem;
 
 import java.util.Set;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 
@@ -30,18 +33,22 @@ public class Dragon extends TransformableNode {
     private final Set<AnimationInstance> animators = new ArraySet<>();
     private ArFragment parentArFragment;
 
+    Long startTimeofCurrentAnimation;
+
     private static class AnimationInstance {
         Animator animator;
         Long startTime;
         float duration;
-        int index = vIndex;
+        int index;
+
 
         AnimationInstance(Animator animator, int index, Long startTime) {
             this.animator = animator;
             this.startTime = startTime;
             this.duration = animator.getAnimationDuration(index);
-            vIndex = index;
+            this.index = index;
         }
+
     }
 
 
@@ -62,7 +69,7 @@ public class Dragon extends TransformableNode {
 
 
     public void setDragonAnimations() {
-        // Oben deklariert FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
+
         filamentAsset = this.getRenderableInstance().getFilamentAsset();
 
         for (int i=0; i < filamentAsset.getAnimator().getAnimationCount(); i++) {
@@ -76,32 +83,31 @@ public class Dragon extends TransformableNode {
     public void onUpdate(FrameTime frameTime) {
         super.onUpdate(frameTime);
 
-
     }
 
 
 
     public void updateAnimation(int index) {
 
+
+       startTimeofCurrentAnimation = System.nanoTime();
+
         parentArFragment
                 .getArSceneView()
                 .getScene()
                 .addOnUpdateListener(
                         frameTime -> {
+
                             Long time = System.nanoTime();
                             for (AnimationInstance animator : animators) {
-                                animator.animator.applyAnimation(
-                                        animator.index = index,
-                                        (float) ((time - animator.startTime) / (double) SECONDS.toNanos(1))
-                                                % animator.duration);
+                                animator.animator.applyAnimation(index, (float) ((time - startTimeofCurrentAnimation) / (double) SECONDS.toNanos(1)) % animator.duration);
                                 animator.animator.updateBoneMatrices();
+                                //Log.d("Animators", Integer.toString(index));
+
                             }
                         });
     }
 
-    private long getAnimationDuration() {
-        return (long) (1000 * 360 / (degreesPerSecond * 1));
-    }
 
     public FilamentAsset getFilamentAsset() {
         return filamentAsset;
@@ -109,48 +115,30 @@ public class Dragon extends TransformableNode {
 
     @Override
     public void onActivate() {
-       // startAnimation();
+        updateAnimation(2);
     }
-
-
-    private void startAnimation() {
-        if (orbitAnimation != null) {
-            return;
-        }
-
-        orbitAnimation = createAnimator(true, 0);
-        orbitAnimation.setTarget(this);
-        orbitAnimation.setDuration(getAnimationDuration());
-        orbitAnimation.start();
-    }
-
 
     boolean moveTo(AnchorNode newPos) {
-
 
         objectAnimation = new ObjectAnimator();
         objectAnimation.setAutoCancel(true);
         objectAnimation.setTarget(this);
-
         // All the positions should be world positions
         // The first position is the start, and the second is the end.
         objectAnimation.setObjectValues(this.getWorldPosition(), newPos.getWorldPosition());
-
-        // Use setWorldPosition to position andy.
         objectAnimation.setPropertyName("worldPosition");
-
         // The Vector3Evaluator is used to evaluator 2 vector3 and return the next
         // vector3.  The default is to use lerp.
         objectAnimation.setEvaluator(new Vector3Evaluator());
         // This makes the animation linear (smooth and uniform).
         objectAnimation.setInterpolator(new LinearInterpolator());
 
-
-
         // Duration in ms of the animation.
-        objectAnimation.setDuration(2000);
+        objectAnimation.setDuration(3750);
         updateAnimation(3);
         objectAnimation.start();
+
+
 
         objectAnimation.addListener(new android.animation.Animator.AnimatorListener() {
             @Override
@@ -160,7 +148,9 @@ public class Dragon extends TransformableNode {
 
             @Override
             public void onAnimationEnd(android.animation.Animator animation) {
+                setNewPosition(newPos);
                 updateAnimation(2);
+
             }
 
             @Override
@@ -179,12 +169,9 @@ public class Dragon extends TransformableNode {
     }
 
 
-
-
-
-
-
-
+    void setNewPosition(AnchorNode newPos) {
+        this.setWorldPosition(newPos.getWorldPosition());
+    }
 
    /* public boolean moveTo(AnchorNode newPos) {
 
@@ -216,9 +203,18 @@ public class Dragon extends TransformableNode {
         return true;
     }*/
 
+   /* *//** Returns an ObjectAnimator that makes this node rotate. *//*
+    private void startAnimation() {
+        if (orbitAnimation != null) {
+            return;
+        }
 
+        orbitAnimation = createAnimator(true, 0);
+        orbitAnimation.setTarget(this);
+        orbitAnimation.setDuration(getAnimationDuration());
+        orbitAnimation.start();
+    }
 
-    /** Returns an ObjectAnimator that makes this node rotate. */
     private static ObjectAnimator createAnimator(boolean clockwise, float axisTiltDeg) {
         // Node's setLocalRotation method accepts Quaternions as parameters.
         // First, set up orientations that will animate a circle.
@@ -254,7 +250,7 @@ public class Dragon extends TransformableNode {
 
         return orbitAnimation;
     }
-
+*/
 
 }
 
