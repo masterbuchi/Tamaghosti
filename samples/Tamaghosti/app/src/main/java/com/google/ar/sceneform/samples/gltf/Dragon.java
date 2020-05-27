@@ -28,6 +28,7 @@ public class Dragon extends TransformableNode {
     public static volatile int vIndex;
     public volatile FilamentAsset filamentAsset;
     private final Set<AnimationInstance> animators = new ArraySet<>();
+    private ArFragment parentArFragment;
 
     private static class AnimationInstance {
         Animator animator;
@@ -45,12 +46,6 @@ public class Dragon extends TransformableNode {
 
 
 
-    public int eat_index = 0;
-    public int getPet_index = 1;
-    public int idle_index = 2;
-    public int walk_index = 3;
-
-
     private ObjectAnimator orbitAnimation = null;
 
     private ObjectAnimator objectAnimation = null;
@@ -60,53 +55,35 @@ public class Dragon extends TransformableNode {
 
 
 
-    public Dragon(TransformationSystem transformationSystem) {
-        super(transformationSystem);
+    public Dragon(ArFragment arFragment) {
+        super(arFragment.getTransformationSystem());
+        parentArFragment = arFragment;
     }
+
+
+    public void setDragonAnimations() {
+        // Oben deklariert FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
+        filamentAsset = this.getRenderableInstance().getFilamentAsset();
+
+        for (int i=0; i < filamentAsset.getAnimator().getAnimationCount(); i++) {
+            animators.add(new AnimationInstance(filamentAsset.getAnimator(), i, System.nanoTime()));
+        }
+    }
+
 
 
     @Override
     public void onUpdate(FrameTime frameTime) {
         super.onUpdate(frameTime);
 
-        // Animation hasn't been set up.
-        if (orbitAnimation == null) {
-            return;
-        }
-
-
-
-       /* float animatedFraction = orbitAnimation.getAnimatedFraction();
-        orbitAnimation.setDuration(getAnimationDuration());
-        orbitAnimation.setCurrentFraction(animatedFraction);*/
-
 
     }
 
-   public void setDragonAnimation() {
-
-        // Oben deklariert FilamentAsset filamentAsset = model.getRenderableInstance().getFilamentAsset();
-        filamentAsset = this.getRenderableInstance().getFilamentAsset();
-        if (filamentAsset.getAnimator().getAnimationCount() > 3) {
-            animators.add(new AnimationInstance(filamentAsset.getAnimator(), idle_index, System.nanoTime()));
-        }
-    }
-
-    public void changeAnimationMethod(int index) {
-        vIndex = index;
-        if (filamentAsset.getAnimator().getAnimationCount() >= 3) {
-            animators.add(new AnimationInstance(filamentAsset.getAnimator(), vIndex, System.nanoTime()));
-            Log.d("ANIMATION", "Animation changed to : " + filamentAsset.getAnimator().getAnimationName(vIndex));
-            //updateAnimation();
-
-        }
-    }
 
 
+    public void updateAnimation(int index) {
 
-    public void updateAnimation(ArFragment arFragment) {
-
-        arFragment
+        parentArFragment
                 .getArSceneView()
                 .getScene()
                 .addOnUpdateListener(
@@ -114,18 +91,13 @@ public class Dragon extends TransformableNode {
                             Long time = System.nanoTime();
                             for (AnimationInstance animator : animators) {
                                 animator.animator.applyAnimation(
-
-                                        animator.index = vIndex,
+                                        animator.index = index,
                                         (float) ((time - animator.startTime) / (double) SECONDS.toNanos(1))
                                                 % animator.duration);
                                 animator.animator.updateBoneMatrices();
-                                Log.d("DURATION", "Duration animation : " + filamentAsset.getAnimator().getAnimationName(vIndex));
-                                Log.d("DURATION", "Duration animator : " + animator.duration);
-                                Log.d("DURATION", "Duration time : " + (time - animator.startTime) / (double) SECONDS.toNanos(1) % animator.duration);
                             }
                         });
     }
-
 
     private long getAnimationDuration() {
         return (long) (1000 * 360 / (degreesPerSecond * 1));
@@ -134,7 +106,6 @@ public class Dragon extends TransformableNode {
     public FilamentAsset getFilamentAsset() {
         return filamentAsset;
     }
-
 
     @Override
     public void onActivate() {
@@ -173,12 +144,42 @@ public class Dragon extends TransformableNode {
         objectAnimation.setEvaluator(new Vector3Evaluator());
         // This makes the animation linear (smooth and uniform).
         objectAnimation.setInterpolator(new LinearInterpolator());
+
+
+
         // Duration in ms of the animation.
-        objectAnimation.setDuration(5000);
+        objectAnimation.setDuration(2000);
+        updateAnimation(3);
         objectAnimation.start();
+
+        objectAnimation.addListener(new android.animation.Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(android.animation.Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(android.animation.Animator animation) {
+                updateAnimation(2);
+            }
+
+            @Override
+            public void onAnimationCancel(android.animation.Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(android.animation.Animator animation) {
+
+            }
+        });
+
 
         return true;
     }
+
+
+
 
 
 

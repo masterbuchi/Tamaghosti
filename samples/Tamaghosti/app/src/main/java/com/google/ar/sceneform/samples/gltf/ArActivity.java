@@ -103,14 +103,12 @@ public class ArActivity extends AppCompatActivity {
 
     //volatile == immer aktuellsten wert, nicht cache
     private volatile boolean stopThread = false;
-    private int nextColor = 0;
 
 
-    // Movement Transition
-    boolean transitionStart;
-    AnchorNode moveAnchorNode;
-    Vector3 currentPos;
-    Vector3 endPose;
+    public int eat_index = 0;
+    public int getPet_index = 1;
+    public int idle_index = 2;
+    public int walk_index = 3;
 
     /**
      * Returns false and displays an error message if Sceneform can not run, true if Sceneform can run
@@ -217,7 +215,7 @@ public class ArActivity extends AppCompatActivity {
 
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
-                    showToast("Tapped");
+
 
                     if (renderable == null) {
                         showToast("model failed to load");
@@ -252,24 +250,18 @@ public class ArActivity extends AppCompatActivity {
 
                         // Create the transformable model and add it to the anchorNode.
                         createModel(anchorNode);
+
+                        dragon.setDragonAnimations();
+                        dragon.updateAnimation(idle_index);
+                        updateCurrentDragonPositionWindow();
                     }
 
-
-                    dragon.setDragonAnimation();
-
-
-                    // Update Model Position
-                    //updateCurrentDragonPositionWindow();
-
-                    // Update the Animation of the Model
-                    dragon.updateAnimation(arFragment);
 
                 });
 
 
         // Cloud Anchor Sachen
         arFragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
-
 
             if (appAnchorState != AppAnchorState.HOSTING)
                 return;
@@ -324,9 +316,12 @@ public class ArActivity extends AppCompatActivity {
                     showPlus();
                     if (dragon != null) {
                         //Change Animation mit Handler
-                        dragon.changeAnimationMethod(dragon.eat_index);
+
+
+                        dragon.updateAnimation(eat_index);
+
                         // if certain duration needed:
-                        float duration = dragon.getFilamentAsset().getAnimator().getAnimationDuration(dragon.eat_index);
+                        float duration = dragon.getFilamentAsset().getAnimator().getAnimationDuration(1);
                         startThread(null, duration);
                     }
                 }
@@ -364,8 +359,7 @@ public class ArActivity extends AppCompatActivity {
                     showPlus();
                 }
                 if (dragon != null) {
-                    //Change Animation mit Handler
-                    dragon.changeAnimationMethod(dragon.getPet_index);
+                    dragon.updateAnimation(getPet_index);
                 }
                 Log.d("SocialDebug", "pressed " + needsControl.getSocial());
             }
@@ -401,7 +395,7 @@ public class ArActivity extends AppCompatActivity {
 
     private void createModel(AnchorNode anchorNode) {
         // Transformable makes it possible to scale and drag the model
-        dragon = new Dragon(arFragment.getTransformationSystem());
+        dragon = new Dragon(arFragment);
 
         // Deactivate Rotation and Translation
         dragon.getTranslationController().setEnabled(false);
@@ -412,17 +406,6 @@ public class ArActivity extends AppCompatActivity {
         dragon.setRenderable(renderable);
         dragon.select();
 
-    }
-
-    private void changePositionOfModel(HitResult hitResult) {
-        AnchorNode instantMoveAnchorNode = new AnchorNode(hitResult.createAnchor());
-        instantMoveAnchorNode.setParent(arFragment.getArSceneView().getScene());
-        Vector3 movePosition = instantMoveAnchorNode.getWorldPosition();
-        dragon.setWorldPosition(movePosition);
-
-        /*showToast(String.valueOf(movePosition.x));
-        showToast(String.valueOf(movePosition.y));
-        showToast(String.valueOf(movePosition.z));*/
     }
 
 
@@ -539,7 +522,6 @@ public class ArActivity extends AppCompatActivity {
         @Override
         public void run() {
 
-
             if (stopThread)
                 return;
             Log.d("ANIMATION", "new thread count: " + milliseconds);
@@ -549,8 +531,6 @@ public class ArActivity extends AppCompatActivity {
                 public void run() {
                     mainAction.setText("Duration " + milliseconds);
                     mainAction.setEnabled(false);
-
-
                 }
             });
             try {
@@ -559,11 +539,10 @@ public class ArActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    dragon.changeAnimationMethod(dragon.idle_index);
+                    dragon.updateAnimation(idle_index);
                     mainAction.setText("eat again");
                     mainAction.setEnabled(true);
 
