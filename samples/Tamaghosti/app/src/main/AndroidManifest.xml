@@ -28,35 +28,23 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="false"
         tools:ignore="GoogleAppIndexingWarning">
-
+        <activity android:name=".SpectatorActivity"></activity>
         <activity
             android:name=".SettingsActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="locked"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
-
-        </activity>
-
-
+            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
         <activity
             android:name=".StoryActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="locked"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
-
-
-        </activity>
-
+            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
         <activity
             android:name=".SleepActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="locked"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
-
-
-        </activity>
-
-<activity android:name=".NeedsControlActivity"></activity>
+            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
+        <activity android:name=".NeedsControlActivity" />
         <activity
             android:name=".MainMenuActivity"
             android:configChanges="orientation|screenSize"
@@ -76,7 +64,9 @@
         <meta-data
             android:name="com.google.ar.core"
             android:value="required" />
-        <meta-data android:name="com.google.android.ar.API_KEY" android:value="AIzaSyDB0jwdYLFmlbN-wKzEq5a1zCQwdhhxocw" />
+        <meta-data
+            android:name="com.google.android.ar.API_KEY"
+            android:value="AIzaSyDB0jwdYLFmlbN-wKzEq5a1zCQwdhhxocw" />
 
         <activity
             android:name=".ArActivity"
@@ -84,7 +74,7 @@
             android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="locked"
-            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
     </application>
 
 </manifest>

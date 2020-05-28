@@ -92,6 +92,7 @@ public class ArActivity extends AppCompatActivity {
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
 
+    private FirebaseManager firebaseManager;
 
     private boolean dragonSet = false;
     private int animationCount = 0;
@@ -145,6 +146,9 @@ public class ArActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
 
+        firebaseManager = new FirebaseManager();
+
+
         // Cloud Anchor on same device
         prefs = getSharedPreferences("AnchorId", MODE_PRIVATE);
         editor = prefs.edit();
@@ -175,9 +179,7 @@ public class ArActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ux);
         setNeeds();
 
-
         hintControl(0);
-
 
         setButtonListeners();
 
@@ -250,6 +252,7 @@ public class ArActivity extends AppCompatActivity {
 
                         createDragon(hitResult);
 
+
                     }
 
 
@@ -268,6 +271,9 @@ public class ArActivity extends AppCompatActivity {
             } else if (cloudAnchorState == Anchor.CloudAnchorState.SUCCESS) {
                 appAnchorState = AppAnchorState.HOSTED;
                 String anchorId = anchor.getCloudAnchorId();
+
+                firebaseManager.uploadAnchorToDatabase(anchorId);
+
                 editor.putString("anchorId", anchorId);
                 editor.apply();
                 showToast("Anchor hosted sucessfully. Anchor Id: " + anchorId);
@@ -275,7 +281,7 @@ public class ArActivity extends AppCompatActivity {
 
         });
 
-
+        /*
         Button resolve = findViewById(R.id.resolve);
         resolve.setOnClickListener(view -> {
             String anchorId = prefs.getString("anchorId", "null");
@@ -287,7 +293,7 @@ public class ArActivity extends AppCompatActivity {
             Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
             showToast("Hat geklappt");
         });
-
+        */
     }
 
     private void createDragon(HitResult hitResult) {
@@ -425,7 +431,6 @@ public class ArActivity extends AppCompatActivity {
 
     }
 
-
     private void updateCurrentDragonPositionWindow() {
         Vector3 dragonPosition = dragon.getWorldPosition();
         TextView textView = findViewById(R.id.modelPosition);
@@ -437,7 +442,6 @@ public class ArActivity extends AppCompatActivity {
     public void showToast(String s) {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
-
 
     public void hintControl(int value) {
         //hint is Checked text view and can disappear when checked. not implememnted yet

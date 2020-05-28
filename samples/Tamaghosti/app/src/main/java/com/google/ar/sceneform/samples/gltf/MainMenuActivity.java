@@ -69,6 +69,14 @@ public class MainMenuActivity extends AppCompatActivity {
 
         });
 
+        // Spectator OnClick Logic
+        Button spectatorButton = findViewById(R.id.spectatorGameButton);
+        spectatorButton.setOnClickListener(view -> {
+
+            Intent intent = new Intent(MainMenuActivity.this, SpectatorActivity.class);
+            startActivity(intent);
+        });
+
     }
 
 }

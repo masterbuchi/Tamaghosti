@@ -57,16 +57,6 @@
       app:layout_constraintBottom_toTopOf="@+id/sleepControl"
       app:layout_constraintEnd_toEndOf="parent" />
 
-  <Button
-      android:id="@+id/resolve"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="8dp"
-      android:layout_marginTop="80dp"
-      android:text="@string/resolve"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
-
   <ImageView
       android:id="@+id/plusImage"
       android:layout_width="83dp"

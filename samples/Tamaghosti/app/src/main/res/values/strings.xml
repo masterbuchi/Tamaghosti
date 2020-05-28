@@ -25,6 +25,7 @@
     <string name="new_game">New Game</string>
     <string name="continue_game">Continue</string>
     <string name="settings_game">Settings</string>
+    <string name="spectator_game">Spectator</string>
 
     <string name="made_by">Made by Jule Maaß, Florian Buchholz &amp; Lukas Werdermann</string>
 
@@ -49,7 +50,6 @@
     <string name="settings_title">Settings</string>
 
     <!-- Bottom Nav Variables -->
-
 
 
     <string name="nav_care">Care</string>
