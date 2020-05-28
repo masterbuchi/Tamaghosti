@@ -52,14 +52,12 @@ public class Dragon extends TransformableNode {
     }
 
 
-
     private ObjectAnimator orbitAnimation = null;
 
     private ObjectAnimator objectAnimation = null;
 
     // Rotating test
     private float degreesPerSecond = 90.0f;
-
 
 
     public Dragon(ArFragment arFragment) {
@@ -72,11 +70,10 @@ public class Dragon extends TransformableNode {
 
         filamentAsset = this.getRenderableInstance().getFilamentAsset();
 
-        for (int i=0; i < filamentAsset.getAnimator().getAnimationCount(); i++) {
+        for (int i = 0; i < filamentAsset.getAnimator().getAnimationCount(); i++) {
             animators.add(new AnimationInstance(filamentAsset.getAnimator(), i, System.nanoTime()));
         }
     }
-
 
 
     @Override
@@ -92,11 +89,10 @@ public class Dragon extends TransformableNode {
     }
 
 
-
     public void updateAnimation(int index) {
 
 
-       startTimeofCurrentAnimation = System.nanoTime();
+        startTimeofCurrentAnimation = System.nanoTime();
 
         parentArFragment
                 .getArSceneView()
@@ -106,7 +102,7 @@ public class Dragon extends TransformableNode {
 
                             Long time = System.nanoTime();
                             for (AnimationInstance animator : animators) {
-                                animator.animator.applyAnimation(index, (float) ((time - startTimeofCurrentAnimation) / (double) SECONDS.toNanos(1)) % animator.duration);
+                                animator.animator.applyAnimation(index, (float) (4*(time - startTimeofCurrentAnimation) / (double) SECONDS.toNanos(1)) % animator.duration);
                                 animator.animator.updateBoneMatrices();
                                 //Log.d("Animators", Integer.toString(index));
 
@@ -139,17 +135,12 @@ public class Dragon extends TransformableNode {
         // This makes the animation linear (smooth and uniform).
         objectAnimation.setInterpolator(new LinearInterpolator());
 
-        double time = distance/0.01333f;
+        double time = distance / 0.01333f;
 
         // Duration in ms of the animation.
-        objectAnimation.setDuration((long) (distance/0.01333f)*1000);
+        objectAnimation.setDuration((long) (distance / 0.01333f) * 1000);
         updateAnimation(3);
         objectAnimation.start();
-
-
-
-
-
 
 
         objectAnimation.addListener(new android.animation.Animator.AnimatorListener() {
@@ -215,7 +206,9 @@ public class Dragon extends TransformableNode {
         return true;
     }*/
 
-   /* *//** Returns an ObjectAnimator that makes this node rotate. *//*
+
+    //Returns an ObjectAnimator that makes this node rotate.
+     /*
     private void startAnimation() {
         if (orbitAnimation != null) {
             return;
