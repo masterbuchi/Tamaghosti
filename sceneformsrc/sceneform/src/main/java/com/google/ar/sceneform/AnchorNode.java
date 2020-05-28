@@ -85,11 +85,7 @@ public class AnchorNode extends Node {
 
   /** Returns true if the ARCore anchor’s tracking state is TRACKING. */
   public boolean isTracking() {
-    if (anchor == null || anchor.getTrackingState() != TrackingState.TRACKING) {
-      return false;
-    }
-
-    return true;
+      return anchor != null && anchor.getTrackingState() == TrackingState.TRACKING;
   }
 
   /**

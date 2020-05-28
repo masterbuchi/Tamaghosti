@@ -52,9 +52,7 @@ public class Dragon extends TransformableNode {
     }
 
 
-    private ObjectAnimator orbitAnimation = null;
-
-    private ObjectAnimator objectAnimation = null;
+        private ObjectAnimator objectAnimation = null;
 
     // Rotating test
     private float degreesPerSecond = 90.0f;
@@ -118,6 +116,39 @@ public class Dragon extends TransformableNode {
     @Override
     public void onActivate() {
         updateAnimation(2);
+    }
+
+
+    double moveToDynamic(AnchorNode newPos, double distance) {
+
+        float velocityStart = 1;
+        float friction = 1;
+
+
+        /*//newPos.getWorldPosition : new Position the Dragon goes to
+        //this.getWorldPosition : current Position of the dragon
+        float distanceInX = Math.abs(newPos.getWorldPosition().x - this.getWorldPosition().x);
+        float distanceInY = Math.abs(newPos.getWorldPosition().y - this.getWorldPosition().y);
+
+
+        FlingAnimation flingX = new FlingAnimation(, DynamicAnimation.TRANSLATION_X);
+        flingX.setStartVelocity(velocityStart)
+                //.setMinValue(MIN_TRANSLATION) // minimum translationX property
+                //.setMaxValue(maxTranslationX)  // maximum translationX property
+                .setFriction(friction)
+                .start();
+
+        FlingAnimation flingY = new FlingAnimation(mViewTobeFlung, DynamicAnimation.TRANSLATION_Y);
+        flingY.setStartVelocity(velocityStart)
+                //.setMinValue(MIN_TRANSLATION) // minimum translationX property
+                //.setMaxValue(maxTranslationX)  // maximum translationX property
+                .setFriction(friction)
+                .start();
+*/
+
+
+
+        return distance;
     }
 
     double moveTo(AnchorNode newPos, double distance) {

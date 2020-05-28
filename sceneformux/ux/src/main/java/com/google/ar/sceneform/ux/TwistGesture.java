@@ -99,11 +99,7 @@ public class TwistGesture extends BaseGesture<TwistGesture> {
 
     float rotation =
         calculateDeltaRotation(newPosition1, newPosition2, startPosition1, startPosition2);
-    if (Math.abs(rotation) < SLOP_ROTATION_DEGREES) {
-      return false;
-    }
-
-    return true;
+      return !(Math.abs(rotation) < SLOP_ROTATION_DEGREES);
   }
 
   @Override

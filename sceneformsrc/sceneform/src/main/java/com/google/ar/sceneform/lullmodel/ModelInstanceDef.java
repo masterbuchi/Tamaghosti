@@ -61,7 +61,7 @@ public final class ModelInstanceDef extends Table {
   /**
    * Whether or not the attributes in the vertex data are interleaved.
    */
-  public boolean interleaved() { int o = __offset(18); return o != 0 ? 0!=bb.get(o + bb_pos) : true; }
+  public boolean interleaved() { int o = __offset(18); return o == 0 || 0 != bb.get(o + bb_pos); }
   /**
    * Maps the skeleton bone index to the shader bone index. The shader bones
    * are only the bones that have at least one vertex weighted to them and, as

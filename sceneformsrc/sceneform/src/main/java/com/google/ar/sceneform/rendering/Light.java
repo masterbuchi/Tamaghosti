@@ -34,13 +34,13 @@ public class Light {
      * #setInnerConeAngle} and {@link #setOuterConeAngle} to control the cone size.
      */
     FOCUSED_SPOTLIGHT
-  };
+  }
 
-  interface LightChangedListener {
+    interface LightChangedListener {
     void onChange();
-  };
+  }
 
-  /** Minimum accepted light intensity */
+    /** Minimum accepted light intensity */
   private static final float MIN_LIGHT_INTENSITY = 0.0001f;
 
   private final Type type;

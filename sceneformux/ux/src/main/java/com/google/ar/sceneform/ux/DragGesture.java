@@ -92,11 +92,7 @@ public class DragGesture extends BaseGesture<DragGesture> {
     Vector3 newPosition = GesturePointersUtility.motionEventToPosition(motionEvent, pointerId);
     float diff = Vector3.subtract(newPosition, startPosition).length();
     float slopPixels = gesturePointersUtility.inchesToPixels(SLOP_INCHES);
-    if (diff >= slopPixels) {
-      return true;
-    }
-
-    return false;
+      return diff >= slopPixels;
   }
 
   @Override

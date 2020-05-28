@@ -239,11 +239,11 @@ public class ArActivity extends AppCompatActivity {
 
 
 
-                        showToast("Distance: " + Double.toString(distance));
+                        showToast("Distance: " + distance);
 
                         double time = dragon.moveTo(moveToNode, distance);
 
-                            showToast("Time: " +Double.toString(time));
+                            showToast("Time: " + time);
 
 
                     }

@@ -81,9 +81,7 @@ class Intersections {
     if (MathHelper.almostEqualRelativeAndAbs(sphereDiffLengthSquared, 0.0f)) {
       Vector3 boxDiff = Vector3.subtract(point, box.getCenter());
       float boxDiffLengthSquared = Vector3.dot(boxDiff, boxDiff);
-      if (MathHelper.almostEqualRelativeAndAbs(boxDiffLengthSquared, 0.0f)) {
-        return false;
-      }
+        return !MathHelper.almostEqualRelativeAndAbs(boxDiffLengthSquared, 0.0f);
     }
 
     return true;

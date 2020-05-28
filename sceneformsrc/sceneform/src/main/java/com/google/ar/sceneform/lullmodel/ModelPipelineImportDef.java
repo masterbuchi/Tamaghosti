@@ -34,7 +34,7 @@ public final class ModelPipelineImportDef extends Table {
    * Inserts an extra node into the asset hierarchy so that the resulting model
    * is centered around the origin.
    */
-  public boolean recenter() { int o = __offset(8); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
+  public boolean recenter() { int o = __offset(8); return o != 0 && 0 != bb.get(o + bb_pos); }
   /**
    * Multiplier applied to the model to change its scale.
    */
@@ -55,33 +55,33 @@ public final class ModelPipelineImportDef extends Table {
   /**
    * some clients do not use LOG to report errors
    */
-  public boolean reportErrorsToStdout() { int o = __offset(18); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
+  public boolean reportErrorsToStdout() { int o = __offset(18); return o != 0 && 0 != bb.get(o + bb_pos); }
   /**
    * Inverts vertical texture coordinates when enabled (D3D/OGL difference).
    */
-  public boolean flipTextureCoordinates() { int o = __offset(20); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
+  public boolean flipTextureCoordinates() { int o = __offset(20); return o != 0 && 0 != bb.get(o + bb_pos); }
   /**
    * Pre-transforms vertices by their node hierarchy so that all vertices are
    * in the same object-space, and the node hierarchy is flattened.
    */
-  public boolean flattenHierarchyAndTransformVerticesToRootSpace() { int o = __offset(22); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
+  public boolean flattenHierarchyAndTransformVerticesToRootSpace() { int o = __offset(22); return o != 0 && 0 != bb.get(o + bb_pos); }
   /**
    * If a model contains both metallic-roughness textures and
    * specular-glossiness textures, this flag causes the import to only use the
    * specular-glossiness textures. Otherwise, it uses the metallic-rougness
    * textures.
    */
-  public boolean useSpecularGlossinessTexturesIfPresent() { int o = __offset(24); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
+  public boolean useSpecularGlossinessTexturesIfPresent() { int o = __offset(24); return o != 0 && 0 != bb.get(o + bb_pos); }
   /**
    * Toggle for Assimp's aiProcess_FixInfacingNormals process.
    */
-  public boolean fixInfacingNormals() { int o = __offset(26); return o != 0 ? 0!=bb.get(o + bb_pos) : true; }
+  public boolean fixInfacingNormals() { int o = __offset(26); return o == 0 || 0 != bb.get(o + bb_pos); }
   /**
    * Encodes a sign into the w value of the orientation quaternion such that >0
    * implies a right handed space, and <0 implies a left handed space. w==0
    * should never happen. This allows orientation components to be encoded in a
    */
-  public boolean ensureVertexOrientationWNotZero() { int o = __offset(28); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
+  public boolean ensureVertexOrientationWNotZero() { int o = __offset(28); return o != 0 && 0 != bb.get(o + bb_pos); }
   /**
    * Distinct from 'scale'; defines the unit we expect positions to be in.
    * Kept as 0 for backwards compatibility, this would be 100.0 for contexts
@@ -96,7 +96,7 @@ public final class ModelPipelineImportDef extends Table {
    */
   public String targetMeshes(int j) { int o = __offset(32); return o != 0 ? __string(__vector(o) + j * 4) : null; }
   public int targetMeshesLength() { int o = __offset(32); return o != 0 ? __vector_len(o) : 0; }
-  public boolean mergeMaterials() { int o = __offset(34); return o != 0 ? 0!=bb.get(o + bb_pos) : true; }
+  public boolean mergeMaterials() { int o = __offset(34); return o == 0 || 0 != bb.get(o + bb_pos); }
 
   public static int createModelPipelineImportDef(FlatBufferBuilder builder,
       int nameOffset,

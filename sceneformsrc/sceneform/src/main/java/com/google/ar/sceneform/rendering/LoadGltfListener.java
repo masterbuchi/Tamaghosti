@@ -3,7 +3,7 @@ package com.google.ar.sceneform.rendering;
 /** Interface callbacks for events that occur when loading a gltf file into a renderable. */
 public interface LoadGltfListener {
   /** Defines the current stage of the load operation, each value supersedes the previous. */
-  public enum GltfLoadStage {
+  enum GltfLoadStage {
     LOAD_STAGE_NONE,
     FETCH_MATERIALS,
     DOWNLOAD_MODEL,

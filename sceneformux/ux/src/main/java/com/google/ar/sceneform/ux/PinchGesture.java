@@ -132,11 +132,7 @@ public class PinchGesture extends BaseGesture<PinchGesture> {
     gap = Vector3.subtract(newPosition1, newPosition2).length();
     float separation = Math.abs(gap - startGap);
     float slopPixels = gesturePointersUtility.inchesToPixels(SLOP_INCHES);
-    if (separation < slopPixels) {
-      return false;
-    }
-
-    return true;
+      return !(separation < slopPixels);
   }
 
   @Override

@@ -43,7 +43,7 @@ public class HandMotionView extends AppCompatImageView {
     clearAnimation();
 
     FrameLayout container =
-        (FrameLayout) ((Activity) getContext()).findViewById(R.id.sceneform_hand_layout);
+            ((Activity) getContext()).findViewById(R.id.sceneform_hand_layout);
 
     animation = new HandMotionAnimation(container, this);
     animation.setRepeatCount(Animation.INFINITE);

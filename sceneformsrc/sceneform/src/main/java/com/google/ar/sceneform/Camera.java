@@ -454,7 +454,7 @@ public class Camera extends Node implements CameraProvider {
       throw new IllegalArgumentException("Parameter \"aspect\" must be greater than zero.");
     }
 
-    final double fovInRadians = Math.toRadians((double) verticalFovInDegrees);
+    final double fovInRadians = Math.toRadians(verticalFovInDegrees);
     final float top = (float) Math.tan(fovInRadians * 0.5) * near;
     final float bottom = -top;
     final float right = top * aspect;

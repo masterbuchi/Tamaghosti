@@ -6,7 +6,7 @@ import com.google.ar.sceneform.utilities.LoadHelper;
 
 final class RenderingResources {
 
-  public static enum Resource {
+  public enum Resource {
     CAMERA_MATERIAL,
     OPAQUE_COLORED_MATERIAL,
     TRANSPARENT_COLORED_MATERIAL,
@@ -16,10 +16,10 @@ final class RenderingResources {
     PLANE_MATERIAL,
     PLANE,
     VIEW_RENDERABLE,
-  };
+  }
 
-  
-  private static int GetSceneformSourceResource(Context context, Resource resource) {
+
+    private static int GetSceneformSourceResource(Context context, Resource resource) {
     switch (resource) {
       case CAMERA_MATERIAL:
         return LoadHelper.rawResourceNameToIdentifier(context, "sceneform_camera_material");

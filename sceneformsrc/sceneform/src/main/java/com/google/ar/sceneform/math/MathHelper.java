@@ -23,10 +23,7 @@ public class MathHelper {
     b = Math.abs(b);
     float largest = Math.max(a, b);
 
-    if (diff <= largest * FLT_EPSILON) {
-      return true;
-    }
-    return false;
+      return diff <= largest * FLT_EPSILON;
   }
 
   /** Clamps a value between a minimum and maximum range. */

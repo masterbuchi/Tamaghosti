@@ -1355,11 +1355,7 @@ public class Node extends NodeParent implements TransformProvider {
       return false;
     }
 
-    if (parentAsNode != null && !parentAsNode.isActive()) {
-      return false;
-    }
-
-    return true;
+      return parentAsNode == null || parentAsNode.isActive();
   }
 
   private void activate() {

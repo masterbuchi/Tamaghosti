@@ -44,7 +44,7 @@
             android:configChanges="orientation|screenSize"
             android:screenOrientation="locked"
             android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
-        <activity android:name=".NeedsControlActivity" />
+
         <activity
             android:name=".MainMenuActivity"
             android:configChanges="orientation|screenSize"

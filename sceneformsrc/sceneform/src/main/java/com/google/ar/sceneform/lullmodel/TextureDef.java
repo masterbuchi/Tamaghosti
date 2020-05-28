@@ -24,15 +24,15 @@ public final class TextureDef extends Table {
   public int dataLength() { int o = __offset(8); return o != 0 ? __vector_len(o) : 0; }
   public ByteBuffer dataAsByteBuffer() { return __vector_as_bytebuffer(8, 1); }
   public ByteBuffer dataInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 8, 1); }
-  public boolean generateMipmaps() { int o = __offset(10); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
-  public boolean premultiplyAlpha() { int o = __offset(12); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
+  public boolean generateMipmaps() { int o = __offset(10); return o != 0 && 0 != bb.get(o + bb_pos); }
+  public boolean premultiplyAlpha() { int o = __offset(12); return o != 0 && 0 != bb.get(o + bb_pos); }
   public int minFilter() { int o = __offset(14); return o != 0 ? bb.getShort(o + bb_pos) & 0xFFFF : 4; }
   public int magFilter() { int o = __offset(16); return o != 0 ? bb.getShort(o + bb_pos) & 0xFFFF : 1; }
   public int wrapS() { int o = __offset(18); return o != 0 ? bb.getShort(o + bb_pos) & 0xFFFF : 4; }
   public int wrapT() { int o = __offset(20); return o != 0 ? bb.getShort(o + bb_pos) & 0xFFFF : 4; }
   public int wrapR() { int o = __offset(22); return o != 0 ? bb.getShort(o + bb_pos) & 0xFFFF : 4; }
   public int targetType() { int o = __offset(24); return o != 0 ? bb.getShort(o + bb_pos) & 0xFFFF : 0; }
-  public boolean isRgbm() { int o = __offset(26); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
+  public boolean isRgbm() { int o = __offset(26); return o != 0 && 0 != bb.get(o + bb_pos); }
 
   public static int createTextureDef(FlatBufferBuilder builder,
       int nameOffset,
