@@ -71,6 +71,8 @@
     <string name="lable_training">Training</string>
     <string name="resolve">Resolve</string>
     <string name="plus_sign">Plus Sign</string>
+    <string name="eatAgain">eat again</string>
+    <string name="eating">Eating</string>
 
 
 </resources>

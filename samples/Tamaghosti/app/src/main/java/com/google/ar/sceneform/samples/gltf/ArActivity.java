@@ -15,13 +15,12 @@
  */
 package com.google.ar.sceneform.samples.gltf;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -82,32 +81,21 @@ public class ArActivity extends AppCompatActivity {
     NeedsController needsControl = new NeedsController();
 
     private String mDragonName;
-    private PersistenceManager persistenceManager;
 
 
     private AppAnchorState appAnchorState = AppAnchorState.NONE;
     private Anchor anchor;
 
-    // Cloud Anchor auf dem selben Gerät
-    private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
 
     private FirebaseManager firebaseManager;
 
     private boolean dragonSet = false;
-    private int animationCount = 0;
     private ArFragment arFragment;
     private Renderable renderable;
-    private Handler mainHandler = new Handler();
 
     //volatile == immer aktuellsten wert, nicht cache
     private volatile boolean stopThread = false;
-
-
-    public int eat_index = 0;
-    public int getPet_index = 1;
-    public int idle_index = 2;
-    public int walk_index = 3;
 
     /**
      * Returns false and displays an error message if Sceneform can not run, true if Sceneform can run
@@ -118,12 +106,6 @@ public class ArActivity extends AppCompatActivity {
      * <p>Finishes the activity if Sceneform can not run
      */
     public static boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
-        if (Build.VERSION.SDK_INT < VERSION_CODES.N) {
-            Log.e(TAG, "Sceneform requires Android N or later");
-            Toast.makeText(activity, "Sceneform requires Android N or later", Toast.LENGTH_LONG).show();
-            activity.finish();
-            return false;
-        }
         String openGlVersionString =
                 ((ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE))
                         .getDeviceConfigurationInfo()
@@ -150,7 +132,8 @@ public class ArActivity extends AppCompatActivity {
 
 
         // Cloud Anchor on same device
-        prefs = getSharedPreferences("AnchorId", MODE_PRIVATE);
+        // Cloud Anchor auf dem selben Gerät
+        SharedPreferences prefs = getSharedPreferences("AnchorId", MODE_PRIVATE);
         editor = prefs.edit();
 
         Intent in = getIntent();
@@ -166,7 +149,7 @@ public class ArActivity extends AppCompatActivity {
         needsControl.setTraining(tValue);
 
 
-        persistenceManager = new PersistenceManager(getApplicationContext());
+        PersistenceManager persistenceManager = new PersistenceManager(getApplicationContext());
         mDragonName = persistenceManager.getString("dragon_name", null);
 
 
@@ -187,10 +170,6 @@ public class ArActivity extends AppCompatActivity {
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
         WeakReference<ArActivity> weakActivity = new WeakReference<>(this);
-
-        // Winkemann-link:  //"https://drive.google.com/uc?export=download&id=1eidGtNQDjHZrFC-xQOtFoZgYu7OqMBfU"
-        // Beispieldatei aus Googledrive fuer passendes Linkformat
-        // https://drive.google.com/uc?export=download&id=
 
         ModelRenderable.builder()
                 .setSource(
@@ -227,15 +206,13 @@ public class ArActivity extends AppCompatActivity {
                         // Create the Anchor.
                         AnchorNode moveToNode = createAnchor(hitResult);
 
-                        Vector3 rotationVect = new Vector3 (moveToNode.getWorldPosition().x -dragon.getWorldPosition().x,
+                        /*Vector3 rotationVect = new Vector3 (moveToNode.getWorldPosition().x -dragon.getWorldPosition().x,
                                 moveToNode.getWorldPosition().y -dragon.getWorldPosition().y,
-                                moveToNode.getWorldPosition().z -dragon.getWorldPosition().z);
+                                moveToNode.getWorldPosition().z -dragon.getWorldPosition().z);*/
 
 
-                        double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2));
-                      //  double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
-
-                        Vector3  normVect = rotationVect.normalized();
+                       // double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2));
+                       double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
 
 
 
@@ -331,61 +308,52 @@ public class ArActivity extends AppCompatActivity {
         training.setEnabled(false);
 
         //Eat animation, hunger + 10, sleep -10
-        mainAction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (needsControl.getHunger() <= 90) {
-                    needsControl.feed(getApplicationContext());
-                    setNeeds();
-                    showPlus();
-                    if (dragon != null) {
-                        //Change Animation mit Handler
+        mainAction.setOnClickListener(v -> {
+            if (needsControl.getHunger() <= 90) {
+                needsControl.feed(getApplicationContext());
+                setNeeds();
+                showPlus();
+                if (dragon != null) {
+                    //Change Animation mit Handler
 
-                        dragon.updateAnimation(eat_index);
+                    dragon.updateAnimation(dragon.eat_index);
 
-                        // if certain duration needed:
-                        float duration = dragon.getFilamentAsset().getAnimator().getAnimationDuration(0);
-                        startThread(null, duration);
-                    }
+                    // if certain duration needed:
+                    float duration = dragon.getFilamentAsset().getAnimator().getAnimationDuration(0);
+                    startThread(duration);
                 }
-
             }
+
         });
 
 // if (model != null) noch nicht überall implementiert, um tests zu beschleunigen
 
 
-        sleep.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("SleepOverviewDebug", "current sleepValue2 " + needsControl.getEnergy());
+        sleep.setOnClickListener(v -> {
+            Log.d("SleepOverviewDebug", "current sleepValue2 " + needsControl.getEnergy());
 
-                Intent intent = new Intent(ArActivity.this, SleepActivity.class);
-                intent.putExtra("hungerValue", needsControl.getHunger());
-                intent.putExtra("sleepValue", needsControl.getEnergy());
-                intent.putExtra("socialValue", needsControl.getSocial());
-                intent.putExtra("trainingValue", needsControl.getTraining());
-                startActivity(intent);
-            }
+            Intent intent = new Intent(ArActivity.this, SleepActivity.class);
+            intent.putExtra("hungerValue", needsControl.getHunger());
+            intent.putExtra("sleepValue", needsControl.getEnergy());
+            intent.putExtra("socialValue", needsControl.getSocial());
+            intent.putExtra("trainingValue", needsControl.getTraining());
+            startActivity(intent);
         });
 
 
         if (needsControl.getHunger() == 100 && needsControl.getEnergy() >= 80) {
             social.setVisibility(View.VISIBLE);
         }
-        social.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (needsControl.getSocial() <= 90) {
-                    needsControl.pet(getApplicationContext());
-                    setNeeds();
-                    showPlus();
-                }
-                if (dragon != null) {
-                    dragon.updateAnimation(getPet_index);
-                }
-                Log.d("SocialDebug", "pressed " + needsControl.getSocial());
+        social.setOnClickListener(v -> {
+            if (needsControl.getSocial() <= 90) {
+                needsControl.pet(getApplicationContext());
+                setNeeds();
+                showPlus();
             }
+            if (dragon != null) {
+                dragon.updateAnimation(dragon.getPet_index);
+            }
+            Log.d("SocialDebug", "pressed " + needsControl.getSocial());
         });
 
 
@@ -393,21 +361,18 @@ public class ArActivity extends AppCompatActivity {
             training.setVisibility(View.VISIBLE);
         }
 
-        training.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (needsControl.getTraining() <= 90) {
-                    needsControl.train(getApplicationContext());
-                    setNeeds();
-                    showPlus();
-                }
-                Log.d("SocialDebug", "pressed " + needsControl.getTraining());
+        training.setOnClickListener(v -> {
+            if (needsControl.getTraining() <= 90) {
+                needsControl.train(getApplicationContext());
+                setNeeds();
+                showPlus();
             }
+            Log.d("SocialDebug", "pressed " + needsControl.getTraining());
         });
     }
 
     private AnchorNode createAnchor(HitResult hitResult) {
-        anchor = arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor());
+        anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
         appAnchorState = AppAnchorState.HOSTING;
 
         AnchorNode anchorNode = new AnchorNode(anchor);
@@ -431,6 +396,7 @@ public class ArActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("SetTextI18n")
     private void updateCurrentDragonPositionWindow() {
         Vector3 dragonPosition = dragon.getWorldPosition();
         TextView textView = findViewById(R.id.modelPosition);
@@ -444,7 +410,7 @@ public class ArActivity extends AppCompatActivity {
     }
 
     public void hintControl(int value) {
-        //hint is Checked text view and can disappear when checked. not implememnted yet
+        //hint is Checked text view and can disappear when checked. not implemented yet
 
         switch (value) {
             case 0:
@@ -495,12 +461,7 @@ public class ArActivity extends AppCompatActivity {
         plus.setVisibility(View.VISIBLE);
 
         Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                plus.setVisibility(View.INVISIBLE);
-
-            }
-        }, 7000);
+        handler.postDelayed(() -> plus.setVisibility(View.INVISIBLE), 7000);
     }
 
     public void setNeeds() {
@@ -515,7 +476,7 @@ public class ArActivity extends AppCompatActivity {
     }
 
 
-    public void startThread(View view, float duration) {
+    public void startThread(float duration) {
         stopThread = false;
         float d = duration * 1000;
         int e = (int) d;
@@ -524,17 +485,8 @@ public class ArActivity extends AppCompatActivity {
         new Thread(runnable).start();
     }
 
-    public void stopThread(View view) {
-        stopThread = true;
-    }
-
-    //Animation siehe https://blog.flexiple.com/build-your-first-android-ar-app-using-arcore-and-sceneform/
-
-
-    //Handler siehe  https://codinginflow.com/tutorials/android/starting-a-background-thread
-    class ExampleRunnable implements Runnable {
+       class ExampleRunnable implements Runnable {
         int milliseconds;
-        int checkDuration;
 
         ExampleRunnable(int seconds) {
             this.milliseconds = seconds;
@@ -547,12 +499,9 @@ public class ArActivity extends AppCompatActivity {
                 return;
             Log.d("ANIMATION", "new thread count: " + milliseconds);
 
-            mainAction.post(new Runnable() {
-                @Override
-                public void run() {
-                    mainAction.setText("Duration " + milliseconds);
-                    mainAction.setEnabled(false);
-                }
+            mainAction.post(() -> {
+                mainAction.setText(R.string.eating);
+                mainAction.setEnabled(false);
             });
             try {
                 Thread.sleep(milliseconds);
@@ -560,14 +509,11 @@ public class ArActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    dragon.updateAnimation(idle_index);
-                    mainAction.setText("eat again");
-                    mainAction.setEnabled(true);
+            runOnUiThread(() -> {
+                dragon.updateAnimation(dragon.idle_index);
+                mainAction.setText(R.string.eatAgain);
+                mainAction.setEnabled(true);
 
-                }
             });
         }
     }

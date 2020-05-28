@@ -2,38 +2,43 @@ package com.google.ar.sceneform.samples.gltf;
 
 import android.animation.ObjectAnimator;
 import android.util.ArraySet;
-import android.util.Log;
 import android.view.animation.LinearInterpolator;
-import android.widget.TextView;
 
 import com.google.android.filament.gltfio.Animator;
 import com.google.android.filament.gltfio.FilamentAsset;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.FrameTime;
-import com.google.ar.sceneform.math.Quaternion;
-import com.google.ar.sceneform.math.QuaternionEvaluator;
-import com.google.ar.sceneform.math.Vector3;
+
 import com.google.ar.sceneform.math.Vector3Evaluator;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
-import com.google.ar.sceneform.ux.TransformationSystem;
+
 
 
 import java.util.Set;
 
-import androidx.appcompat.app.AppCompatActivity;
+
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 
 public class Dragon extends TransformableNode {
 
-    public static volatile int vIndex;
-    public volatile FilamentAsset filamentAsset;
+
+    private volatile FilamentAsset filamentAsset;
     private final Set<AnimationInstance> animators = new ArraySet<>();
     private ArFragment parentArFragment;
 
-    Long startTimeofCurrentAnimation;
+    private Long startTimeofCurrentAnimation;
+
+
+
+    int eat_index = 0;
+    int getPet_index = 1;
+    int idle_index = 2;
+    int walk_index = 3;
+    private float speedFactor = 3;
+
 
     private static class AnimationInstance {
         Animator animator;
@@ -52,20 +57,15 @@ public class Dragon extends TransformableNode {
     }
 
 
-        private ObjectAnimator objectAnimation = null;
-
-    // Rotating test
-    private float degreesPerSecond = 90.0f;
-
-
-    public Dragon(ArFragment arFragment) {
+    Dragon(ArFragment arFragment) {
         super(arFragment.getTransformationSystem());
         parentArFragment = arFragment;
     }
 
 
-    public void setDragonAnimations() {
+    void setDragonAnimations() {
 
+        assert this.getRenderableInstance() != null;
         filamentAsset = this.getRenderableInstance().getFilamentAsset();
 
         for (int i = 0; i < filamentAsset.getAnimator().getAnimationCount(); i++) {
@@ -87,7 +87,7 @@ public class Dragon extends TransformableNode {
     }
 
 
-    public void updateAnimation(int index) {
+    void updateAnimation(int index) {
 
 
         startTimeofCurrentAnimation = System.nanoTime();
@@ -100,7 +100,7 @@ public class Dragon extends TransformableNode {
 
                             Long time = System.nanoTime();
                             for (AnimationInstance animator : animators) {
-                                animator.animator.applyAnimation(index, (float) (4*(time - startTimeofCurrentAnimation) / (double) SECONDS.toNanos(1)) % animator.duration);
+                                animator.animator.applyAnimation(index, (float) (speedFactor * (time - startTimeofCurrentAnimation) / (double) SECONDS.toNanos(1)) % animator.duration);
                                 animator.animator.updateBoneMatrices();
                                 //Log.d("Animators", Integer.toString(index));
 
@@ -109,23 +109,23 @@ public class Dragon extends TransformableNode {
     }
 
 
-    public FilamentAsset getFilamentAsset() {
+    FilamentAsset getFilamentAsset() {
         return filamentAsset;
     }
 
     @Override
     public void onActivate() {
-        updateAnimation(2);
+        updateAnimation(idle_index);
     }
 
-
+/*
     double moveToDynamic(AnchorNode newPos, double distance) {
 
         float velocityStart = 1;
         float friction = 1;
 
 
-        /*//newPos.getWorldPosition : new Position the Dragon goes to
+        //newPos.getWorldPosition : new Position the Dragon goes to
         //this.getWorldPosition : current Position of the dragon
         float distanceInX = Math.abs(newPos.getWorldPosition().x - this.getWorldPosition().x);
         float distanceInY = Math.abs(newPos.getWorldPosition().y - this.getWorldPosition().y);
@@ -144,16 +144,19 @@ public class Dragon extends TransformableNode {
                 //.setMaxValue(maxTranslationX)  // maximum translationX property
                 .setFriction(friction)
                 .start();
-*/
+
 
 
 
         return distance;
     }
 
+    */
+
+
     double moveTo(AnchorNode newPos, double distance) {
 
-        objectAnimation = new ObjectAnimator();
+        ObjectAnimator objectAnimation = new ObjectAnimator();
         objectAnimation.setAutoCancel(true);
         objectAnimation.setTarget(this);
         // All the positions should be world positions
@@ -169,8 +172,8 @@ public class Dragon extends TransformableNode {
         double time = distance / 0.01333f;
 
         // Duration in ms of the animation.
-        objectAnimation.setDuration((long) (distance / 0.01333f) * 1000);
-        updateAnimation(3);
+        objectAnimation.setDuration((long) (distance * speedFactor / 0.01333f) * 1000);
+        updateAnimation(walk_index);
         objectAnimation.start();
 
 
@@ -183,7 +186,7 @@ public class Dragon extends TransformableNode {
             @Override
             public void onAnimationEnd(android.animation.Animator animation) {
                 setNewPosition(newPos);
-                updateAnimation(2);
+                updateAnimation(idle_index);
 
             }
 
@@ -203,7 +206,7 @@ public class Dragon extends TransformableNode {
     }
 
 
-    void setNewPosition(AnchorNode newPos) {
+    private void setNewPosition(AnchorNode newPos) {
         this.setWorldPosition(newPos.getWorldPosition());
     }
 
