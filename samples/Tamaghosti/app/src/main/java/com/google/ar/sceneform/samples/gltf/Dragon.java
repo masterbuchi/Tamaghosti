@@ -11,6 +11,7 @@ import com.google.ar.sceneform.FrameTime;
 
 import com.google.ar.sceneform.math.Vector3Evaluator;
 import com.google.ar.sceneform.ux.ArFragment;
+import com.google.ar.sceneform.ux.BaseTransformableNode;
 import com.google.ar.sceneform.ux.TransformableNode;
 
 
@@ -18,11 +19,14 @@ import com.google.ar.sceneform.ux.TransformableNode;
 import java.util.Set;
 
 
+import androidx.dynamicanimation.animation.DynamicAnimation;
+import androidx.dynamicanimation.animation.FlingAnimation;
+import androidx.dynamicanimation.animation.SpringAnimation;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 
-public class Dragon extends TransformableNode {
+public class Dragon extends TransformableNode  {
 
 
     private volatile FilamentAsset filamentAsset;
@@ -37,7 +41,7 @@ public class Dragon extends TransformableNode {
     int getPet_index = 1;
     int idle_index = 2;
     int walk_index = 3;
-    private float speedFactor = 3;
+    private float speedFactor = 4;
 
 
     private static class AnimationInstance {
@@ -100,7 +104,7 @@ public class Dragon extends TransformableNode {
 
                             Long time = System.nanoTime();
                             for (AnimationInstance animator : animators) {
-                                animator.animator.applyAnimation(index, (float) (speedFactor * (time - startTimeofCurrentAnimation) / (double) SECONDS.toNanos(1)) % animator.duration);
+                                animator.animator.applyAnimation(index, (float) ( speedFactor * (time - startTimeofCurrentAnimation) / (double) SECONDS.toNanos(1)) % animator.duration);
                                 animator.animator.updateBoneMatrices();
                                 //Log.d("Animators", Integer.toString(index));
 
@@ -116,10 +120,12 @@ public class Dragon extends TransformableNode {
     @Override
     public void onActivate() {
         updateAnimation(idle_index);
+
+
     }
 
-/*
-    double moveToDynamic(AnchorNode newPos, double distance) {
+
+   /* double moveToDynamic(AnchorNode newPos, double distance) {
 
         float velocityStart = 1;
         float friction = 1;
@@ -131,7 +137,7 @@ public class Dragon extends TransformableNode {
         float distanceInY = Math.abs(newPos.getWorldPosition().y - this.getWorldPosition().y);
 
 
-        FlingAnimation flingX = new FlingAnimation(, DynamicAnimation.TRANSLATION_X);
+        FlingAnimation flingX = new FlingAnimation(this, DynamicAnimation.TRANSLATION_X);
         flingX.setStartVelocity(velocityStart)
                 //.setMinValue(MIN_TRANSLATION) // minimum translationX property
                 //.setMaxValue(maxTranslationX)  // maximum translationX property
@@ -149,9 +155,9 @@ public class Dragon extends TransformableNode {
 
 
         return distance;
-    }
+    }*/
 
-    */
+
 
 
     double moveTo(AnchorNode newPos, double distance) {
@@ -169,10 +175,11 @@ public class Dragon extends TransformableNode {
         // This makes the animation linear (smooth and uniform).
         objectAnimation.setInterpolator(new LinearInterpolator());
 
-        double time = distance / 0.01333f;
+        double velocity = 0.1*speedFactor;
+        double time = distance / velocity;
 
         // Duration in ms of the animation.
-        objectAnimation.setDuration((long) (distance * speedFactor / 0.01333f) * 1000);
+        objectAnimation.setDuration((long) (distance  / velocity) * 1000);
         updateAnimation(walk_index);
         objectAnimation.start();
 

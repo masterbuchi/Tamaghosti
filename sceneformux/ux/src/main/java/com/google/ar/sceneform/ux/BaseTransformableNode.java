@@ -70,12 +70,12 @@ public abstract class BaseTransformableNode extends Node implements Node.OnTapLi
     select();
   }
 
-  protected void addTransformationController(
-      BaseTransformationController<?> transformationController) {
+  public void addTransformationController(
+          BaseTransformationController<?> transformationController) {
     controllers.add(transformationController);
   }
 
-  protected void removeTransformationController(
+  public void removeTransformationController(
       BaseTransformationController<?> transformationController) {
     controllers.remove(transformationController);
   }

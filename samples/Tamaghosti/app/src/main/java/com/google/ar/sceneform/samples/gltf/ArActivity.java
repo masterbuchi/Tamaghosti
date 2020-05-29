@@ -286,8 +286,6 @@ public class ArActivity extends AppCompatActivity {
 
         // Create the Anchor.
         AnchorNode anchorNode = createAnchor(hitResult);
-
-
         // Create the transformable model and add it to the anchorNode.
         createDragonNode(anchorNode);
         //Load all Animations of the Model into the Dragon
@@ -326,7 +324,6 @@ public class ArActivity extends AppCompatActivity {
 
         });
 
-// if (model != null) noch nicht überall implementiert, um tests zu beschleunigen
 
 
         sleep.setOnClickListener(v -> {
@@ -386,9 +383,16 @@ public class ArActivity extends AppCompatActivity {
         dragon = new Dragon(arFragment);
 
         // Deactivate Rotation and Translation
+
+
         dragon.getTranslationController().setEnabled(false);
         dragon.getRotationController().setEnabled(false);
         //     model.getScaleController().setEnabled(false);
+
+
+        DragPettingController dragPettingController = new DragPettingController(dragon, arFragment.getTransformationSystem().getDragRecognizer());
+        dragon.addTransformationController(dragPettingController);
+
 
         dragon.setParent(anchorNode);
         dragon.setRenderable(renderable);
