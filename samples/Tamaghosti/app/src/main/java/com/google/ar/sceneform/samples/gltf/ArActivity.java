@@ -65,6 +65,7 @@ public class ArActivity extends AppCompatActivity {
     private static final String TAG = ArActivity.class.getSimpleName();
     private static final double MIN_OPENGL_VERSION = 3.0;
 
+    OnSwipeTouchListener onSwipeTouchListener;
 
     Dragon dragon;
     ProgressBar prgHunger;
@@ -131,6 +132,8 @@ public class ArActivity extends AppCompatActivity {
         firebaseManager = new FirebaseManager();
 
 
+
+
         // Cloud Anchor on same device
         // Cloud Anchor auf dem selben Gerät
         SharedPreferences prefs = getSharedPreferences("AnchorId", MODE_PRIVATE);
@@ -169,6 +172,9 @@ public class ArActivity extends AppCompatActivity {
 
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
+
+
+
         WeakReference<ArActivity> weakActivity = new WeakReference<>(this);
 
         ModelRenderable.builder()
@@ -194,8 +200,6 @@ public class ArActivity extends AppCompatActivity {
 
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
-
-
                     if (renderable == null) {
                         showToast("model failed to load");
                         return;
@@ -203,6 +207,11 @@ public class ArActivity extends AppCompatActivity {
 
 
                     if (dragonSet) {
+
+                        assert arFragment != null;
+                        onSwipeTouchListener = new OnSwipeTouchListener(this, arFragment.getArSceneView());
+
+                        // Moving the dragon
                         // Create the Anchor.
                         AnchorNode moveToNode = createAnchor(hitResult);
 
@@ -211,10 +220,7 @@ public class ArActivity extends AppCompatActivity {
                                 moveToNode.getWorldPosition().z -dragon.getWorldPosition().z);*/
 
 
-                       // double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2));
-                       double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
-
-
+                        double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
 
                         showToast("Distance: " + distance);
 
@@ -257,6 +263,9 @@ public class ArActivity extends AppCompatActivity {
             }
 
         });
+
+
+
 
         /*
         Button resolve = findViewById(R.id.resolve);
@@ -390,8 +399,9 @@ public class ArActivity extends AppCompatActivity {
         //     model.getScaleController().setEnabled(false);
 
 
-        DragPettingController dragPettingController = new DragPettingController(dragon, arFragment.getTransformationSystem().getDragRecognizer());
+        DragPettingController dragPettingController = new DragPettingController(dragon, dragon, arFragment.getTransformationSystem().getDragRecognizer());
         dragon.addTransformationController(dragPettingController);
+
 
 
         dragon.setParent(anchorNode);
