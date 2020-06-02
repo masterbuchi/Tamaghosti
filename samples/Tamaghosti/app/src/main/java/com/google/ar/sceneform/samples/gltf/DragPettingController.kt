@@ -11,12 +11,15 @@ import com.google.ar.sceneform.ux.DragGestureRecognizer
 class DragPettingController(private var dragon: Dragon, transformableNode: BaseTransformableNode, gestureRecognizer: DragGestureRecognizer) :
         BaseTransformationController<DragGesture>(transformableNode, gestureRecognizer) {
 
-    // Rate that the node rotates in degrees per degree of twisting.
-    var rotationRateDegrees = 0.5f
-    var animationStart: Boolean = false;
+    private var animationStart: Boolean = false;
 
 
     public override fun canStartTransformation(gesture: DragGesture): Boolean {
+        if (!animationStart) {
+            dragon.updateAnimation(dragon.getPet_index);
+            animationStart = true
+        }
+
         return transformableNode.isSelected
     }
 
