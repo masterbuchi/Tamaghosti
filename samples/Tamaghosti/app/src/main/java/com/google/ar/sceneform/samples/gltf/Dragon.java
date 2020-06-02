@@ -46,14 +46,12 @@ public class Dragon extends TransformableNode  {
 
     private static class AnimationInstance {
         Animator animator;
-        Long startTime;
         float duration;
         int index;
 
 
-        AnimationInstance(Animator animator, int index, Long startTime) {
+        AnimationInstance(Animator animator, int index) {
             this.animator = animator;
-            this.startTime = startTime;
             this.duration = animator.getAnimationDuration(index);
             this.index = index;
         }
@@ -64,6 +62,7 @@ public class Dragon extends TransformableNode  {
     Dragon(ArFragment arFragment) {
         super(arFragment.getTransformationSystem());
         parentArFragment = arFragment;
+
     }
 
 
@@ -73,7 +72,7 @@ public class Dragon extends TransformableNode  {
         filamentAsset = this.getRenderableInstance().getFilamentAsset();
 
         for (int i = 0; i < filamentAsset.getAnimator().getAnimationCount(); i++) {
-            animators.add(new AnimationInstance(filamentAsset.getAnimator(), i, System.nanoTime()));
+            animators.add(new AnimationInstance(filamentAsset.getAnimator(), i));
         }
     }
 

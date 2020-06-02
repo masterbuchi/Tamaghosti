@@ -254,22 +254,6 @@ public class ArActivity extends AppCompatActivity {
 
         });
 
-
-
-
-        /*
-        Button resolve = findViewById(R.id.resolve);
-        resolve.setOnClickListener(view -> {
-            String anchorId = prefs.getString("anchorId", "null");
-            if (anchorId.equals("null")) {
-                showToast("No anchor found");
-                return;
-            }
-
-            Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
-            showToast("Hat geklappt");
-        });
-        */
     }
 
     private void createDragon(HitResult hitResult) {
@@ -287,8 +271,6 @@ public class ArActivity extends AppCompatActivity {
         AnchorNode anchorNode = createAnchor(hitResult);
         // Create the transformable model and add it to the anchorNode.
         createDragonNode(anchorNode);
-        //Load all Animations of the Model into the Dragon
-        dragon.setDragonAnimations();
         //Update current Position window of Dragon
         updateCurrentDragonPositionWindow();
     }
@@ -382,8 +364,6 @@ public class ArActivity extends AppCompatActivity {
         dragon = new Dragon(arFragment);
 
         // Deactivate Rotation and Translation
-
-
         dragon.getTranslationController().setEnabled(false);
         dragon.getRotationController().setEnabled(false);
         //     model.getScaleController().setEnabled(false);
@@ -396,8 +376,8 @@ public class ArActivity extends AppCompatActivity {
 
         dragon.setParent(anchorNode);
         dragon.setRenderable(renderable);
-        dragon.select();
-
+//        dragon.select();
+        dragon.setDragonAnimations();
     }
 
     @SuppressLint("SetTextI18n")

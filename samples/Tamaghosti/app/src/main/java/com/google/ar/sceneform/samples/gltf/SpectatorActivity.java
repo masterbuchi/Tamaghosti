@@ -35,9 +35,6 @@ public class SpectatorActivity extends AppCompatActivity {
 
         WeakReference<SpectatorActivity> weakActivity = new WeakReference<>(this);
 
-        // Winkemann-link:  //"https://drive.google.com/uc?export=download&id=1eidGtNQDjHZrFC-xQOtFoZgYu7OqMBfU"
-        // Beispieldatei aus Googledrive fuer passendes Linkformat
-        // https://drive.google.com/uc?export=download&id=
 
         ModelRenderable.builder()
                 .setSource(
@@ -58,12 +55,6 @@ public class SpectatorActivity extends AppCompatActivity {
 
                             return null;
                         });
-
-
-
-
-
-
 
         Button resolve = findViewById(R.id.resolve);
 
@@ -87,9 +78,6 @@ public class SpectatorActivity extends AppCompatActivity {
 
             }
 
-
-
-            // showToast("Hat geklappt");
         });
 
     }
