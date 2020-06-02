@@ -75,4 +75,20 @@
     <string name="eating">Eating</string>
 
 
+    <!-- Notification Strings -->
+
+    <!-- Two different types: @30%, @1ß% -->
+
+    <string name="notification_hunger_title">is hungry</string>
+
+    <string name="notification_hunger_normal">Get your dragon some nice food.</string>
+    <string name="notification_hunger_urgent">Your dragon hasn\'t eaten for a long time.</string>
+
+
+    <string name="notification_social_title">feels lonely</string>
+
+    <string name="notification_social_normal">Got some spare time for your dragon?</string>
+    <string name="notification_social_urgent">Better spend some time with your dragon.</string>
+
+
 </resources>

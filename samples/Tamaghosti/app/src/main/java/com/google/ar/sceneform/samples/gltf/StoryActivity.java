@@ -4,10 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.concurrent.TimeUnit;
 
 public class StoryActivity extends AppCompatActivity {
 
@@ -59,10 +65,14 @@ public class StoryActivity extends AppCompatActivity {
 
                 // Open GLTFActivity
                 Intent intent = new Intent(StoryActivity.this, ArActivity.class);
-                intent.putExtra("hungerValue", hungerValue);
-                intent.putExtra("sleepValue", sleepValue);
-                intent.putExtra("socialValue", socialValue);
-                intent.putExtra("trainingValue", trainingValue);
+
+                WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+
+                PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(SystemWorker.class, 15, TimeUnit.MINUTES)
+                        .build();
+
+                workManager.enqueueUniquePeriodicWork("Background Logic", ExistingPeriodicWorkPolicy.REPLACE, request);
+
 
                 startActivity(intent);
 

@@ -9,63 +9,70 @@ import android.util.Log;
 public class NeedsController {
 
 
+    private PersistenceManager persistenceManager;
+
+    private Context context;
+
     private int hunger;
     private int energy;
     private int social;
     private int training;
 
-    private PersistenceManager persistenceManager;
+    public NeedsController(Context context) {
+
+        this.context = context;
+
+        persistenceManager = new PersistenceManager(context);
 
 
-    public void feed(Context context){
+
+    }
+
+
+    public void feed(){
 
         setHunger(10);
 
-        persistenceManager = new PersistenceManager(context);
         persistenceManager.saveInt("hunger", hunger);
 
         Log.d("SleepDebug", "check Energy in feed " + energy);
-        getTired(context);
+        getTired();
     }
 
-    public void getTired(Context context){
-        setEnergy( - 10);
+    public void getTired(){
+        setEnergy(-10);
 
-        persistenceManager = new PersistenceManager(context);
         persistenceManager.saveInt("sleep", energy);
 
         Log.d("SleepDebug", "check Energy in tired " + energy);
     }
 
-    public void getHungry(Context context){
+    public void getHungry(){
 
-        setHunger( - 10);
+        setHunger(-10);
 
-        persistenceManager = new PersistenceManager(context);
         persistenceManager.saveInt("hunger", hunger);
 
 
     }
 
-    public void pet(Context context){
-        setSocial( 10);
+    public void pet(){
+        setSocial(10);
 
-        persistenceManager = new PersistenceManager(context);
         persistenceManager.saveInt("social", social);
 
-        getTired(context);
-        getHungry(context);
+        getTired();
+        getHungry();
     }
 
-    public void train(Context context){
+    public void train(){
 
         setTraining(10);
 
-        persistenceManager = new PersistenceManager(context);
         persistenceManager.saveInt("training", training);
 
-        getTired(context);
-        getHungry(context);
+        getTired();
+        getHungry();
     }
 
     public void setEnergy(int value) {
@@ -94,19 +101,19 @@ public class NeedsController {
     }
 
     public int getEnergy() {
-        return energy;
+        return  persistenceManager.getInt("sleep", 0);
     }
 
     public int getHunger() {
-        return hunger;
+        return  persistenceManager.getInt("hunger", 0);
     }
 
     public int getSocial() {
-        return social;
+        return  persistenceManager.getInt("social", 0);
     }
 
     public int getTraining() {
-        return training;
+        return  persistenceManager.getInt("training", 0);
     }
 
 }

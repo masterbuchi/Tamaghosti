@@ -79,7 +79,7 @@ public class ArActivity extends AppCompatActivity {
     ImageView plus;
 
 
-    NeedsController needsControl = new NeedsController();
+    NeedsController needsControl;
 
     private String mDragonName;
 
@@ -131,7 +131,7 @@ public class ArActivity extends AppCompatActivity {
 
         firebaseManager = new FirebaseManager();
 
-
+        needsControl = new NeedsController(getApplicationContext());
 
 
         // Cloud Anchor on same device
@@ -139,21 +139,11 @@ public class ArActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("AnchorId", MODE_PRIVATE);
         editor = prefs.edit();
 
-        Intent in = getIntent();
-
-        final int hValue = in.getIntExtra("hungerValue", 0);
-        final int slValue = in.getIntExtra("sleepValue", 0);
-        final int soValue = in.getIntExtra("socialValue", 0);
-        final int tValue = in.getIntExtra("trainingValue", 0);
-
-        needsControl.setHunger(hValue);
-        needsControl.setEnergy(slValue);
-        needsControl.setSocial(soValue);
-        needsControl.setTraining(tValue);
-
 
         PersistenceManager persistenceManager = new PersistenceManager(getApplicationContext());
         mDragonName = persistenceManager.getString("dragon_name", null);
+
+        //int hValue = persistenceManager.getInt("hunger", 0);
 
 
         Log.d("SleepOverviewDebug", "current sleepValue1 " + needsControl.getEnergy());
@@ -317,7 +307,7 @@ public class ArActivity extends AppCompatActivity {
         //Eat animation, hunger + 10, sleep -10
         mainAction.setOnClickListener(v -> {
             if (needsControl.getHunger() <= 90) {
-                needsControl.feed(getApplicationContext());
+                needsControl.feed();
                 setNeeds();
                 showPlus();
                 if (dragon != null) {
@@ -352,7 +342,7 @@ public class ArActivity extends AppCompatActivity {
         }
         social.setOnClickListener(v -> {
             if (needsControl.getSocial() <= 90) {
-                needsControl.pet(getApplicationContext());
+                needsControl.pet();
                 setNeeds();
                 showPlus();
             }
@@ -369,7 +359,7 @@ public class ArActivity extends AppCompatActivity {
 
         training.setOnClickListener(v -> {
             if (needsControl.getTraining() <= 90) {
-                needsControl.train(getApplicationContext());
+                needsControl.train();
                 setNeeds();
                 showPlus();
             }

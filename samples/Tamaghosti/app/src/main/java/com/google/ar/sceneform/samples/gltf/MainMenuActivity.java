@@ -4,10 +4,19 @@ import android.content.Intent;
 
 import androidx.annotation.IdRes;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkerParameters;
+
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import java.util.concurrent.TimeUnit;
 
 public class MainMenuActivity extends AppCompatActivity {
 
@@ -18,14 +27,11 @@ public class MainMenuActivity extends AppCompatActivity {
 
         PersistenceManager persistenceManager = new PersistenceManager(getApplicationContext());
 
-        // Mode Private: Nur die App kann auf die Daten zugreifen
-        //SharedPreferences preferences = getApplicationContext().getSharedPreferences("preferences", MODE_PRIVATE);
-
-        //SharedPreferences.Editor editor = preferences.edit();
-
 
         // Def-value: Value to return if this preference does not exist
         boolean firstStart = persistenceManager.getBoolean("first_start", true);
+
+        Log.i("TEST", String.valueOf(firstStart));
 
         if (!firstStart) {
 
@@ -35,15 +41,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
             continueGameButton.setOnClickListener(view -> {
 
-                Toast.makeText(getApplicationContext(), "Tapped", Toast.LENGTH_SHORT);
-
                 // Load
                 Intent intent = new Intent(MainMenuActivity.this, ArActivity.class);
-
-                intent.putExtra("hungerValue", persistenceManager.getInt("hunger", 0));
-                intent.putExtra("sleepValue", persistenceManager.getInt("sleep", 0));
-                intent.putExtra("socialValue", persistenceManager.getInt("social", 0));
-                intent.putExtra("trainingValue", persistenceManager.getInt("training", 0));
 
                 startActivity(intent);
 
