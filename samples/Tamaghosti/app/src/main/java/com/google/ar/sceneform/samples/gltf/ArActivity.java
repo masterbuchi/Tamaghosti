@@ -40,6 +40,7 @@ import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
@@ -208,17 +209,19 @@ public class ArActivity extends AppCompatActivity {
                         AnchorNode moveToNode = createAnchor(hitResult);
 
 
-
-                       // Vector3 rotationVect = new Vector3 (moveToNode.getWorldPosition().x -dragon.getWorldPosition().x,
-                        //        moveToNode.getWorldPosition().y -dragon.getWorldPosition().y,
-                          //      moveToNode.getWorldPosition().z -dragon.getWorldPosition().z);
-
                         Vector3 rotationVect = new Vector3().subtract(moveToNode.getWorldPosition(), dragon.getWorldPosition());
+
+                    //   Log.d("Rotation", "Dragon World Position: " + dragon.getWorldPosition());
+
+                      //  Log.d("Rotation", "moveToNode.getWorldPosition(): " + moveToNode.getWorldPosition());
+
+                     //   Log.d("Rotation", "rotationVect: " + rotationVect);
 
                         double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
 
-                        showToast("Distance: " + distance);
-                       // double time = dragon.moveTo(moveToNode, distance);
+                       // showToast("Distance: " + distance);
+                        double time = dragon.moveTo(moveToNode, distance);
+
 
                         dragon.rotateDragon(rotationVect);
 
@@ -241,6 +244,7 @@ public class ArActivity extends AppCompatActivity {
         // Cloud Anchor Sachen
         arFragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
 
+
             if (appAnchorState != AppAnchorState.HOSTING)
                 return;
             Anchor.CloudAnchorState cloudAnchorState = anchor.getCloudAnchorState();
@@ -248,6 +252,8 @@ public class ArActivity extends AppCompatActivity {
             if (cloudAnchorState.isError()) {
                 showToast(cloudAnchorState.toString());
             } else if (cloudAnchorState == Anchor.CloudAnchorState.SUCCESS) {
+
+
                 appAnchorState = AppAnchorState.HOSTED;
                 String anchorId = anchor.getCloudAnchorId();
 
@@ -279,6 +285,8 @@ public class ArActivity extends AppCompatActivity {
         createDragonNode(anchorNode);
         //Update current Position window of Dragon
         updateCurrentDragonPositionWindow();
+
+
     }
 
 
@@ -355,6 +363,7 @@ public class ArActivity extends AppCompatActivity {
         });
     }
 
+
     private AnchorNode createAnchor(HitResult hitResult) {
         anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
         appAnchorState = AppAnchorState.HOSTING;
@@ -391,7 +400,7 @@ public class ArActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetTextI18n")
-    private void updateCurrentDragonPositionWindow() {
+    void updateCurrentDragonPositionWindow() {
         Vector3 dragonPosition = dragon.getWorldPosition();
         TextView textView = findViewById(R.id.modelPosition);
         textView.setText("");
