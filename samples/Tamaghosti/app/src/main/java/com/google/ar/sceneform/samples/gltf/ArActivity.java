@@ -65,7 +65,7 @@ public class ArActivity extends AppCompatActivity {
     private static final String TAG = ArActivity.class.getSimpleName();
     private static final double MIN_OPENGL_VERSION = 3.0;
 
-    OnSwipeTouchListener onSwipeTouchListener;
+    //OnSwipeTouchListener onSwipeTouchListener;
 
     Dragon dragon;
     ProgressBar prgHunger;
@@ -195,38 +195,44 @@ public class ArActivity extends AppCompatActivity {
                         return;
                     }
 
-
-                    if (dragonSet) {
-
-                        assert arFragment != null;
-                        onSwipeTouchListener = new OnSwipeTouchListener(this, arFragment.getArSceneView());
-
-                        // Moving the dragon
-                        // Create the Anchor.
-                        AnchorNode moveToNode = createAnchor(hitResult);
-
-                        /*Vector3 rotationVect = new Vector3 (moveToNode.getWorldPosition().x -dragon.getWorldPosition().x,
-                                moveToNode.getWorldPosition().y -dragon.getWorldPosition().y,
-                                moveToNode.getWorldPosition().z -dragon.getWorldPosition().z);*/
-
-
-                        double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
-
-                        showToast("Distance: " + distance);
-
-                        double time = dragon.moveTo(moveToNode, distance);
-
-                            showToast("Time: " + time);
-
-
-                    }
-
                     if (dragon == null) {
 
                         createDragon(hitResult);
 
 
+                    } else {
+
+
+                        // Moving the dragon
+                        // Create the Anchor.
+                        AnchorNode moveToNode = createAnchor(hitResult);
+
+
+
+                       // Vector3 rotationVect = new Vector3 (moveToNode.getWorldPosition().x -dragon.getWorldPosition().x,
+                        //        moveToNode.getWorldPosition().y -dragon.getWorldPosition().y,
+                          //      moveToNode.getWorldPosition().z -dragon.getWorldPosition().z);
+
+                        Vector3 rotationVect = new Vector3().subtract(moveToNode.getWorldPosition(), dragon.getWorldPosition());
+
+                        double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
+
+                        showToast("Distance: " + distance);
+                       // double time = dragon.moveTo(moveToNode, distance);
+
+                        dragon.rotateDragon(rotationVect);
+
+                       //     showToast("Time: " + time);
+
+
+
+
+
                     }
+
+
+
+
 
 
                 });
@@ -308,7 +314,7 @@ public class ArActivity extends AppCompatActivity {
 
 
         sleep.setOnClickListener(v -> {
-            Log.d("SleepOverviewDebug", "current sleepValue2 " + needsControl.getEnergy());
+
 
             Intent intent = new Intent(ArActivity.this, SleepActivity.class);
             intent.putExtra("hungerValue", needsControl.getHunger());
@@ -331,7 +337,7 @@ public class ArActivity extends AppCompatActivity {
             if (dragon != null) {
                 dragon.updateAnimation(dragon.getPet_index);
             }
-            Log.d("SocialDebug", "pressed " + needsControl.getSocial());
+
         });
 
 
@@ -368,9 +374,13 @@ public class ArActivity extends AppCompatActivity {
         dragon.getRotationController().setEnabled(false);
         //     model.getScaleController().setEnabled(false);
 
+       // assert arFragment != null;
+       // onSwipeTouchListener = new OnSwipeTouchListener(this, arFragment.getArSceneView());
 
         DragPettingController dragPettingController = new DragPettingController(dragon, dragon, arFragment.getTransformationSystem().getDragRecognizer());
         dragon.addTransformationController(dragPettingController);
+
+
 
 
 

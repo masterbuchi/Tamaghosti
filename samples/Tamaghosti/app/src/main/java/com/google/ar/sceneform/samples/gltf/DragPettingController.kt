@@ -1,8 +1,6 @@
 package com.google.ar.sceneform.samples.gltf
 
-import com.google.ar.sceneform.Node
-import com.google.ar.sceneform.math.Quaternion
-import com.google.ar.sceneform.math.Vector3
+import android.util.Log
 import com.google.ar.sceneform.ux.BaseTransformableNode
 import com.google.ar.sceneform.ux.BaseTransformationController
 import com.google.ar.sceneform.ux.DragGesture
@@ -18,6 +16,7 @@ class DragPettingController(private var dragon: Dragon, transformableNode: BaseT
         if (!animationStart) {
             dragon.updateAnimation(dragon.getPet_index);
             animationStart = true
+            Log.d("Petting", "Petting started")
         }
 
         return transformableNode.isSelected
@@ -36,8 +35,13 @@ class DragPettingController(private var dragon: Dragon, transformableNode: BaseT
     }
 
     public override fun onEndTransformation(gesture: DragGesture) {
-      dragon.updateAnimation(dragon.idle_index)
-        animationStart = false
+
+        if (animationStart) {
+            dragon.updateAnimation(dragon.idle_index)
+            animationStart = false
+
+            Log.d("Petting", "Petting finished")
+        }
     }
 
 

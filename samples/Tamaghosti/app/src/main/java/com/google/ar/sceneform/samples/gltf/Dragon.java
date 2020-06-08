@@ -2,6 +2,7 @@ package com.google.ar.sceneform.samples.gltf;
 
 import android.animation.ObjectAnimator;
 import android.util.ArraySet;
+import android.util.Log;
 import android.view.animation.LinearInterpolator;
 
 import com.google.android.filament.gltfio.Animator;
@@ -9,19 +10,17 @@ import com.google.android.filament.gltfio.FilamentAsset;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.FrameTime;
 
+import com.google.ar.sceneform.math.Quaternion;
+import com.google.ar.sceneform.math.QuaternionEvaluator;
+import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.math.Vector3Evaluator;
 import com.google.ar.sceneform.ux.ArFragment;
-import com.google.ar.sceneform.ux.BaseTransformableNode;
 import com.google.ar.sceneform.ux.TransformableNode;
 
 
 
 import java.util.Set;
 
-
-import androidx.dynamicanimation.animation.DynamicAnimation;
-import androidx.dynamicanimation.animation.FlingAnimation;
-import androidx.dynamicanimation.animation.SpringAnimation;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -35,6 +34,7 @@ public class Dragon extends TransformableNode  {
 
     private Long startTimeofCurrentAnimation;
 
+    ObjectAnimator dragonRotation;
 
 
     int eat_index = 0;
@@ -62,6 +62,8 @@ public class Dragon extends TransformableNode  {
     Dragon(ArFragment arFragment) {
         super(arFragment.getTransformationSystem());
         parentArFragment = arFragment;
+
+
 
     }
 
@@ -211,52 +213,107 @@ public class Dragon extends TransformableNode  {
         return time;
     }
 
+   void rotateDragon(Vector3 distanceVector) {
+
+       if (dragonRotation != null) {
+           return;
+       }
+
+
+        if (distanceVector.length() < 1)
+        {
+            Log.d("Rotation", "DistanceVectorlength  too small");
+            return;
+            //exit - don't do any rotation
+            //distance is too small for rotation to be numerically stable
+        }
+
+        //Don't actually need to call normalize for directionA - just doing it to indicate that this vector must be normalized.
+        final Vector3 directionA = new Vector3(0, 1, 0).normalized();
+        final Vector3 directionB = distanceVector.normalized();
+
+        float rotationAngle = (float)Math.acos(new Vector3().dot(directionA, directionB));
+
+       Log.d("Rotation", "Rotationangle: " + rotationAngle);
+
+        if (Math.abs(rotationAngle) < 1)
+        {
+            Log.d("Rotation", "Rotationangle too small");
+            return;
+            //exit - don't do any rotation
+            //angle is too small for rotation to be numerically stable
+        }
+
+        final Vector3 rotationAxis = new Vector3().cross(directionA, directionB).normalized();
+
+       Log.d("Rotation", "RotationAxis: " + rotationAxis);
+
+        //rotate object about rotationAxis by rotationAngle
+
+       dragonRotation = createAnimator(true, rotationAxis, rotationAngle);
+       dragonRotation.setTarget(this);
+       dragonRotation.setDuration((1000 * 360 / 90));
+       dragonRotation.start();
+
+
+
+    }
+
+
+    private static ObjectAnimator createAnimator(boolean clockwise, Vector3 rotationAxis, float rotationAngle) {
+        // Node's setLocalRotation method accepts Quaternions as parameters.
+        // First, set up orientations that will animate a circle.
+        Quaternion[] orientations = new Quaternion[4];
+        // Rotation to apply first, to tilt its axis.
+        Quaternion baseOrientation = Quaternion.axisAngle(rotationAxis,0);
+        for (int i = 0; i < rotationAngle; i++) {
+            //float angle = i * 360 / (orientations.length - 1);
+
+            float angle = i;
+
+            if (clockwise) {
+                angle = 360 - angle;
+            }
+            Quaternion orientation = Quaternion.axisAngle(rotationAxis, angle);
+            orientations[i] = Quaternion.multiply(baseOrientation, orientation);
+        }
+
+        ObjectAnimator rotationAnimation = new ObjectAnimator();
+        // Cast to Object[] to make sure the varargs overload is called.
+        rotationAnimation.setObjectValues(orientations);
+
+        // Next, give it the localRotation property.
+        rotationAnimation.setPropertyName("localRotation");
+
+        // Use Sceneform's QuaternionEvaluator.
+        rotationAnimation.setEvaluator(new QuaternionEvaluator());
+
+        //  Allow rotationAnimation to repeat forever
+        //rotationAnimation.setRepeatCount(ObjectAnimator.INFINITE);
+        //rotationAnimation.setRepeatMode(ObjectAnimator.RESTART);
+        rotationAnimation.setInterpolator(new LinearInterpolator());
+        rotationAnimation.setAutoCancel(false);
+
+        return rotationAnimation;
+    }
+
 
     private void setNewPosition(AnchorNode newPos) {
         this.setWorldPosition(newPos.getWorldPosition());
     }
 
-   /* public boolean moveTo(AnchorNode newPos) {
-
-
-        float velocityStart = 1;
-        float friction = 1;
-
-
-        //newPos.getWorldPosition : new Position the Dragon goes to
-        //this.getWorldPosition : current Position of the dragon
-        float distanceInX = Math.abs(newPos.getWorldPosition().x - this.getWorldPosition().x);
-        float distanceInY = Math.abs(newPos.getWorldPosition().y - this.getWorldPosition().y);
-
-
-            FlingAnimation flingX = new FlingAnimation(, DynamicAnimation.TRANSLATION_X);
-            flingX.setStartVelocity(velocityStart)
-                    //.setMinValue(MIN_TRANSLATION) // minimum translationX property
-                    //.setMaxValue(maxTranslationX)  // maximum translationX property
-                    .setFriction(friction)
-                    .start();
-
-        FlingAnimation flingY = new FlingAnimation(mViewTobeFlung, DynamicAnimation.TRANSLATION_Y);
-        flingY.setStartVelocity(velocityStart)
-                //.setMinValue(MIN_TRANSLATION) // minimum translationX property
-                //.setMaxValue(maxTranslationX)  // maximum translationX property
-                .setFriction(friction)
-                .start();
-
-        return true;
-    }*/
 
 
     //Returns an ObjectAnimator that makes this node rotate.
-     /*
-    private void startAnimation() {
+
+    /*private void startAnimation() {
         if (orbitAnimation != null) {
             return;
         }
 
         orbitAnimation = createAnimator(true, 0);
         orbitAnimation.setTarget(this);
-        orbitAnimation.setDuration(getAnimationDuration());
+        orbitAnimation.setDuration((1000 * 360 / 90));
         orbitAnimation.start();
     }
 
@@ -294,8 +351,8 @@ public class Dragon extends TransformableNode  {
         orbitAnimation.setAutoCancel(true);
 
         return orbitAnimation;
-    }
-*/
+    }*/
+
 
 }
 
