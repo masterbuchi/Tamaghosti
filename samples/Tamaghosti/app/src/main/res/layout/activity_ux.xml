@@ -11,47 +11,47 @@
       android:name="com.google.ar.sceneform.ux.ArFragment"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      tools:layout_editor_absoluteX="-84dp"
-      tools:layout_editor_absoluteY="152dp" />
-
-  <Button
-      android:id="@+id/mainActionControl"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginEnd="24dp"
-      android:layout_marginBottom="24dp"
-      android:editable="false"
-      android:text="@string/nav_actions"
-      app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-      app:layout_constraintEnd_toEndOf="parent" />
-
-  <Button
-      android:id="@+id/sleepControl"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginEnd="24dp"
-      android:layout_marginBottom="24dp"
-      android:text="@string/sleep"
-      app:layout_constraintBottom_toTopOf="@+id/mainActionControl"
-      app:layout_constraintEnd_toEndOf="parent" />
+      tools:layout_editor_absoluteX="121dp"
+      tools:layout_editor_absoluteY="-118dp" />
 
   <Button
       android:id="@+id/trainingControl"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginEnd="24dp"
-      android:layout_marginBottom="24dp"
+      android:layout_marginEnd="16dp"
+      android:layout_marginBottom="12dp"
       android:text="@string/train"
       android:visibility="invisible"
       app:layout_constraintBottom_toTopOf="@+id/socialControl"
       app:layout_constraintEnd_toEndOf="parent" />
 
   <Button
+      android:id="@+id/mainActionControl"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="16dp"
+      android:layout_marginBottom="150dp"
+      android:editable="false"
+      android:text="@string/nav_actions"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
+
+  <Button
+      android:id="@+id/sleepControl"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="16dp"
+      android:layout_marginBottom="32dp"
+      android:text="@string/sleep"
+      app:layout_constraintBottom_toTopOf="@+id/mainActionControl"
+      app:layout_constraintEnd_toEndOf="parent" />
+
+  <Button
       android:id="@+id/socialControl"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginEnd="24dp"
-      android:layout_marginBottom="24dp"
+      android:layout_marginEnd="16dp"
+      android:layout_marginBottom="16dp"
       android:text="@string/social"
       android:visibility="invisible"
       app:layout_constraintBottom_toTopOf="@+id/sleepControl"
@@ -72,120 +72,164 @@
       app:srcCompat="@android:drawable/ic_input_add"
       android:contentDescription="@string/plus_sign" />
 
-  <ProgressBar
-      android:id="@+id/progressHunger"
-      style="?android:attr/progressBarStyleHorizontal"
-      android:layout_width="157dp"
-      android:layout_height="16dp"
-      android:layout_marginTop="16dp"
-      android:layout_marginEnd="104dp"
-      android:background="#00F8F8F8"
-      android:foregroundTint="#00ED1B1B"
-      android:indeterminateTint="#FBFBFB"
-      android:max="100"
-      android:progress="50"
-      android:progressTint="#80CBC4"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
-
-  <ProgressBar
-      android:id="@+id/progressEnergy"
-      style="?android:attr/progressBarStyleHorizontal"
-      android:layout_width="157dp"
-      android:layout_height="16dp"
-      android:layout_marginTop="16dp"
-      android:layout_marginEnd="104dp"
-      android:max="100"
-      android:progress="50"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/progressHunger" />
-
-  <ProgressBar
-      android:id="@+id/progressTraining"
-      style="?android:attr/progressBarStyleHorizontal"
-      android:layout_width="157dp"
-      android:layout_height="16dp"
-      android:layout_marginTop="16dp"
-      android:layout_marginEnd="104dp"
-      android:max="100"
-      android:progress="0"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/progressSocial" />
-
-  <ProgressBar
-      android:id="@+id/progressSocial"
-      style="?android:attr/progressBarStyleHorizontal"
-      android:layout_width="157dp"
-      android:layout_height="16dp"
-      android:layout_marginTop="16dp"
-      android:layout_marginEnd="104dp"
-      android:max="100"
-      android:progress="0"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/progressEnergy" />
-
   <TextView
       android:id="@+id/modelPosition"
-      android:layout_width="98dp"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginStart="8dp"
       android:layout_marginTop="8dp"
       android:text="@string/model_position"
-      android:textColor="@android:color/holo_red_dark"
+      android:textColor="@android:color/primary_text_dark"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="@+id/ux_fragment" />
 
-  <TextView
-      android:id="@+id/lableHunger"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="16dp"
-      android:layout_marginEnd="36dp"
-      android:text="@string/lable_hunger"
+  <ImageButton
+      android:id="@+id/needsShow"
+      android:layout_width="68dp"
+      android:layout_height="43dp"
+      android:tint="#80CBC4"
+      app:layout_constraintBottom_toTopOf="@+id/cardViewNeeds"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
+      app:srcCompat="@android:drawable/ic_menu_sort_by_size" />
 
-  <TextView
-      android:id="@+id/lableSocial"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="12dp"
-      android:layout_marginEnd="44dp"
-      android:text="@string/lable_social"
+  <androidx.cardview.widget.CardView
+      android:id="@+id/cardViewNeeds"
+      android:layout_width="0dp"
+
+
+      android:layout_height="100dp"
+      app:cardElevation="10dp"
+      app:layout_constraintBottom_toBottomOf="@+id/ux_fragment"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/lableEnergy2" />
+      app:layout_constraintStart_toStartOf="parent">
 
-  <TextView
-      android:id="@+id/lableTraining"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="12dp"
-      android:layout_marginEnd="32dp"
-      android:text="@string/lable_training"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/lableSocial" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-  <TextView
-      android:id="@+id/lableEnergy2"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="12dp"
-      android:layout_marginEnd="40dp"
-      android:text="@string/lable_energy"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/lableHunger" />
+      <androidx.constraintlayout.widget.ConstraintLayout
+          android:id="@+id/constraintLayout2"
+          android:layout_width="0dp"
+          android:layout_height="0dp"
+          android:layout_marginEnd="5dp"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toStartOf="@+id/constraintLayout"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent">
 
-  <com.google.android.material.bottomnavigation.BottomNavigationView
-      android:id="@+id/bottomNavigationView"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:background="@color/cardview_shadow_start_color"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:menu="@menu/navigation" />
+        <ProgressBar
+            android:id="@+id/progressTraining"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:max="100"
+            android:progress="0"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lableTraining" />
 
+        <ProgressBar
+            android:id="@+id/progressSocial"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:max="100"
+            android:progress="0"
+            app:layout_constraintBottom_toTopOf="@+id/lableTraining"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lableSocial" />
 
+        <TextView
+            android:id="@+id/lableSocial"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:text="@string/lable_social"
+            app:layout_constraintBottom_toTopOf="@+id/progressSocial"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/lableTraining"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:text="@string/lable_training"
+            app:layout_constraintBottom_toTopOf="@+id/progressTraining"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/progressSocial" />
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+          android:id="@+id/constraintLayout"
+          android:layout_width="0dp"
+          android:layout_height="0dp"
+          android:layout_marginStart="20dp"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
+          app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/lableEnergy2"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:text="@string/lable_energy"
+            app:layout_constraintBottom_toTopOf="@+id/progressEnergy"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/progressHunger" />
+
+        <ProgressBar
+            android:id="@+id/progressEnergy"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:max="100"
+            android:progress="50"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lableEnergy2" />
+
+        <ProgressBar
+            android:id="@+id/progressHunger"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#00F8F8F8"
+            android:foregroundTint="#00ED1B1B"
+            android:indeterminateTint="#FBFBFB"
+            android:max="100"
+            android:progress="50"
+            android:progressTint="#80CBC4"
+            app:layout_constraintBottom_toTopOf="@+id/lableEnergy2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lableHunger" />
+
+        <TextView
+            android:id="@+id/lableHunger"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:text="@string/lable_hunger"
+            app:layout_constraintBottom_toTopOf="@+id/progressHunger"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+      </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+  </androidx.cardview.widget.CardView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

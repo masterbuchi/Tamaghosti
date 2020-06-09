@@ -25,11 +25,13 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -77,11 +79,20 @@ public class ArActivity extends AppCompatActivity {
     Button sleep;
     Button social;
     Button training;
+    ImageButton needsShow;
     ImageView plus;
+
+    TextView lHunger;
+    TextView lEnergy;
+    TextView lSocial;
+    TextView lTraining;
+    CardView card;
+
 
 
     NeedsController needsControl;
 
+    private boolean needsShown = true;
     private String mDragonName;
 
 
@@ -292,6 +303,7 @@ public class ArActivity extends AppCompatActivity {
 
     private void setButtonListeners() {
         mainAction = findViewById(R.id.mainActionControl);
+        needsShow =  findViewById(R.id.needsShow);
         sleep = findViewById(R.id.sleepControl);
         social = findViewById(R.id.socialControl);
         training = findViewById(R.id.trainingControl);
@@ -299,6 +311,20 @@ public class ArActivity extends AppCompatActivity {
         sleep.setEnabled(false);
         social.setEnabled(false);
         training.setEnabled(false);
+
+
+        card = findViewById(R.id.cardViewNeeds);
+
+
+        needsShow.setOnClickListener(v -> {
+            if(needsShown){
+                needsShown = false;
+                card.setVisibility(View.INVISIBLE);
+            }else{
+                needsShown = true;
+                card.setVisibility(View.VISIBLE);
+            }
+        });
 
         //Eat animation, hunger + 10, sleep -10
         mainAction.setOnClickListener(v -> {
