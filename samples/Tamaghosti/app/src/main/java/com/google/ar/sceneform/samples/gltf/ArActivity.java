@@ -24,6 +24,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
@@ -61,6 +62,10 @@ public class ArActivity extends AppCompatActivity {
         NONE
     }
 
+    private enum AnchorType {
+        MOVE_TO_ANCHOR,
+        ANCHOR
+    }
 
     private static final String TAG = ArActivity.class.getSimpleName();
     private static final double MIN_OPENGL_VERSION = 3.0;
@@ -133,7 +138,6 @@ public class ArActivity extends AppCompatActivity {
 
         needsControl = new NeedsController(getApplicationContext());
 
-
         // Cloud Anchor on same device
         // Cloud Anchor auf dem selben Gerät
         SharedPreferences prefs = getSharedPreferences("AnchorId", MODE_PRIVATE);
@@ -142,8 +146,6 @@ public class ArActivity extends AppCompatActivity {
 
         PersistenceManager persistenceManager = new PersistenceManager(getApplicationContext());
         mDragonName = persistenceManager.getString("dragon_name", null);
-
-        //int hValue = persistenceManager.getInt("hunger", 0);
 
 
         Log.d("SleepOverviewDebug", "current sleepValue1 " + needsControl.getEnergy());
@@ -161,8 +163,6 @@ public class ArActivity extends AppCompatActivity {
 
 
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
-
-
 
 
         WeakReference<ArActivity> weakActivity = new WeakReference<>(this);
@@ -203,7 +203,16 @@ public class ArActivity extends AppCompatActivity {
 
                         // Moving the dragon
                         // Create the Anchor.
-                        AnchorNode moveToNode = createAnchor(hitResult);
+                        //AnchorNode moveToNode = createAnchor(hitResult);
+
+
+                        anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
+                        appAnchorState = AppAnchorState.HOSTING;
+
+                        AnchorNode moveToNode = new AnchorNode(anchor);
+                        moveToNode.setParent(arFragment.getArSceneView().getScene());
+
+
 
                         /*Vector3 rotationVect = new Vector3 (moveToNode.getWorldPosition().x -dragon.getWorldPosition().x,
                                 moveToNode.getWorldPosition().y -dragon.getWorldPosition().y,
@@ -212,7 +221,11 @@ public class ArActivity extends AppCompatActivity {
 
                         double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
 
+                        // Upload distance to Firebase
+                        firebaseManager.uploadDistance(distance);
+
                         showToast("Distance: " + distance);
+
 
                         double time = dragon.moveTo(moveToNode, distance);
 
@@ -225,34 +238,48 @@ public class ArActivity extends AppCompatActivity {
 
                         createDragon(hitResult);
 
+                        // Create a standing dragon
+                        firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.STAND);
 
                     }
-
 
                 });
 
 
-        // Cloud Anchor Sachen
+        // Cloud Anchor Update Loop
         arFragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
 
-            if (appAnchorState != AppAnchorState.HOSTING)
-                return;
-            Anchor.CloudAnchorState cloudAnchorState = anchor.getCloudAnchorState();
-
-            if (cloudAnchorState.isError()) {
-                showToast(cloudAnchorState.toString());
-            } else if (cloudAnchorState == Anchor.CloudAnchorState.SUCCESS) {
-                appAnchorState = AppAnchorState.HOSTED;
-                String anchorId = anchor.getCloudAnchorId();
-
-                firebaseManager.uploadAnchorToDatabase(anchorId);
-
-                editor.putString("anchorId", anchorId);
-                editor.apply();
-                showToast("Anchor hosted sucessfully. Anchor Id: " + anchorId);
-            }
+            CheckIfUploaded(anchor, appAnchorState);
 
         });
+
+    }
+
+    private void CheckIfUploaded(Anchor anchor, AppAnchorState state) {
+
+        if (state != AppAnchorState.HOSTING) {
+            return;
+        }
+
+        Anchor.CloudAnchorState cloudAnchorState = anchor.getCloudAnchorState();
+
+        if (cloudAnchorState.isError()) {
+
+            showToast(cloudAnchorState.toString());
+
+        } else if (cloudAnchorState == Anchor.CloudAnchorState.SUCCESS) {
+
+            String anchorId = anchor.getCloudAnchorId();
+
+            // Upload Cloud Anchor
+            firebaseManager.uploadAnchor(anchorId);
+
+
+            appAnchorState = AppAnchorState.HOSTED;
+
+            showToast("Anchor hosted sucessfully. Cloud Anchor Id: " + anchorId);
+
+        }
 
     }
 
@@ -294,6 +321,11 @@ public class ArActivity extends AppCompatActivity {
                 showPlus();
                 if (dragon != null) {
                     //Change Animation mit Handler
+
+
+                    // Notify Database!
+                    firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
+
 
                     dragon.updateAnimation(dragon.eat_index);
 
@@ -349,6 +381,7 @@ public class ArActivity extends AppCompatActivity {
         });
     }
 
+    // Create Cloud Anchor
     private AnchorNode createAnchor(HitResult hitResult) {
         anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
         appAnchorState = AppAnchorState.HOSTING;
