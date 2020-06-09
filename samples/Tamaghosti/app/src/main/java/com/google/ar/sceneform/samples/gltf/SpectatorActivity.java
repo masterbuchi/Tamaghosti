@@ -74,7 +74,8 @@ public class SpectatorActivity extends AppCompatActivity {
                 anchorNode.setParent(arFragment.getArSceneView().getScene());
 
                 // Place Resolved Anchor
-                createDragonNode(anchorNode);
+                dragon = new Dragon(arFragment, anchorNode, renderable);
+                dragon.select();
 
             }
 
@@ -82,22 +83,6 @@ public class SpectatorActivity extends AppCompatActivity {
 
     }
 
-    private void createDragonNode(AnchorNode anchorNode) {
-        // Transformable makes it possible to scale and drag the model
-        dragon = new Dragon(arFragment);
-
-        // Deactivate Rotation and Translation
-        dragon.getTranslationController().setEnabled(false);
-        dragon.getRotationController().setEnabled(false);
-        //     model.getScaleController().setEnabled(false);
-
-        dragon.setParent(anchorNode);
-        dragon.setRenderable(renderable);
-        dragon.select();
-
-        dragon.setDragonAnimations();
-
-    }
 
 
 }

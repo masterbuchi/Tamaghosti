@@ -272,7 +272,7 @@ public class ArActivity extends AppCompatActivity {
 
                 editor.putString("anchorId", anchorId);
                 editor.apply();
-                showToast("Anchor hosted sucessfully. Anchor Id: " + anchorId);
+             //   showToast("Anchor hosted sucessfully. Anchor Id: " + anchorId);
             }
 
         });
@@ -286,14 +286,16 @@ public class ArActivity extends AppCompatActivity {
         social.setEnabled(true);
         training.setEnabled(true);
 
-        showToast(mDragonName + " woke up. Hosting...");
-        dragonSet = true;
 
+       // showToast(mDragonName + " woke up.");
+
+        //This function is not called, after this is set to true
+        dragonSet = true;
 
         // Create the Anchor.
         AnchorNode anchorNode = createAnchor(hitResult);
         // Create the transformable model and add it to the anchorNode.
-        createDragonNode(anchorNode);
+        dragon = new Dragon(arFragment, anchorNode, renderable);
         //Update current Position window of Dragon
         updateCurrentDragonPositionWindow();
 
@@ -400,30 +402,6 @@ public class ArActivity extends AppCompatActivity {
         return anchorNode;
     }
 
-    private void createDragonNode(AnchorNode anchorNode) {
-        // Transformable makes it possible to scale and drag the model
-        dragon = new Dragon(arFragment);
-
-        // Deactivate Rotation and Translation
-        dragon.getTranslationController().setEnabled(false);
-        dragon.getRotationController().setEnabled(false);
-        //     model.getScaleController().setEnabled(false);
-
-       // assert arFragment != null;
-       // onSwipeTouchListener = new OnSwipeTouchListener(this, arFragment.getArSceneView());
-
-        DragPettingController dragPettingController = new DragPettingController(dragon, dragon, arFragment.getTransformationSystem().getDragRecognizer());
-        dragon.addTransformationController(dragPettingController);
-
-
-
-
-
-        dragon.setParent(anchorNode);
-        dragon.setRenderable(renderable);
-//        dragon.select();
-        dragon.setDragonAnimations();
-    }
 
     @SuppressLint("SetTextI18n")
     void updateCurrentDragonPositionWindow() {
