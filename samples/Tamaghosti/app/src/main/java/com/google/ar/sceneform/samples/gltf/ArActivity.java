@@ -170,7 +170,7 @@ public class ArActivity extends AppCompatActivity {
 
         ModelRenderable.builder()
                 .setSource(
-                        this, R.raw.dino)
+                        this, R.raw.dragon66_one)
                 .setIsFilamentGltf(true)
                 .build()
                 .thenAccept(
