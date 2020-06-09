@@ -42,6 +42,7 @@ import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
@@ -71,6 +72,7 @@ public class ArActivity extends AppCompatActivity {
     //OnSwipeTouchListener onSwipeTouchListener;
 
     Dragon dragon;
+    Node meatNode;
     ProgressBar prgHunger;
     ProgressBar prgEnergy;
     ProgressBar prgSocial;
@@ -106,6 +108,8 @@ public class ArActivity extends AppCompatActivity {
     private boolean dragonSet = false;
     private ArFragment arFragment;
     private Renderable renderable;
+    private Renderable meatRenderable;
+
 
     //volatile == immer aktuellsten wert, nicht cache
     private volatile boolean stopThread = false;
@@ -179,6 +183,30 @@ public class ArActivity extends AppCompatActivity {
 
         WeakReference<ArActivity> weakActivity = new WeakReference<>(this);
 
+
+
+        ModelRenderable.builder()
+                .setSource(
+                        this, R.raw.meat)
+                .setIsFilamentGltf(true)
+                .build()
+                .thenAccept(
+                        modelRenderable -> {
+                            ArActivity activity = weakActivity.get();
+                            if (activity != null) {
+                                activity.meatRenderable = modelRenderable;
+                            }
+                        })
+                .exceptionally(
+                        throwable -> {
+
+                            showToast("while loading an error occurred.");
+
+                            return null;
+                        });
+
+
+
         ModelRenderable.builder()
                 .setSource(
                         this, R.raw.dragon66_one)
@@ -198,6 +226,9 @@ public class ArActivity extends AppCompatActivity {
 
                             return null;
                         });
+
+
+
 
 
         arFragment.setOnTapArPlaneListener(
@@ -220,35 +251,19 @@ public class ArActivity extends AppCompatActivity {
                         AnchorNode moveToNode = createAnchor(hitResult);
 
 
+                        createMeat(hitResult);
+
                         Vector3 rotationVect = new Vector3().subtract(moveToNode.getWorldPosition(), dragon.getWorldPosition());
-
-                    //   Log.d("Rotation", "Dragon World Position: " + dragon.getWorldPosition());
-
-                      //  Log.d("Rotation", "moveToNode.getWorldPosition(): " + moveToNode.getWorldPosition());
-
-                     //   Log.d("Rotation", "rotationVect: " + rotationVect);
 
                         double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
 
                        // showToast("Distance: " + distance);
                         double time = dragon.moveTo(moveToNode, distance);
 
-
                         dragon.rotateDragon(rotationVect);
 
                        //     showToast("Time: " + time);
-
-
-
-
-
                     }
-
-
-
-
-
-
                 });
 
 
@@ -276,6 +291,24 @@ public class ArActivity extends AppCompatActivity {
             }
 
         });
+
+    }
+
+
+    private void createMeat(HitResult hitResult) {
+
+
+        meatNode = new Node();
+        AnchorNode anchorNode = createAnchor(hitResult);
+        meatNode.setParent(anchorNode);
+        meatNode.setRenderable(meatRenderable);
+
+        meatNode.setWorldScale(new Vector3(0.25f,0.25f,0.25f));
+
+        meatNode.setLocalRotation(new Quaternion(0,180,180,0));
+
+        meatNode.setLocalPosition(new Vector3().add(meatNode.getLocalPosition(),new Vector3(0,0.01f,0)));
+
 
     }
 
