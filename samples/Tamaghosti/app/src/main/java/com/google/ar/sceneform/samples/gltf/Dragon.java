@@ -14,7 +14,6 @@ import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.QuaternionEvaluator;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.math.Vector3Evaluator;
-import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
@@ -60,23 +59,16 @@ public class Dragon extends TransformableNode  {
     }
 
 
-    Dragon(ArFragment arFragment, AnchorNode anchorNode, Renderable renderable) {
+    Dragon(ArFragment arFragment) {
         super(arFragment.getTransformationSystem());
         parentArFragment = arFragment;
 
-        // Deactivate Rotation and Translation
-        getTranslationController().setEnabled(false);
-        getRotationController().setEnabled(false);
-        //     model.getScaleController().setEnabled(false);
 
 
-        DragPettingController dragPettingController = new DragPettingController(this, this, arFragment.getTransformationSystem().getDragRecognizer());
-        addTransformationController(dragPettingController);
 
-        setParent(anchorNode);
-        setRenderable(renderable);
-        setDragonAnimations();
     }
+
+
 
     void setDragonAnimations() {
 
