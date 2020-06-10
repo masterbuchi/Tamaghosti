@@ -277,6 +277,27 @@ public class ArActivity extends AppCompatActivity {
                         if (meatNode != null) {
                             meatAnimation(hitResult);
                             meatNode.setWorldPosition(moveToNode.getWorldPosition());
+
+
+                            if (needsControl.getHunger() <= 90) {
+                                needsControl.feed();
+                                setNeeds();
+                                showPlus();
+                                if (dragon != null) {
+
+                                    // Notify Database!
+                                    firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
+                                    firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
+
+                                  dragon.setEating(true);
+
+                                    // if certain duration needed:
+
+                                    startThread((float)time);
+                                }
+                            }
+
+
                         }
 
                         //     showToast("Time: " + time);
@@ -324,16 +345,11 @@ public class ArActivity extends AppCompatActivity {
 
     private void createMeat() {
 
-        Log.d("Meat", "Meat Creation started");
 
         //A method to find the screen center. This is used while placing objects in the scene
 
 
        /* Vector3 screenCenter = new Vector3(vw.getWidth() / 2, vw.getHeight() / 2, 0f);
-
-        Log.d("Meat", "Screencenter: " + screenCenter);
-
-
 
 
         Frame frame = vw.getArFrame();
@@ -345,11 +361,9 @@ public class ArActivity extends AppCompatActivity {
 
         AnchorNode anchorNode = createAnchor(hitResult);*/
 
-        Scene arscene =  arFragment.getArSceneView().getScene();
-
                 //create a new TranformableNode that will carry our object
         meatNode = new Node();
-        meatNode.setParent(arscene.getCamera());
+        meatNode.setParent(arFragment.getArSceneView().getScene().getCamera());
         meatNode.setRenderable(meatRenderable);
 
 
@@ -367,9 +381,12 @@ public class ArActivity extends AppCompatActivity {
 
         meatNode.setParent(anchorNode);
 
+
+
         meatNode.setLocalRotation(new Quaternion(0, 180, 180, 0));
         meatNode.setLocalPosition(new Vector3(0,0.05f,0));
         meatNode.setLocalScale(new Vector3(0.25f, 0.25f, 0.25f));
+
 
     }
 
@@ -429,28 +446,6 @@ public class ArActivity extends AppCompatActivity {
 
             if (meatNode == null) createMeat();
 
-
-
-
-            if (needsControl.getHunger() <= 90) {
-                needsControl.feed();
-                setNeeds();
-                showPlus();
-                if (dragon != null) {
-                    //Change Animation mit Handler
-
-
-                    // Notify Database!
-                    firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
-                    firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
-
-                    dragon.updateAnimation(dragon.eat_index);
-
-                    // if certain duration needed:
-                    float duration = dragon.getFilamentAsset().getAnimator().getAnimationDuration(0);
-                    startThread(duration);
-                }
-            }
 
         });
 
@@ -598,7 +593,7 @@ public class ArActivity extends AppCompatActivity {
 
     public void startThread(float duration) {
         stopThread = false;
-        float d = duration * 1000;
+        float d = duration +2000;
         int e = (int) d;
         Log.d("ANIMATION", "duration in millis " + e);
         ExampleRunnable runnable = new ExampleRunnable(e);
@@ -633,6 +628,7 @@ public class ArActivity extends AppCompatActivity {
 
                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE);
 
+                dragon.setEating(false);
                 dragon.updateAnimation(dragon.idle_index);
                 mainAction.setText(R.string.eatAgain);
                 mainAction.setEnabled(true);

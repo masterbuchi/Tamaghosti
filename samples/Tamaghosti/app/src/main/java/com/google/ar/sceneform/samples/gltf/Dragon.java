@@ -35,6 +35,7 @@ public class Dragon extends TransformableNode  {
 
     private Long startTimeofCurrentAnimation;
 
+    private boolean eating;
 
 
 
@@ -138,6 +139,14 @@ public class Dragon extends TransformableNode  {
     }
 
 
+    public boolean getEating() {
+        return eating;
+    }
+
+    public void setEating (boolean eating) {
+        this.eating = eating;
+    }
+
 
 
     double moveTo(AnchorNode newPos, double distance) {
@@ -173,7 +182,8 @@ public class Dragon extends TransformableNode  {
             @Override
             public void onAnimationEnd(android.animation.Animator animation) {
                 setNewPosition(newPos);
-                updateAnimation(idle_index);
+                if (eating) updateAnimation(eat_index);
+                else updateAnimation(idle_index);
 
             }
 
@@ -189,7 +199,7 @@ public class Dragon extends TransformableNode  {
         });
 
 
-        return time;
+        return (long) (distance  / velocity) * 1000;
     }
 
    void rotateDragon(Vector3 distanceVector) {
@@ -230,6 +240,29 @@ public class Dragon extends TransformableNode  {
        dragonRotation.setTarget(this);
        dragonRotation.setDuration((long)  (1000 * radToDegree / 90));
        dragonRotation.start();
+
+
+       dragonRotation.addListener(new android.animation.Animator.AnimatorListener() {
+           @Override
+           public void onAnimationStart(android.animation.Animator animation) {
+
+           }
+
+           @Override
+           public void onAnimationEnd(android.animation.Animator animation) {
+
+           }
+
+           @Override
+           public void onAnimationCancel(android.animation.Animator animation) {
+
+           }
+
+           @Override
+           public void onAnimationRepeat(android.animation.Animator animation) {
+
+           }
+       });
 
     }
 
