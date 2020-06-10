@@ -214,6 +214,32 @@ public class SpectatorActivity extends AppCompatActivity {
                     initAnimationStateListener = false;
                 } else {
                     firebaseManager.setAnimationState(animationState);
+
+                    switch(animationState) {
+
+                        case PET:
+
+                            dragon.updateAnimation(dragon.getPet_index);
+                            break;
+
+                        case EAT:
+
+                            dragon.updateAnimation(dragon.eat_index);
+                            break;
+
+                        case RESET:
+
+                            // Resetting Animation State
+
+
+                        default:
+
+
+
+                            break;
+
+                    }
+
                 }
             }
 

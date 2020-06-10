@@ -324,8 +324,8 @@ public class ArActivity extends AppCompatActivity {
 
 
                     // Notify Database!
+                    firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
                     firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
-
 
                     dragon.updateAnimation(dragon.eat_index);
 
@@ -361,7 +361,14 @@ public class ArActivity extends AppCompatActivity {
                 showPlus();
             }
             if (dragon != null) {
+
+                // Pet dragon
+
                 dragon.updateAnimation(dragon.getPet_index);
+
+                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
+                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.PET);
+
             }
             Log.d("SocialDebug", "pressed " + needsControl.getSocial());
         });
