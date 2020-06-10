@@ -239,8 +239,6 @@ public class SpectatorActivity extends AppCompatActivity {
 
                         default:
 
-
-
                             break;
 
                     }
