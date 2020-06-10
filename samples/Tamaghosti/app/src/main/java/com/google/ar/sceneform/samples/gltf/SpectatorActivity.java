@@ -34,7 +34,7 @@ public class SpectatorActivity extends AppCompatActivity {
 
     private boolean checkForUpdates;
 
-
+    private boolean dragonCreated;
 
     private boolean initAnchorListener;
     private boolean initDistanceListener;
@@ -48,6 +48,8 @@ public class SpectatorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_spectator);
 
         checkForUpdates = false;
+
+        dragonCreated = false;
 
         initAnchorListener = true;
         initAnimationStateListener = true;
@@ -108,7 +110,7 @@ public class SpectatorActivity extends AppCompatActivity {
             if(anchorId == null) {
 
                 Toast.makeText(getApplicationContext(), "Please wait a second", Toast.LENGTH_SHORT).show();
-            } else {
+            } else if(dragonCreated == false) {
 
                 Toast.makeText(getApplicationContext(), "Dragon created", Toast.LENGTH_SHORT).show();
 
@@ -122,8 +124,12 @@ public class SpectatorActivity extends AppCompatActivity {
                 dragon = new Dragon(arFragment, anchorNode, renderable);
                 dragon.select();
 
+                dragonCreated = true;
+
                 checkForUpdates = true;
 
+            } else {
+                Toast.makeText(getApplicationContext(), "Dragon is already created", Toast.LENGTH_SHORT).show();
             }
 
         });
