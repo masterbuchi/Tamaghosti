@@ -217,6 +217,11 @@ public class SpectatorActivity extends AppCompatActivity {
 
                     switch(animationState) {
 
+                        case IDLE:
+
+                            dragon.updateAnimation(dragon.idle_index);
+                            break;
+
                         case PET:
 
                             dragon.updateAnimation(dragon.getPet_index);
