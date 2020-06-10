@@ -239,7 +239,7 @@ public class ArActivity extends AppCompatActivity {
                         createDragon(hitResult);
 
                         // Create a standing dragon
-                        firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.STAND);
+                        firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE);
 
                     }
 
@@ -534,6 +534,9 @@ public class ArActivity extends AppCompatActivity {
             }
 
             runOnUiThread(() -> {
+
+                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE);
+
                 dragon.updateAnimation(dragon.idle_index);
                 mainAction.setText(R.string.eatAgain);
                 mainAction.setEnabled(true);

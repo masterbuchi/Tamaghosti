@@ -36,7 +36,7 @@ public class FirebaseManager {
 
         WALK,
         PET,
-        STAND,
+        IDLE,
         EAT,
         RESET
 
