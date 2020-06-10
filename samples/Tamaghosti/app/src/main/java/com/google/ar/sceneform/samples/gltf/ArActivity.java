@@ -48,6 +48,7 @@ import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.HitTestResult;
 import com.google.ar.sceneform.Node;
+import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
@@ -272,6 +273,12 @@ public class ArActivity extends AppCompatActivity {
 
                         dragon.rotateDragon(rotationVect);
 
+
+                        if (meatNode != null) {
+                            meatAnimation(hitResult);
+                            meatNode.setWorldPosition(moveToNode.getWorldPosition());
+                        }
+
                         //     showToast("Time: " + time);
                     }
                 });
@@ -320,11 +327,13 @@ public class ArActivity extends AppCompatActivity {
         Log.d("Meat", "Meat Creation started");
 
         //A method to find the screen center. This is used while placing objects in the scene
-        ArSceneView vw = arFragment.getArSceneView();
 
-        Vector3 screenCenter = new Vector3(vw.getWidth() / 2, vw.getHeight() / 2, 0f);
+
+       /* Vector3 screenCenter = new Vector3(vw.getWidth() / 2, vw.getHeight() / 2, 0f);
 
         Log.d("Meat", "Screencenter: " + screenCenter);
+
+
 
 
         Frame frame = vw.getArFrame();
@@ -334,27 +343,33 @@ public class ArActivity extends AppCompatActivity {
 
         HitResult hitResult = (HitResult) hitTest.get(hitTest.size() - 1);
 
-        AnchorNode anchorNode = createAnchor(hitResult);
+        AnchorNode anchorNode = createAnchor(hitResult);*/
 
-       /* //Create an anchor at the plane hit
-        Anchor modelAnchor = vw.getSession().createAnchor(hitResult.getHitPose());
-        AnchorNode anchorNode = new AnchorNode(modelAnchor);
-        anchorNode.setParent(arFragment.getArSceneView().getScene());*/
+        Scene arscene =  arFragment.getArSceneView().getScene();
 
-        //create a new TranformableNode that will carry our object
+                //create a new TranformableNode that will carry our object
         meatNode = new Node();
-        meatNode.setParent(anchorNode);
+        meatNode.setParent(arscene.getCamera());
         meatNode.setRenderable(meatRenderable);
 
-        Log.d("Meat", "meatNode WorldScale vorher: " + meatNode.getWorldScale());
 
-        meatNode.setWorldScale(new Vector3(0.25f, 0.25f, 0.25f));
+        meatNode.setLocalRotation(new Quaternion(0, 180, 225, 0));
+        meatNode.setLocalPosition(new Vector3(0,-0.3f,-1));
+        meatNode.setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
 
-        Log.d("Meat", "meatNode WorldScale nachher: " + meatNode.getWorldScale());
+      //  arscene.getCamera().addChild(meatNode);
+
+    }
+
+    private void meatAnimation (HitResult hitResult) {
+
+        AnchorNode anchorNode = createAnchor(hitResult);
+
+        meatNode.setParent(anchorNode);
 
         meatNode.setLocalRotation(new Quaternion(0, 180, 180, 0));
-
-        meatNode.setLocalPosition(new Vector3().add(meatNode.getLocalPosition(), new Vector3(0, 0.05f, 0)));
+        meatNode.setLocalPosition(new Vector3(0,0.05f,0));
+        meatNode.setLocalScale(new Vector3(0.25f, 0.25f, 0.25f));
 
     }
 
