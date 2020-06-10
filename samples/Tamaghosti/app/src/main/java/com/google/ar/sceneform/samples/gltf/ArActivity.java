@@ -89,10 +89,6 @@ public class ArActivity extends AppCompatActivity {
     ImageButton needsShow;
     ImageView plus;
 
-    TextView lHunger;
-    TextView lEnergy;
-    TextView lSocial;
-    TextView lTraining;
     CardView card;
 
 
