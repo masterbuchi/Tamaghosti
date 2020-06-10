@@ -40,17 +40,24 @@ import android.widget.Toast;
 
 
 import com.google.ar.core.Anchor;
+import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
+import com.google.ar.core.Pose;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.ArSceneView;
+import com.google.ar.sceneform.HitTestResult;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
+import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.lang.ref.WeakReference;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This is a example activity that uses the Sceneform UX package to make common AR tasks easier.
@@ -90,7 +97,6 @@ public class ArActivity extends AppCompatActivity {
     ImageView plus;
 
     CardView card;
-
 
 
     NeedsController needsControl;
@@ -180,7 +186,6 @@ public class ArActivity extends AppCompatActivity {
         WeakReference<ArActivity> weakActivity = new WeakReference<>(this);
 
 
-
         ModelRenderable.builder()
                 .setSource(
                         this, R.raw.meat)
@@ -200,7 +205,6 @@ public class ArActivity extends AppCompatActivity {
 
                             return null;
                         });
-
 
 
         ModelRenderable.builder()
@@ -224,9 +228,6 @@ public class ArActivity extends AppCompatActivity {
                         });
 
 
-
-
-
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
                     if (renderable == null) {
@@ -238,8 +239,8 @@ public class ArActivity extends AppCompatActivity {
 
                         createDragon(hitResult);
 
-                          // Create a standing dragon
-                          firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE);
+                        // Create a standing dragon
+                        firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE);
 
 
                     } else {
@@ -249,7 +250,6 @@ public class ArActivity extends AppCompatActivity {
                         // Create the Anchor.
                         //AnchorNode moveToNode = createAnchor(hitResult);
 
-
                         anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
                         appAnchorState = AppAnchorState.HOSTING;
 
@@ -257,15 +257,11 @@ public class ArActivity extends AppCompatActivity {
                         moveToNode.setParent(arFragment.getArSceneView().getScene());
 
 
-
-
-                        createMeat(hitResult);
-
                         Vector3 rotationVect = new Vector3().subtract(moveToNode.getWorldPosition(), dragon.getWorldPosition());
 
                         double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
 
-                       // showToast("Distance: " + distance);
+                        // showToast("Distance: " + distance);
                         // Upload distance to Firebase
                         firebaseManager.uploadDistance(distance);
 
@@ -276,7 +272,7 @@ public class ArActivity extends AppCompatActivity {
 
                         dragon.rotateDragon(rotationVect);
 
-                       //     showToast("Time: " + time);
+                        //     showToast("Time: " + time);
                     }
                 });
 
@@ -319,22 +315,49 @@ public class ArActivity extends AppCompatActivity {
     }
 
 
-    private void createMeat(HitResult hitResult) {
+    private void createMeat() {
+
+        Log.d("Meat", "Meat Creation started");
+
+        //A method to find the screen center. This is used while placing objects in the scene
+        ArSceneView vw = arFragment.getArSceneView();
+
+        Vector3 screenCenter = new Vector3(vw.getWidth() / 2, vw.getHeight() / 2, 0f);
+
+        Log.d("Meat", "Screencenter: " + screenCenter);
 
 
-        meatNode = new Node();
+        Frame frame = vw.getArFrame();
+
+        assert frame != null;
+        List hitTest = frame.hitTest(screenCenter.x, screenCenter.y);
+
+        HitResult hitResult = (HitResult) hitTest.get(hitTest.size() - 1);
+
         AnchorNode anchorNode = createAnchor(hitResult);
+
+       /* //Create an anchor at the plane hit
+        Anchor modelAnchor = vw.getSession().createAnchor(hitResult.getHitPose());
+        AnchorNode anchorNode = new AnchorNode(modelAnchor);
+        anchorNode.setParent(arFragment.getArSceneView().getScene());*/
+
+        //create a new TranformableNode that will carry our object
+        meatNode = new Node();
         meatNode.setParent(anchorNode);
         meatNode.setRenderable(meatRenderable);
 
-        meatNode.setWorldScale(new Vector3(0.25f,0.25f,0.25f));
+        Log.d("Meat", "meatNode WorldScale vorher: " + meatNode.getWorldScale());
 
-        meatNode.setLocalRotation(new Quaternion(0,180,180,0));
+        meatNode.setWorldScale(new Vector3(0.25f, 0.25f, 0.25f));
 
-        meatNode.setLocalPosition(new Vector3().add(meatNode.getLocalPosition(),new Vector3(0,0.01f,0)));
+        Log.d("Meat", "meatNode WorldScale nachher: " + meatNode.getWorldScale());
 
+        meatNode.setLocalRotation(new Quaternion(0, 180, 180, 0));
+
+        meatNode.setLocalPosition(new Vector3().add(meatNode.getLocalPosition(), new Vector3(0, 0.05f, 0)));
 
     }
+
 
     private void createDragon(HitResult hitResult) {
         hintControl(20);
@@ -344,7 +367,7 @@ public class ArActivity extends AppCompatActivity {
         training.setEnabled(true);
 
 
-       // showToast(mDragonName + " woke up.");
+        // showToast(mDragonName + " woke up.");
 
         //This function is not called, after this is set to true
         dragonSet = true;
@@ -362,7 +385,7 @@ public class ArActivity extends AppCompatActivity {
 
     private void setButtonListeners() {
         mainAction = findViewById(R.id.mainActionControl);
-        needsShow =  findViewById(R.id.needsShow);
+        needsShow = findViewById(R.id.needsShow);
         sleep = findViewById(R.id.sleepControl);
         social = findViewById(R.id.socialControl);
         training = findViewById(R.id.trainingControl);
@@ -376,10 +399,10 @@ public class ArActivity extends AppCompatActivity {
 
 
         needsShow.setOnClickListener(v -> {
-            if(needsShown){
+            if (needsShown) {
                 needsShown = false;
                 card.setVisibility(View.INVISIBLE);
-            }else{
+            } else {
                 needsShown = true;
                 card.setVisibility(View.VISIBLE);
             }
@@ -387,6 +410,13 @@ public class ArActivity extends AppCompatActivity {
 
         //Eat animation, hunger + 10, sleep -10
         mainAction.setOnClickListener(v -> {
+
+
+            if (meatNode == null) createMeat();
+
+
+
+
             if (needsControl.getHunger() <= 90) {
                 needsControl.feed();
                 setNeeds();
@@ -408,7 +438,6 @@ public class ArActivity extends AppCompatActivity {
             }
 
         });
-
 
 
         sleep.setOnClickListener(v -> {
@@ -561,7 +590,7 @@ public class ArActivity extends AppCompatActivity {
         new Thread(runnable).start();
     }
 
-       class ExampleRunnable implements Runnable {
+    class ExampleRunnable implements Runnable {
         int milliseconds;
 
         ExampleRunnable(int seconds) {
