@@ -18,25 +18,25 @@ import static java.lang.Thread.sleep;
 
 
 public class SleepActivity extends AppCompatActivity {
+
     private int energy;
-    ProgressBar prgEnergy;
+    private ProgressBar prgEnergy;
     private Calendar currentTime;
-    public volatile int safeEnergy;
+    private volatile int safeEnergy;
     private volatile boolean stopThread = false;
-    TextView progress;
+    private TextView progress;
 
-
-    PersistenceManager persistenceManager;
+    private PersistenceManager persistenceManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        persistenceManager = new PersistenceManager(getApplicationContext());
-
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sleep);
+
+        persistenceManager = new PersistenceManager(getApplicationContext());
+
+        //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
         final int slValue = persistenceManager.getInt("sleep",0);
 
@@ -49,7 +49,7 @@ public class SleepActivity extends AppCompatActivity {
         Log.d("SLEEP", "energy first: " + energy);
 
 
-        Handler handlerSleep = new Handler();
+        //Handler handlerSleep = new Handler();
 
         currentTime = Calendar.getInstance();
         Calendar updateTime = currentTime;
@@ -58,17 +58,14 @@ public class SleepActivity extends AppCompatActivity {
         
 
         Button wakeUp = findViewById(R.id.wkaeUpControl);
-        wakeUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopThread(null);
+        wakeUp.setOnClickListener(v -> {
+            stopThread(null);
 
-                Log.d("SLEEP", "safeEnergy end: " + safeEnergy);
+            Log.d("SLEEP", "safeEnergy end: " + safeEnergy);
 
-                Intent intent = new Intent(SleepActivity.this, ArActivity.class);
+            Intent intent = new Intent(SleepActivity.this, ArActivity.class);
 
-                startActivity(intent);
-            }
+            startActivity(intent);
         });
 
         startThread(null);
