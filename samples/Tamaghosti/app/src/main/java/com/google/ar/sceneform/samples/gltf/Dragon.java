@@ -36,13 +36,16 @@ public class Dragon extends TransformableNode  {
     private Long startTimeofCurrentAnimation;
 
     private boolean eating;
+    private float currentAnimationDuration;
+
+    // Abfrage ob animation läuft
+    boolean moving;
 
 
-
-    int eat_index = 0;
-    int getPet_index = 1;
-    int idle_index = 2;
-    int walk_index = 3;
+    final int eat_index = 0;
+    final int getPet_index = 1;
+    final int idle_index = 2;
+    final int walk_index = 3;
     private float speedFactor = 4;
 
 
@@ -110,6 +113,13 @@ public class Dragon extends TransformableNode  {
 
         startTimeofCurrentAnimation = System.nanoTime();
 
+        switch (index) {
+            case eat_index: speedFactor = 1f; break;
+            case getPet_index: speedFactor = 2f; break;
+            case idle_index: speedFactor = 2f; break;
+            case walk_index: speedFactor = 4f; break;
+        }
+
         parentArFragment
                 .getArSceneView()
                 .getScene()
@@ -121,7 +131,7 @@ public class Dragon extends TransformableNode  {
                                 animator.animator.applyAnimation(index, (float) ( speedFactor * (time - startTimeofCurrentAnimation) / (double) SECONDS.toNanos(1)) % animator.duration);
                                 animator.animator.updateBoneMatrices();
                                 //Log.d("Animators", Integer.toString(index));
-
+                                currentAnimationDuration = animator.duration;
                             }
                         });
     }
@@ -129,6 +139,11 @@ public class Dragon extends TransformableNode  {
 
     FilamentAsset getFilamentAsset() {
         return filamentAsset;
+    }
+
+    public float getAnimationDuration () {
+
+        return currentAnimationDuration;
     }
 
     @Override
@@ -151,55 +166,65 @@ public class Dragon extends TransformableNode  {
 
     long moveTo(AnchorNode newPos, double distance) {
 
-        ObjectAnimator objectAnimation = new ObjectAnimator();
-        objectAnimation.setAutoCancel(true);
-        objectAnimation.setTarget(this);
-        // All the positions should be world positions
-        // The first position is the start, and the second is the end.
-        objectAnimation.setObjectValues(this.getWorldPosition(), newPos.getWorldPosition());
-        objectAnimation.setPropertyName("worldPosition");
-        // The Vector3Evaluator is used to evaluator 2 vector3 and return the next
-        // vector3.  The default is to use lerp.
-        objectAnimation.setEvaluator(new Vector3Evaluator());
-        // This makes the animation linear (smooth and uniform).
-        objectAnimation.setInterpolator(new LinearInterpolator());
+        moving = true;
 
-        double velocity = 0.1*speedFactor;
-        long time = (long) ((distance / velocity) * 1000);
-
-        // Duration in ms of the animation.
-        objectAnimation.setDuration(time);
-        updateAnimation(walk_index);
-        objectAnimation.start();
+            updateAnimation(walk_index);
 
 
-        objectAnimation.addListener(new android.animation.Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(android.animation.Animator animation) {
+            ObjectAnimator objectAnimation = new ObjectAnimator();
+            objectAnimation.setAutoCancel(true);
+            objectAnimation.setTarget(this);
+            // All the positions should be world positions
+            // The first position is the start, and the second is the end.
+            objectAnimation.setObjectValues(this.getWorldPosition(), newPos.getWorldPosition());
+            objectAnimation.setPropertyName("worldPosition");
+            // The Vector3Evaluator is used to evaluator 2 vector3 and return the next
+            // vector3.  The default is to use lerp.
+            objectAnimation.setEvaluator(new Vector3Evaluator());
+            // This makes the animation linear (smooth and uniform).
+            objectAnimation.setInterpolator(new LinearInterpolator());
 
-            }
+            double velocity = 0.1 * speedFactor;
+            long time = (long) ((distance / velocity) * 1000);
 
-            @Override
-            public void onAnimationEnd(android.animation.Animator animation) {
-                setNewPosition(newPos);
-                if (eating) updateAnimation(eat_index);
-                else updateAnimation(idle_index);
+            // Duration in ms of the animation.
+            objectAnimation.setDuration(time);
 
-            }
-
-            @Override
-            public void onAnimationCancel(android.animation.Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(android.animation.Animator animation) {
-
-            }
-        });
+            objectAnimation.start();
 
 
-        return time;
+            objectAnimation.addListener(new android.animation.Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(android.animation.Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(android.animation.Animator animation) {
+                    setNewPosition(newPos);
+                    if (eating) updateAnimation(eat_index);
+                    else updateAnimation(idle_index);
+                    moving = false;
+
+               //     setLocalRotation(new Quaternion(0,getLocalRotation().y,0,getLocalRotation().w));
+
+                }
+
+                @Override
+                public void onAnimationCancel(android.animation.Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(android.animation.Animator animation) {
+
+                }
+            });
+
+
+            return time;
+
+
     }
 
    void rotateDragon(Vector3 distanceVector) {
@@ -229,6 +254,8 @@ public class Dragon extends TransformableNode  {
 
        Vector3 rotationAxis = new Vector3().cross(directionA, directionB).normalized();
 
+        if(rotationAxis.y > 0) rotationAxis = new Vector3(0,1,0);
+        else rotationAxis = new Vector3(0,-1,0);
 
       double radToDegree = rotationAngle * 180.0 / Math.PI;
 
@@ -248,7 +275,7 @@ public class Dragon extends TransformableNode  {
 
            @Override
            public void onAnimationEnd(android.animation.Animator animation) {
-
+               setLocalRotation(new Quaternion(0,getLocalRotation().y,0,getLocalRotation().w));
            }
 
            @Override

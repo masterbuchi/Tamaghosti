@@ -250,62 +250,62 @@ public class ArActivity extends AppCompatActivity {
 
                     } else {
 
+                        if (!dragon.moving) {
+                            // Moving the dragon
+                            // Create the Anchor.
+                            //AnchorNode moveToNode = createAnchor(hitResult);
 
-                        // Moving the dragon
-                        // Create the Anchor.
-                        //AnchorNode moveToNode = createAnchor(hitResult);
+                            anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
+                            appAnchorState = AppAnchorState.HOSTING;
 
-                        anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
-                        appAnchorState = AppAnchorState.HOSTING;
-
-                        AnchorNode moveToNode = new AnchorNode(anchor);
-                        moveToNode.setParent(arFragment.getArSceneView().getScene());
-
-
-                        Vector3 rotationVect = new Vector3().subtract(moveToNode.getWorldPosition(), dragon.getWorldPosition());
-
-                        double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
-
-                        // showToast("Distance: " + distance);
-                        // Upload distance to Firebase
-                        firebaseManager.uploadDistance(distance);
-
-                        showToast("Distance: " + distance);
+                            AnchorNode moveToNode = new AnchorNode(anchor);
+                            moveToNode.setParent(arFragment.getArSceneView().getScene());
 
 
-                        long time = dragon.moveTo(moveToNode, distance);
+                            Vector3 rotationVect = new Vector3().subtract(moveToNode.getWorldPosition(), dragon.getWorldPosition());
 
-                        dragon.rotateDragon(rotationVect);
+                            double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
+
+                            // showToast("Distance: " + distance);
+                            // Upload distance to Firebase
+                            firebaseManager.uploadDistance(distance);
+
+                            showToast("Distance: " + distance);
 
 
-                        if (meatNode != null) {
-                            meatAnimation(hitResult, time);
+                            long time = dragon.moveTo(moveToNode, distance);
 
-                            Log.d("Meat", " getWorldPosition: " + meatNode.getWorldPosition());
+                            dragon.rotateDragon(rotationVect);
 
 
-                            if (needsControl.getHunger() <= 90) {
-                                needsControl.feed();
-                                setNeeds();
-                                showPlus();
-                                if (dragon != null) {
+                            if (meatNode != null && dragon.getEating()) {
+                                meatAnimation(hitResult, time);
 
-                                    // Notify Database!
-                                    firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
-                                    firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
+                                Log.d("Meat", " getWorldPosition: " + meatNode.getWorldPosition());
 
-                                    dragon.setEating(true);
 
-                                    // if certain duration needed:
+                                if (needsControl.getHunger() <= 90) {
+                                    needsControl.feed();
+                                    setNeeds();
+                                    showPlus();
+                                    if (dragon != null) {
 
-                                    startThread((float) time);
+                                        // Notify Database!
+                                        firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
+                                        firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
+
+
+                                        // if certain duration needed:
+
+                                        startThread((float) time);
+                                    }
                                 }
+
+
                             }
 
-
+                            //     showToast("Time: " + time);
                         }
-
-                        //     showToast("Time: " + time);
                     }
                 });
 
@@ -351,32 +351,16 @@ public class ArActivity extends AppCompatActivity {
     private void createMeat() {
 
 
-        //A method to find the screen center. This is used while placing objects in the scene
-
-
-       /* Vector3 screenCenter = new Vector3(vw.getWidth() / 2, vw.getHeight() / 2, 0f);
-
-
-        Frame frame = vw.getArFrame();
-
-        assert frame != null;
-        List hitTest = frame.hitTest(screenCenter.x, screenCenter.y);
-
-        HitResult hitResult = (HitResult) hitTest.get(hitTest.size() - 1);
-
-        AnchorNode anchorNode = createAnchor(hitResult);*/
-
         //create a new TranformableNode that will carry our object
         meatNode = new Node();
         meatNode.setParent(arFragment.getArSceneView().getScene().getCamera());
         meatNode.setRenderable(meatRenderable);
 
 
-        meatNode.setLocalRotation(new Quaternion(0, 180, 225, 0));
+        meatNode.setLocalRotation(new Quaternion(0, 180, 250, 0));
         meatNode.setLocalPosition(new Vector3(0, -0.3f, -1));
         meatNode.setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
 
-        //  arscene.getCamera().addChild(meatNode);
 
     }
 
@@ -431,18 +415,12 @@ public class ArActivity extends AppCompatActivity {
 
             x = x+  0.01f;
 
-
-            Log.d("Meat", " x: " + x);
-
-            Log.d("Meat", " y: " + y);
-
-
              if (i <100) currentPosY =  currentPos.y + directionVector.y/(float)steps + 0.01f;
              else currentPosY =  currentPos.y + directionVector.y/(float)steps - 0.01f;
 
 
 
-            currentPos = new Vector3(currentPos.x + directionVector.x/(float)steps,currentPosY , currentPos.z + directionVector.z/(float)steps);
+            currentPos = new Vector3(currentPos.x + directionVector.x/(float)steps, currentPosY , currentPos.z + directionVector.z/(float)steps);
 
            // currentPos = new Vector3().add(currentPos, directionVector.scaled(1 / 200f));
 
@@ -568,8 +546,18 @@ public class ArActivity extends AppCompatActivity {
         //Eat animation, hunger + 10, sleep -10
         mainAction.setOnClickListener(v -> {
 
+            if (!dragon.moving) {
+                dragon.setEating(true);
 
-            if (meatNode == null) createMeat();
+                if (meatNode == null) createMeat();
+                else {
+                    meatNode.setParent(arFragment.getArSceneView().getScene().getCamera());
+                    meatNode.setLocalRotation(new Quaternion(0, 180, 250, 0));
+                    meatNode.setLocalPosition(new Vector3(0, -0.3f, -1));
+                    meatNode.setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
+                    meatNode.setEnabled(true);
+                }
+            }
 
 
         });
@@ -718,7 +706,9 @@ public class ArActivity extends AppCompatActivity {
 
     public void startThread(float duration) {
         stopThread = false;
-        float d = duration + 2000;
+
+        Log.d("Meat", "AnimationDuration " + dragon.getAnimationDuration());
+        float d = duration + dragon.getAnimationDuration()*1000;
         int e = (int) d;
         Log.d("ANIMATION", "duration in millis " + e);
         ExampleRunnable runnable = new ExampleRunnable(e);
@@ -755,10 +745,11 @@ public class ArActivity extends AppCompatActivity {
 
                 dragon.setEating(false);
                 dragon.updateAnimation(dragon.idle_index);
+                meatNode.setEnabled(false);
                 mainAction.setText(R.string.eatAgain);
                 mainAction.setEnabled(true);
 
-                Log.d("Meat", " getWorldPosition: " + meatNode.getWorldPosition());
+               // Log.d("Meat", " getWorldPosition: " + meatNode.getWorldPosition());
 
             });
         }
