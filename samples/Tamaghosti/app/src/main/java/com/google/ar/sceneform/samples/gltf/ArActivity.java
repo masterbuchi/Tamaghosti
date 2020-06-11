@@ -514,6 +514,10 @@ public class ArActivity extends AppCompatActivity {
         //Update current Position window of Dragon
         updateCurrentDragonPositionWindow();
 
+        Log.d("Firebase", "DragonPosition " + dragon.getWorldPosition());
+
+        Log.d("Firebase", "DragonRotation " + dragon.getWorldRotation());
+
 
     }
 
@@ -565,6 +569,9 @@ public class ArActivity extends AppCompatActivity {
 
         sleep.setOnClickListener(v -> {
 
+            Log.d("Firebase", "DragonPosition " + dragon.getWorldPosition());
+
+            Log.d("Firebase", "DragonRotation " + dragon.getWorldRotation());
 
             Intent intent = new Intent(ArActivity.this, SleepActivity.class);
             intent.putExtra("hungerValue", needsControl.getHunger());

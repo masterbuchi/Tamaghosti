@@ -128,8 +128,16 @@ public class SpectatorActivity extends AppCompatActivity {
 
                 checkForUpdates = true;
 
+                Log.d("Firebase", "DragonPosition " + dragon.getWorldPosition());
+
+                Log.d("Firebase", "DragonRotation " + dragon.getWorldRotation());
+
+
             } else {
                 Toast.makeText(getApplicationContext(), "Dragon is already created", Toast.LENGTH_SHORT).show();
+                Log.d("Firebase", "DragonPosition " + dragon.getWorldPosition());
+
+                Log.d("Firebase", "DragonRotation " + dragon.getWorldRotation());
             }
 
         });

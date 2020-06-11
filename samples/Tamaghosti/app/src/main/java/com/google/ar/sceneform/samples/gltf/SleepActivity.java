@@ -34,8 +34,6 @@ public class SleepActivity extends AppCompatActivity {
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sleep);
         Intent in = getIntent();
@@ -58,11 +56,7 @@ public class SleepActivity extends AppCompatActivity {
         Calendar updateTime = currentTime;
         updateTime.add(Calendar.SECOND, 1);
 
-
-
-
-
-
+        
 
         Button wakeUp = findViewById(R.id.wkaeUpControl);
         wakeUp.setOnClickListener(new View.OnClickListener() {
