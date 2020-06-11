@@ -574,10 +574,7 @@ public class ArActivity extends AppCompatActivity {
             Log.d("Firebase", "DragonRotation " + dragon.getWorldRotation());
 
             Intent intent = new Intent(ArActivity.this, SleepActivity.class);
-            intent.putExtra("hungerValue", needsControl.getHunger());
-            intent.putExtra("sleepValue", needsControl.getEnergy());
-            intent.putExtra("socialValue", needsControl.getSocial());
-            intent.putExtra("trainingValue", needsControl.getTraining());
+
             startActivity(intent);
         });
 

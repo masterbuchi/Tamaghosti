@@ -26,21 +26,20 @@ public class SleepActivity extends AppCompatActivity {
     TextView progress;
 
 
-    PersistenceManager persistenceManager = new PersistenceManager(getApplicationContext());
+    PersistenceManager persistenceManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        persistenceManager = new PersistenceManager(getApplicationContext());
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sleep);
-        Intent in = getIntent();
-        final int hValue = in.getIntExtra("hungerValue", 0);
-        final int slValue = in.getIntExtra("sleepValue", 0);
-        final int soValue = in.getIntExtra("socialValue", 0);
-        final int tValue = in.getIntExtra("trainingValue", 0);
+
+        final int slValue = persistenceManager.getInt("sleep",0);
+
         Log.d("SLEEP", "sleep value: " + slValue);
         this.energy = slValue;
         prgEnergy = findViewById(R.id.progressEnergy2);
@@ -65,11 +64,9 @@ public class SleepActivity extends AppCompatActivity {
                 stopThread(null);
 
                 Log.d("SLEEP", "safeEnergy end: " + safeEnergy);
+
                 Intent intent = new Intent(SleepActivity.this, ArActivity.class);
-                intent.putExtra("hungerValue", hValue);
-                intent.putExtra("sleepValue", safeEnergy);
-                intent.putExtra("socialValue", soValue);
-                intent.putExtra("trainingValue", tValue);
+
                 startActivity(intent);
             }
         });
@@ -97,20 +94,17 @@ public class SleepActivity extends AppCompatActivity {
                     return;
                 if (energy > 100)
                     return;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        prgEnergy.setProgress(energy);
-                        progress.setText(energy + "%");
-                        if (energy % 10 == 0)
-                            safeEnergy = energy;
-                        Log.d("SLEEP", "progress in 10er steps: " + safeEnergy);
-                        Log.d("SLEEP", "progress is growing: " + energy);
-                        energy ++;
+                runOnUiThread(() -> {
+                    prgEnergy.setProgress(energy);
+                    progress.setText(energy + "%");
+                    if (energy % 10 == 0)
+                        safeEnergy = energy;
+                    Log.d("SLEEP", "progress in 10er steps: " + safeEnergy);
+                    Log.d("SLEEP", "progress is growing: " + energy);
+                    energy ++;
 
-                        persistenceManager.saveInt("sleep", safeEnergy);
+                    persistenceManager.saveInt("sleep", safeEnergy);
 
-                    }
                 });
 
                 try {
