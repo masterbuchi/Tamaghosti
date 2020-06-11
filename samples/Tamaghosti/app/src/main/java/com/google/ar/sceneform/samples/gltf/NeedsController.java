@@ -29,17 +29,27 @@ public class NeedsController {
     }
 
 
-    public void feed(){
+    public void makeDragonEat(){
+
+        hunger = getHunger();
+
+        //setValue(hunger, 10);
 
         setHunger(10);
 
         persistenceManager.saveInt("hunger", hunger);
 
         Log.d("SleepDebug", "check Energy in feed " + energy);
-        getTired();
+
+        makeDragonTired();
     }
 
-    public void getTired(){
+    public void makeDragonTired(){
+
+        energy = getEnergy();
+
+        //setValue(energy, -10);
+
         setEnergy(-10);
 
         persistenceManager.saveInt("sleep", energy);
@@ -47,7 +57,11 @@ public class NeedsController {
         Log.d("SleepDebug", "check Energy in tired " + energy);
     }
 
-    public void getHungry(){
+    public void makeDragonHungry(){
+
+        hunger = getHunger();
+
+        //setValue(hunger, -10);
 
         setHunger(-10);
 
@@ -56,49 +70,107 @@ public class NeedsController {
 
     }
 
-    public void pet(){
+    public void petDragon(){
+
+        social = getSocial();
+
+        //setValue(social, 10);
+
         setSocial(10);
 
         persistenceManager.saveInt("social", social);
 
-        getTired();
-        getHungry();
+        makeDragonTired();
+        makeDragonHungry();
     }
 
-    public void train(){
+    public void trainDragon(){
+
+        //setValue(training, 10);
 
         setTraining(10);
 
         persistenceManager.saveInt("training", training);
 
-        getTired();
-        getHungry();
+        makeDragonTired();
+        makeDragonHungry();
     }
 
     public void setEnergy(int value) {
-        if (this.energy>=10 || this.energy <=90){
-        this.energy += value;
+        if (energy > 0 && energy < 100 ){
+
+            if(energy + value <= 0) {
+
+                energy = 0;
+
+            } else if(energy + value >= 100) {
+
+                energy = 100;
+
+            } else {
+                energy += value;
+            }
+
         }
     }
 
     public void setHunger(int value) {
-        if (this.hunger>=10 || this.hunger <=90){
-            this.hunger += value;
+
+        if (hunger > 0 && hunger < 100 ){
+
+            if(hunger + value <= 0) {
+
+                hunger = 0;
+
+            } else if(hunger + value >= 100) {
+
+                hunger = 100;
+
+            } else {
+                hunger += value;
+            }
+
         }
 
     }
 
     public void setSocial(int value) {
-        if (this.social>=10 || this.social <=90){
-            this.social += value;
+        if (social > 0 && social < 100 ){
+
+            if(social + value <= 0) {
+
+                social = 0;
+
+            } else if(social + value >= 100) {
+
+                social = 100;
+
+            } else {
+                social += value;
+            }
+
         }
     }
 
     public void setTraining(int value) {
-        if (this.training>=10 || this.training <=90){
-            this.training += value;
+        if (training > 0 && training < 100 ){
+
+            if(training + value <= 0) {
+
+                training = 0;
+
+            } else if(training + value >= 100) {
+
+                training = 100;
+
+            } else {
+                training += value;
+            }
+
         }
     }
+
+
 
     public int getEnergy() {
         return  persistenceManager.getInt("sleep", 0);

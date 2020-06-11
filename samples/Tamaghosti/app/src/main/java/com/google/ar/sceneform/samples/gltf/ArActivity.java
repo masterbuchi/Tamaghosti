@@ -78,11 +78,6 @@ public class ArActivity extends AppCompatActivity {
         NONE
     }
 
-    private enum AnchorType {
-        MOVE_TO_ANCHOR,
-        ANCHOR
-    }
-
     private static final String TAG = ArActivity.class.getSimpleName();
     private static final double MIN_OPENGL_VERSION = 3.0;
 
@@ -163,11 +158,14 @@ public class ArActivity extends AppCompatActivity {
 
         // Cloud Anchor on same device
         // Cloud Anchor auf dem selben Gerät
-        SharedPreferences prefs = getSharedPreferences("AnchorId", MODE_PRIVATE);
+        /*SharedPreferences prefs = getSharedPreferences("AnchorId", MODE_PRIVATE);
         editor = prefs.edit();
 
 
+         */
+
         PersistenceManager persistenceManager = new PersistenceManager(getApplicationContext());
+
         mDragonName = persistenceManager.getString("dragon_name", null);
 
 
@@ -285,7 +283,12 @@ public class ArActivity extends AppCompatActivity {
 
 
                                 if (needsControl.getHunger() <= 90) {
-                                    needsControl.feed();
+
+                                    //needsControl.feed();
+
+                                    needsControl.makeDragonEat();
+
+
                                     setNeeds();
                                     showPlus();
                                     if (dragon != null) {
@@ -569,9 +572,14 @@ public class ArActivity extends AppCompatActivity {
 
         sleep.setOnClickListener(v -> {
 
+            /*
             Log.d("Firebase", "DragonPosition " + dragon.getWorldPosition());
 
             Log.d("Firebase", "DragonRotation " + dragon.getWorldRotation());
+
+
+             */
+
 
             Intent intent = new Intent(ArActivity.this, SleepActivity.class);
 
@@ -582,15 +590,23 @@ public class ArActivity extends AppCompatActivity {
         if (needsControl.getHunger() == 100 && needsControl.getEnergy() >= 80) {
             social.setVisibility(View.VISIBLE);
         }
+
+
         social.setOnClickListener(v -> {
-            if (needsControl.getSocial() <= 90) {
-                needsControl.pet();
-                setNeeds();
-                showPlus();
-            }
+
             if (dragon != null) {
 
                 // Pet dragon
+
+                if (needsControl.getSocial() <= 90) {
+
+                    //needsControl.pet();
+
+                    needsControl.petDragon();
+
+                    setNeeds();
+                    showPlus();
+                }
 
                 dragon.updateAnimation(dragon.getPet_index);
 
@@ -608,7 +624,10 @@ public class ArActivity extends AppCompatActivity {
 
         training.setOnClickListener(v -> {
             if (needsControl.getTraining() <= 90) {
-                needsControl.train();
+                //needsControl.train();
+
+                needsControl.trainDragon();
+
                 setNeeds();
                 showPlus();
             }
