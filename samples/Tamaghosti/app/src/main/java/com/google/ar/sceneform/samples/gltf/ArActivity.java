@@ -15,6 +15,7 @@
  */
 package com.google.ar.sceneform.samples.gltf;
 
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -31,6 +32,7 @@ import androidx.cardview.widget.CardView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -50,7 +52,9 @@ import com.google.ar.sceneform.HitTestResult;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.math.Quaternion;
+import com.google.ar.sceneform.math.QuaternionEvaluator;
 import com.google.ar.sceneform.math.Vector3;
+import com.google.ar.sceneform.math.Vector3Evaluator;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
@@ -269,14 +273,15 @@ public class ArActivity extends AppCompatActivity {
                         showToast("Distance: " + distance);
 
 
-                        double time = dragon.moveTo(moveToNode, distance);
+                        long time = dragon.moveTo(moveToNode, distance);
 
                         dragon.rotateDragon(rotationVect);
 
 
                         if (meatNode != null) {
-                            meatAnimation(hitResult);
-                            meatNode.setWorldPosition(moveToNode.getWorldPosition());
+                            meatAnimation(hitResult, time);
+
+                            Log.d("Meat", " getWorldPosition: " + meatNode.getWorldPosition());
 
 
                             if (needsControl.getHunger() <= 90) {
@@ -289,11 +294,11 @@ public class ArActivity extends AppCompatActivity {
                                     firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
                                     firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
 
-                                  dragon.setEating(true);
+                                    dragon.setEating(true);
 
                                     // if certain duration needed:
 
-                                    startThread((float)time);
+                                    startThread((float) time);
                                 }
                             }
 
@@ -361,32 +366,152 @@ public class ArActivity extends AppCompatActivity {
 
         AnchorNode anchorNode = createAnchor(hitResult);*/
 
-                //create a new TranformableNode that will carry our object
+        //create a new TranformableNode that will carry our object
         meatNode = new Node();
         meatNode.setParent(arFragment.getArSceneView().getScene().getCamera());
         meatNode.setRenderable(meatRenderable);
 
 
         meatNode.setLocalRotation(new Quaternion(0, 180, 225, 0));
-        meatNode.setLocalPosition(new Vector3(0,-0.3f,-1));
+        meatNode.setLocalPosition(new Vector3(0, -0.3f, -1));
         meatNode.setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
 
-      //  arscene.getCamera().addChild(meatNode);
+        //  arscene.getCamera().addChild(meatNode);
 
     }
 
-    private void meatAnimation (HitResult hitResult) {
+    private void meatAnimation(HitResult hitResult, long time) {
+
+        Vector3 cameraPosition = meatNode.getWorldPosition();
+
 
         AnchorNode anchorNode = createAnchor(hitResult);
+        Vector3 newPosition = anchorNode.getWorldPosition();
+
+
+        // calculate curve
+        Vector3 directionVector = new Vector3().subtract(newPosition, cameraPosition);
+
+        float distance = directionVector.length();
+
+
+        int steps = 200;
+        float v_y_0 = 2f;
+        float pos_y_0 = cameraPosition.y;
+        float d_t = 1f / steps * time;
+
+       float  pos_y = 0;
+
+        Log.d("Meat", " time: " + time);
+
+        Log.d("Meat", " d_t: " + d_t);
+
+        Log.d("Meat", " cameraPosition: " + cameraPosition);
+
+        Log.d("Meat", " newPosition: " + newPosition);
+
+        Log.d("Meat", " directionVector: " + directionVector);
+
+        Log.d("Meat", " getParentWorldPosition: " + meatNode.getParent().getWorldPosition());
+
+
+        Vector3[] positions = new Vector3[steps];
+
+        Vector3 currentPos = cameraPosition;
+        float currentPosY = 0;
+
+        float x = 0;
+        float y = 0;
+
+        // 20 Steps for smooth curve
+        for (int i = 0; i < steps; i++) {
+
+
+            pos_y = -0.5f * 2 * i*d_t * i*d_t + v_y_0 * (float) Math.sin(45) * i*d_t + pos_y_0;
+
+            x = x+  0.01f;
+
+
+            Log.d("Meat", " x: " + x);
+
+            Log.d("Meat", " y: " + y);
+
+
+             if (i <100) currentPosY =  currentPos.y + directionVector.y/(float)steps + 0.01f;
+             else currentPosY =  currentPos.y + directionVector.y/(float)steps - 0.01f;
+
+
+
+            currentPos = new Vector3(currentPos.x + directionVector.x/(float)steps,currentPosY , currentPos.z + directionVector.z/(float)steps);
+
+           // currentPos = new Vector3().add(currentPos, directionVector.scaled(1 / 200f));
+
+            positions[i] = currentPos;
+
+            // Log.d("Meat", " currentPos: " +  currentPos + " i: " + i);
+            // Log.d("Meat", " directionVector.scaled(1/200f): " +  directionVector.scaled(1/200f) + " i: " + i);
+
+
+        }
 
         meatNode.setParent(anchorNode);
 
+        meatNode.setWorldPosition(cameraPosition);
+
+
+        Log.d("Meat", " localPos: " + meatNode.getLocalPosition());
+        Log.d("Meat", " getWorldPosition: " + meatNode.getWorldPosition());
+
+        Log.d("Meat", " getParentWorldPosition: " + meatNode.getParent().getWorldPosition());
 
 
         meatNode.setLocalRotation(new Quaternion(0, 180, 180, 0));
-        meatNode.setLocalPosition(new Vector3(0,0.05f,0));
+
+
+        Log.d("Meat", " getWorldPositionafterLocal: " + meatNode.getWorldPosition());
+
         meatNode.setLocalScale(new Vector3(0.25f, 0.25f, 0.25f));
 
+        Log.d("Meat", " getWorldPositionafterscale: " + meatNode.getWorldPosition());
+
+        ObjectAnimator objectAnimation = new ObjectAnimator();
+        objectAnimation.setAutoCancel(true);
+        objectAnimation.setTarget(meatNode);
+        objectAnimation.setObjectValues(positions);
+        objectAnimation.setPropertyName("WorldPosition");
+        // The Vector3Evaluator is used to evaluator 2 vector3 and return the next
+        // vector3.  The default is to use lerp.
+        objectAnimation.setEvaluator(new Vector3Evaluator());
+        // This makes the animation linear (smooth and uniform).
+        objectAnimation.setInterpolator(new LinearInterpolator());
+
+        // Duration in ms of the animation.
+        objectAnimation.setDuration(time-1000);
+        objectAnimation.start();
+
+
+        objectAnimation.addListener(new android.animation.Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(android.animation.Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(android.animation.Animator animation) {
+                meatNode.setLocalPosition(new Vector3(0, 0.05f, 0));
+
+            }
+
+            @Override
+            public void onAnimationCancel(android.animation.Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(android.animation.Animator animation) {
+
+            }
+        });
 
     }
 
@@ -593,7 +718,7 @@ public class ArActivity extends AppCompatActivity {
 
     public void startThread(float duration) {
         stopThread = false;
-        float d = duration +2000;
+        float d = duration + 2000;
         int e = (int) d;
         Log.d("ANIMATION", "duration in millis " + e);
         ExampleRunnable runnable = new ExampleRunnable(e);
@@ -632,6 +757,8 @@ public class ArActivity extends AppCompatActivity {
                 dragon.updateAnimation(dragon.idle_index);
                 mainAction.setText(R.string.eatAgain);
                 mainAction.setEnabled(true);
+
+                Log.d("Meat", " getWorldPosition: " + meatNode.getWorldPosition());
 
             });
         }

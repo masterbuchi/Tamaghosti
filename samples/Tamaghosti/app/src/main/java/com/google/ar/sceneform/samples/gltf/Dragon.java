@@ -149,7 +149,7 @@ public class Dragon extends TransformableNode  {
 
 
 
-    double moveTo(AnchorNode newPos, double distance) {
+    long moveTo(AnchorNode newPos, double distance) {
 
         ObjectAnimator objectAnimation = new ObjectAnimator();
         objectAnimation.setAutoCancel(true);
@@ -165,10 +165,10 @@ public class Dragon extends TransformableNode  {
         objectAnimation.setInterpolator(new LinearInterpolator());
 
         double velocity = 0.1*speedFactor;
-        double time = distance / velocity;
+        long time = (long) ((distance / velocity) * 1000);
 
         // Duration in ms of the animation.
-        objectAnimation.setDuration((long) (distance  / velocity) * 1000);
+        objectAnimation.setDuration(time);
         updateAnimation(walk_index);
         objectAnimation.start();
 
@@ -199,7 +199,7 @@ public class Dragon extends TransformableNode  {
         });
 
 
-        return (long) (distance  / velocity) * 1000;
+        return time;
     }
 
    void rotateDragon(Vector3 distanceVector) {
@@ -231,8 +231,6 @@ public class Dragon extends TransformableNode  {
 
 
       double radToDegree = rotationAngle * 180.0 / Math.PI;
-
-      Quaternion rotationEnd = Quaternion.axisAngle(rotationAxis, (float) radToDegree);
 
       ObjectAnimator dragonRotation;
 
