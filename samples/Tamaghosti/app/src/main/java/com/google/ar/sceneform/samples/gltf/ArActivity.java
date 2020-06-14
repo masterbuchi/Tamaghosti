@@ -648,7 +648,7 @@ public class ArActivity extends AppCompatActivity {
                 break;
             case 3:
 
-                t.makeLongToast(mDragonName + " seems sad, show some love and ped your dragon.", 8000);
+                t.makeLongToast(mDragonName + " seems sad, show some love and pet your dragon.", 8000);
                 break;
             case 4:
 
