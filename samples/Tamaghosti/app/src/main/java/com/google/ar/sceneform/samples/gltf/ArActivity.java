@@ -25,7 +25,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
@@ -33,7 +32,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -42,27 +40,18 @@ import android.widget.Toast;
 
 
 import com.google.ar.core.Anchor;
-import com.google.ar.core.Frame;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
-import com.google.ar.core.Pose;
 import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.ArSceneView;
-import com.google.ar.sceneform.HitTestResult;
 import com.google.ar.sceneform.Node;
-import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.math.Quaternion;
-import com.google.ar.sceneform.math.QuaternionEvaluator;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.math.Vector3Evaluator;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
-import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * This is a example activity that uses the Sceneform UX package to make common AR tasks easier.
@@ -88,11 +77,12 @@ public class ArActivity extends AppCompatActivity {
     ProgressBar prgHunger;
     ProgressBar prgEnergy;
     ProgressBar prgSocial;
-    ProgressBar prgTraining;
-    Button mainAction;
-    Button sleep;
-    Button social;
-    Button training;
+    ProgressBar prgFun;
+
+    ImageButton meat;
+    ImageButton sleep;
+
+    ImageButton play;
     ImageButton needsShow;
     ImageView plus;
 
@@ -100,6 +90,7 @@ public class ArActivity extends AppCompatActivity {
 
 
     NeedsController needsControl;
+    ToasterLong t;
 
     private boolean needsShown = true;
     private String mDragonName;
@@ -155,6 +146,7 @@ public class ArActivity extends AppCompatActivity {
         firebaseManager = new FirebaseManager();
 
         needsControl = new NeedsController(getApplicationContext());
+        t = new ToasterLong(getApplicationContext());
 
         // Cloud Anchor on same device
         // Cloud Anchor auf dem selben Gerät
@@ -282,7 +274,7 @@ public class ArActivity extends AppCompatActivity {
                                 Log.d("Meat", " getWorldPosition: " + meatNode.getWorldPosition());
 
 
-                                if (needsControl.getHunger() <= 90) {
+                                if ((needsControl.getHunger() <= 90)) {
 
                                     //needsControl.feed();
 
@@ -387,7 +379,7 @@ public class ArActivity extends AppCompatActivity {
         float pos_y_0 = cameraPosition.y;
         float d_t = 1f / steps * time;
 
-       float  pos_y = 0;
+        float pos_y = 0;
 
         Log.d("Meat", " time: " + time);
 
@@ -414,18 +406,17 @@ public class ArActivity extends AppCompatActivity {
         for (int i = 0; i < steps; i++) {
 
 
-            pos_y = -0.5f * 2 * i*d_t * i*d_t + v_y_0 * (float) Math.sin(45) * i*d_t + pos_y_0;
+            pos_y = -0.5f * 2 * i * d_t * i * d_t + v_y_0 * (float) Math.sin(45) * i * d_t + pos_y_0;
 
-            x = x+  0.01f;
+            x = x + 0.01f;
 
-             if (i <100) currentPosY =  currentPos.y + directionVector.y/(float)steps + 0.01f;
-             else currentPosY =  currentPos.y + directionVector.y/(float)steps - 0.01f;
+            if (i < 100) currentPosY = currentPos.y + directionVector.y / (float) steps + 0.01f;
+            else currentPosY = currentPos.y + directionVector.y / (float) steps - 0.01f;
 
 
+            currentPos = new Vector3(currentPos.x + directionVector.x / (float) steps, currentPosY, currentPos.z + directionVector.z / (float) steps);
 
-            currentPos = new Vector3(currentPos.x + directionVector.x/(float)steps, currentPosY , currentPos.z + directionVector.z/(float)steps);
-
-           // currentPos = new Vector3().add(currentPos, directionVector.scaled(1 / 200f));
+            // currentPos = new Vector3().add(currentPos, directionVector.scaled(1 / 200f));
 
             positions[i] = currentPos;
 
@@ -467,7 +458,7 @@ public class ArActivity extends AppCompatActivity {
         objectAnimation.setInterpolator(new LinearInterpolator());
 
         // Duration in ms of the animation.
-        objectAnimation.setDuration(time-1000);
+        objectAnimation.setDuration(time - 1000);
         objectAnimation.start();
 
 
@@ -498,11 +489,12 @@ public class ArActivity extends AppCompatActivity {
 
 
     private void createDragon(HitResult hitResult) {
-        hintControl(20);
-        mainAction.setEnabled(true);
+       hintControl(20);
+        meat.setEnabled(true);
         sleep.setEnabled(true);
-        social.setEnabled(true);
-        training.setEnabled(true);
+
+        play.setEnabled(false);
+        play.setHovered(true);
 
 
         // showToast(mDragonName + " woke up.");
@@ -526,15 +518,17 @@ public class ArActivity extends AppCompatActivity {
 
 
     private void setButtonListeners() {
-        mainAction = findViewById(R.id.mainActionControl);
+
+
+        meat = findViewById(R.id.meatButton);
         needsShow = findViewById(R.id.needsShow);
         sleep = findViewById(R.id.sleepControl);
-        social = findViewById(R.id.socialControl);
-        training = findViewById(R.id.trainingControl);
-        mainAction.setEnabled(false);
+
+        play = findViewById(R.id.playControl);
+        meat.setEnabled(false);
         sleep.setEnabled(false);
-        social.setEnabled(false);
-        training.setEnabled(false);
+
+        play.setEnabled(false);
 
 
         card = findViewById(R.id.cardViewNeeds);
@@ -550,22 +544,27 @@ public class ArActivity extends AppCompatActivity {
             }
         });
 
+
         //Eat animation, hunger + 10, sleep -10
-        mainAction.setOnClickListener(v -> {
+        meat.setOnClickListener(v -> {
 
-            if (!dragon.moving) {
-                dragon.setEating(true);
+            if (needsControl.getEnergy() > 10) {
 
-                if (meatNode == null) createMeat();
-                else {
-                    meatNode.setParent(arFragment.getArSceneView().getScene().getCamera());
-                    meatNode.setLocalRotation(new Quaternion(0, 180, 250, 0));
-                    meatNode.setLocalPosition(new Vector3(0, -0.3f, -1));
-                    meatNode.setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
-                    meatNode.setEnabled(true);
+                if (!dragon.moving) {
+                    dragon.setEating(true);
+
+                    if (meatNode == null) createMeat();
+                    else {
+                        meatNode.setParent(arFragment.getArSceneView().getScene().getCamera());
+                        meatNode.setLocalRotation(new Quaternion(0, 180, 250, 0));
+                        meatNode.setLocalPosition(new Vector3(0, -0.3f, -1));
+                        meatNode.setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
+                        meatNode.setEnabled(true);
+                    }
                 }
+            }else {
+                hintControl(2);
             }
-
 
         });
 
@@ -587,43 +586,12 @@ public class ArActivity extends AppCompatActivity {
         });
 
 
-        if (needsControl.getHunger() == 100 && needsControl.getEnergy() >= 80) {
-            social.setVisibility(View.VISIBLE);
+        if (needsControl.getHunger() >= 50 && needsControl.getEnergy() >= 50 && needsControl.getSocial() == 50) {
+            play.setEnabled(true);
         }
 
-
-        social.setOnClickListener(v -> {
-
-            if (dragon != null) {
-
-                // Pet dragon
-
-                if (needsControl.getSocial() <= 90) {
-
-                    //needsControl.pet();
-
-                    needsControl.petDragon();
-
-                    setNeeds();
-                    showPlus();
-                }
-
-                dragon.updateAnimation(dragon.getPet_index);
-
-                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
-                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.PET);
-
-            }
-
-        });
-
-
-        if (needsControl.getHunger() >= 80 && needsControl.getEnergy() >= 80 && needsControl.getSocial() == 100) {
-            training.setVisibility(View.VISIBLE);
-        }
-
-        training.setOnClickListener(v -> {
-            if (needsControl.getTraining() <= 90) {
+        play.setOnClickListener(v -> {
+            if (needsControl.getFun() <= 90) {
                 //needsControl.train();
 
                 needsControl.trainDragon();
@@ -631,7 +599,7 @@ public class ArActivity extends AppCompatActivity {
                 setNeeds();
                 showPlus();
             }
-            Log.d("SocialDebug", "pressed " + needsControl.getTraining());
+            Log.d("SocialDebug", "pressed " + needsControl.getFun());
         });
     }
 
@@ -658,6 +626,7 @@ public class ArActivity extends AppCompatActivity {
 
     public void showToast(String s) {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+
     }
 
     public void hintControl(int value) {
@@ -665,43 +634,32 @@ public class ArActivity extends AppCompatActivity {
 
         switch (value) {
             case 0:
-                showToast("Call " + mDragonName + " by tapping on plane");
+                t.makeLongToast("Call " + mDragonName + " by tapping on plane.", 9000);
+
 
                 break;
             case 1:
-                showToast(mDragonName + " is hungry, to feed him hit *ACTIONS*");
 
+                t.makeLongToast(mDragonName + " is hungry, select meat to fee.d", 8000);
                 break;
             case 2:
-                showToast(mDragonName + " seems tired");
 
+                t.makeLongToast(mDragonName + " seems too tired.", 8000);
                 break;
             case 3:
-                showToast(mDragonName + " seems sad, give him some love");
 
+                t.makeLongToast(mDragonName + " seems sad, show some love and ped your dragon.", 8000);
                 break;
             case 4:
-                showToast(mDragonName + " needs some training");
 
+                t.makeLongToast(mDragonName + " needs some fun.", 8000);
                 break;
-            case 20:
-                //Control by needs
-                if (needsControl.getHunger() <= 50) {
-                    hintControl(1);
-                    break;
-                } else if (needsControl.getEnergy() <= 20) {
-                    hintControl(2);
-                    break;
-                } else if (needsControl.getSocial() <= 20) {
-                    hintControl(3);
-                    break;
-                } else if (needsControl.getTraining() <= 20) {
-                    hintControl(4);
-                    break;
-                }
 
+            case 20:
+
+                t.makeLongToast("Welcome to Dragon Care. Check what " + mDragonName + " currently needs.", 9000);
             default:
-                showToast("Care for " + mDragonName);
+                ;
                 break;
         }
 
@@ -722,8 +680,8 @@ public class ArActivity extends AppCompatActivity {
         prgEnergy.setProgress(needsControl.getEnergy());
         prgSocial = findViewById(R.id.progressSocial);
         prgSocial.setProgress(needsControl.getSocial());
-        prgTraining = findViewById(R.id.progressTraining);
-        prgTraining.setProgress(needsControl.getTraining());
+        prgFun = findViewById(R.id.progressFun);
+        prgFun.setProgress(needsControl.getFun());
     }
 
 
@@ -731,7 +689,7 @@ public class ArActivity extends AppCompatActivity {
         stopThread = false;
 
         Log.d("Meat", "AnimationDuration " + dragon.getAnimationDuration());
-        float d = duration + dragon.getAnimationDuration()*1000;
+        float d = duration + dragon.getAnimationDuration() * 1000;
         int e = (int) d;
         Log.d("ANIMATION", "duration in millis " + e);
         ExampleRunnable runnable = new ExampleRunnable(e);
@@ -752,9 +710,8 @@ public class ArActivity extends AppCompatActivity {
                 return;
             Log.d("ANIMATION", "new thread count: " + milliseconds);
 
-            mainAction.post(() -> {
-                mainAction.setText(R.string.eating);
-                mainAction.setEnabled(false);
+            meat.post(() -> {
+                meat.setEnabled(false);
             });
             try {
                 Thread.sleep(milliseconds);
@@ -769,10 +726,9 @@ public class ArActivity extends AppCompatActivity {
                 dragon.setEating(false);
                 dragon.updateAnimation(dragon.idle_index);
                 meatNode.setEnabled(false);
-                mainAction.setText(R.string.eatAgain);
-                mainAction.setEnabled(true);
+                meat.setEnabled(true);
 
-               // Log.d("Meat", " getWorldPosition: " + meatNode.getWorldPosition());
+                // Log.d("Meat", " getWorldPosition: " + meatNode.getWorldPosition());
 
             });
         }
@@ -780,8 +736,6 @@ public class ArActivity extends AppCompatActivity {
 
 
 }
-
-
 
 
 

@@ -2,7 +2,6 @@ package com.google.ar.sceneform.samples.gltf;
 
 import android.content.Context;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
 
@@ -16,7 +15,7 @@ public class NeedsController {
     private int hunger;
     private int energy;
     private int social;
-    private int training;
+    private int Fun;
 
     public NeedsController(Context context) {
 
@@ -86,11 +85,11 @@ public class NeedsController {
 
     public void trainDragon(){
 
-        //setValue(training, 10);
+        //setValue(fun, 10);
 
-        setTraining(10);
+        setFun(10);
 
-        persistenceManager.saveInt("training", training);
+        persistenceManager.saveInt("fun", Fun);
 
         makeDragonTired();
         makeDragonHungry();
@@ -152,19 +151,19 @@ public class NeedsController {
         }
     }
 
-    public void setTraining(int value) {
-        if (training > 0 && training < 100 ){
+    public void setFun(int value) {
+        if (Fun > 0 && Fun < 100 ){
 
-            if(training + value <= 0) {
+            if(Fun + value <= 0) {
 
-                training = 0;
+                Fun = 0;
 
-            } else if(training + value >= 100) {
+            } else if(Fun + value >= 100) {
 
-                training = 100;
+                Fun = 100;
 
             } else {
-                training += value;
+                Fun += value;
             }
 
         }
@@ -184,8 +183,8 @@ public class NeedsController {
         return  persistenceManager.getInt("social", 0);
     }
 
-    public int getTraining() {
-        return  persistenceManager.getInt("training", 0);
+    public int getFun() {
+        return  persistenceManager.getInt("fun", 0);
     }
 
 }

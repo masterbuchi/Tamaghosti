@@ -54,10 +54,11 @@
 
     <string name="nav_care">Care</string>
 
-    <string name="nav_train">Training</string>
+    <string name="nav_fun">Fun</string>
 
 
-    <string name="sleep_progress">progress</string>
+
+
     <string name="nav_actions">Actions</string>
     <string name="social">Pet</string>
     <string name="train">Train</string>
@@ -68,12 +69,17 @@
     <string name="lable_hunger">Hunger</string>
     <string name="lable_social">Social</string>
     <string name="lable_energy">Energy</string>
-    <string name="lable_training">Training</string>
+    <string name="lable_fun">Fun</string>
     <string name="resolve">Resolve</string>
     <string name="plus_sign">Plus Sign</string>
     <string name="eatAgain">eat again</string>
     <string name="eating">Eating</string>
 
+    <string name="sleep_progress">progress</string>
+    <string name="showMeat">showMeat</string>
+    <string name="showNeeds">showNeeds</string>
+    <string name="showBall">showBall</string>
+    <string name="showSleep">showSleep</string>
 
     <!-- Notification Strings -->
 

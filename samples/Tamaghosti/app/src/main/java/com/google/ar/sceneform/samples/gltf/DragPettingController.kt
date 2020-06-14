@@ -16,6 +16,7 @@ class DragPettingController(private var dragon: Dragon, transformableNode: BaseT
         return transformableNode.isSelected
     }
 
+
     public override fun onContinueTransformation(gesture: DragGesture) {
         if (!animationStart) {
             dragon.updateAnimation(dragon.getPet_index);

@@ -1,0 +1,329 @@
+{
+  "accessors": [
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 9984,
+      "max": [
+        98.078529357910156,
+        97.588417053222656,
+        98.560127258300781
+      ],
+      "min": [
+        -98.078529357910156,
+        -97.588455200195312,
+        -98.560073852539062
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 119808,
+      "componentType": 5126,
+      "count": 9984,
+      "max": [
+        0.99952125549316406,
+        0.99742680788040161,
+        0.99679297208786011
+      ],
+      "min": [
+        -0.99952125549316406,
+        -0.99742680788040161,
+        -0.9967924952507019
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 9984,
+      "max": [
+        0.99990743398666382,
+        0.99492454528808594
+      ],
+      "min": [
+        0,
+        0
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 79872,
+      "componentType": 5126,
+      "count": 9984,
+      "max": [
+        0.99990743398666382,
+        0.99492454528808594
+      ],
+      "min": [
+        0,
+        0
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "componentType": 5125,
+      "count": 14976,
+      "max": [
+        9983
+      ],
+      "min": [
+        0
+      ],
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 239616,
+      "componentType": 5126,
+      "count": 6394,
+      "max": [
+        96.201179504394531,
+        96.996955871582031,
+        96.996994018554688
+      ],
+      "min": [
+        -96.201179504394531,
+        -96.996978759765625,
+        -96.9969482421875
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 316344,
+      "componentType": 5126,
+      "count": 6394,
+      "max": [
+        1,
+        1,
+        1
+      ],
+      "min": [
+        -1,
+        -1,
+        -1
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 159744,
+      "componentType": 5126,
+      "count": 6394,
+      "max": [
+        1,
+        0.99419045448303223
+      ],
+      "min": [
+        0.0017004945548251271,
+        0.00065713818185031414
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 59904,
+      "componentType": 5125,
+      "count": 21360,
+      "max": [
+        6393
+      ],
+      "min": [
+        0
+      ],
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "extras": {
+      "author": "Mauro3D (https://sketchfab.com/maurogsw)",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "source": "https://sketchfab.com/3d-models/basketball-45aee654bbd541d18c9cd1a6c951f72d",
+      "title": "Basketball"
+    },
+    "generator": "Sketchfab-8.61.0",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 145344,
+      "byteOffset": 0,
+      "name": "floatBufferViews",
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 210896,
+      "byteOffset": 145344,
+      "byteStride": 8,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 393072,
+      "byteOffset": 356240,
+      "byteStride": 12,
+      "name": "floatBufferViews",
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 749312,
+      "uri": "scene.bin"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "emissiveFactor": [
+        0,
+        0,
+        0
+      ],
+      "name": "Leather",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.22602,
+          0.067846299999999998,
+          0.023781699999999999,
+          1
+        ],
+        "metallicFactor": 0,
+        "roughnessFactor": 0.97802111440952177
+      }
+    },
+    {
+      "doubleSided": true,
+      "emissiveFactor": [
+        0,
+        0,
+        0
+      ],
+      "name": "InBetween",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "metallicFactor": 0,
+        "roughnessFactor": 1
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Sphere_Leather_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TEXCOORD_0": 2,
+            "TEXCOORD_1": 3
+          },
+          "indices": 4,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Sphere_InBetween_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 6,
+            "POSITION": 5,
+            "TEXCOORD_0": 7
+          },
+          "indices": 8,
+          "material": 1,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1
+      ],
+      "name": "RootNode (gltf orientation matrix)",
+      "rotation": [
+        -0.70710678118654746,
+        -0,
+        -0,
+        0.70710678118654757
+      ]
+    },
+    {
+      "children": [
+        2
+      ],
+      "name": "RootNode (model correction matrix)"
+    },
+    {
+      "children": [
+        3
+      ],
+      "matrix": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        -1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "name": "1b9127b61cb0430d8879a470f1c1f022.fbx"
+    },
+    {
+      "children": [
+        4
+      ],
+      "name": "RootNode"
+    },
+    {
+      "children": [
+        5,
+        6
+      ],
+      "name": "Sphere"
+    },
+    {
+      "mesh": 0,
+      "name": "Sphere_Leather_0"
+    },
+    {
+      "mesh": 1,
+      "name": "Sphere_InBetween_0"
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "OSG_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ]
+}
+
