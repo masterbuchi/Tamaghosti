@@ -16,11 +16,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wkaeUpControl"
+        app:layout_constraintTop_toBottomOf="@+id/wakeUpControl"
         app:layout_constraintVertical_bias="0.49" />
 
     <Button
-        android:id="@+id/wkaeUpControl"
+        android:id="@+id/wakeUpControl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="170dp"
@@ -39,5 +39,5 @@
         app:layout_constraintBottom_toTopOf="@+id/progressEnergy2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wkaeUpControl" />
+        app:layout_constraintTop_toBottomOf="@+id/wakeUpControl" />
 </androidx.constraintlayout.widget.ConstraintLayout>

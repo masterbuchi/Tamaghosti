@@ -44,6 +44,7 @@ public class Dragon extends TransformableNode  {
 
     Control control;
 
+    Renderable renderableOne, renderableTwo;
 
     final int eat_index = 0;
     final int getPet_index = 1;
@@ -67,11 +68,12 @@ public class Dragon extends TransformableNode  {
     }
 
 
-    Dragon(ArFragment arFragment, AnchorNode anchorNode, Renderable renderable, Control control) {
+    Dragon(ArFragment arFragment, AnchorNode anchorNode, Renderable renderableOne, Renderable renderableTwo, Control control) {
         super(arFragment.getTransformationSystem());
         parentArFragment = arFragment;
         this.control = control;
-
+        this.renderableOne = renderableOne;
+        this.renderableTwo = renderableTwo;
         // Deactivate Rotation and Translation
         getTranslationController().setEnabled(false);
         getRotationController().setEnabled(false);
@@ -82,8 +84,15 @@ public class Dragon extends TransformableNode  {
         addTransformationController(dragPettingController);
 
         setParent(anchorNode);
-        setRenderable(renderable);
+
+        updateRenderable();
+
         setDragonAnimations();
+    }
+
+    void updateRenderable() {
+        if (control.getHappyAnimation()) setRenderable(renderableTwo);
+        else setRenderable(renderableOne);
     }
 
     void setSocial (Boolean pettingAllowed) {
@@ -122,8 +131,7 @@ public class Dragon extends TransformableNode  {
 
     void updateAnimation(int index) {
 
-
-        startTimeofCurrentAnimation = System.nanoTime();
+               startTimeofCurrentAnimation = System.nanoTime();
 
         switch (index) {
             case eat_index: speedFactor = 1f; break;
@@ -200,8 +208,7 @@ public class Dragon extends TransformableNode  {
                 @Override
                 public void onAnimationEnd(android.animation.Animator animation) {
                     setNewPosition(newPos);
-                    if (control.getRestrictions()[1]) {
-
+                    if (control.getMeatActivated()) {
                         updateAnimation(eat_index);
 
                         // Notify Database!

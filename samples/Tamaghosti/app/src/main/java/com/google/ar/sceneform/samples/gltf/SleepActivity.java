@@ -1,9 +1,10 @@
 package com.google.ar.sceneform.samples.gltf;
 
 
-import android.content.Intent;
-import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,7 +12,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import static java.lang.Thread.sleep;
@@ -30,7 +30,6 @@ public class SleepActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sleep);
 
@@ -38,7 +37,7 @@ public class SleepActivity extends AppCompatActivity {
 
         //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 
-        final int slValue = persistenceManager.getInt("sleep",0);
+        final int slValue = persistenceManager.getInt("energy",0);
 
         Log.d("SLEEP", "sleep value: " + slValue);
         this.energy = slValue;
@@ -57,15 +56,12 @@ public class SleepActivity extends AppCompatActivity {
 
         
 
-        Button wakeUp = findViewById(R.id.wkaeUpControl);
+        Button wakeUp = findViewById(R.id.wakeUpControl);
         wakeUp.setOnClickListener(v -> {
             stopThread(null);
-
-            Log.d("SLEEP", "safeEnergy end: " + safeEnergy);
-
-            Intent intent = new Intent(SleepActivity.this, ArActivity.class);
-
-            startActivity(intent);
+            Intent returnIntent = new Intent();
+            setResult(Activity.RESULT_CANCELED, returnIntent);
+            finish();
         });
 
         startThread(null);
@@ -100,7 +96,7 @@ public class SleepActivity extends AppCompatActivity {
                     Log.d("SLEEP", "progress is growing: " + energy);
                     energy ++;
 
-                    persistenceManager.saveInt("sleep", safeEnergy);
+                    persistenceManager.saveInt("energy", safeEnergy);
 
                 });
 

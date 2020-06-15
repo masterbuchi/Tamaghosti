@@ -20,13 +20,15 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.lang.ref.WeakReference;
 
-public class SpectatorActivity extends AppCompatActivity {
+public class SpectatorActivity extends ArActivity {
 
     private ArFragment arFragment;
 
-    private Renderable renderable;
+    private Renderable dragonRenderableOne, dragonRenderableTwo, meatRenderable;
 
     private Dragon dragon;
+
+    Control control;
 
     private double distance;
     private String anchorId;
@@ -50,6 +52,8 @@ public class SpectatorActivity extends AppCompatActivity {
         checkForUpdates = false;
 
         dragonCreated = false;
+
+        control = new Control(this);
 
         initAnchorListener = true;
         initAnimationStateListener = true;
@@ -83,7 +87,7 @@ public class SpectatorActivity extends AppCompatActivity {
                         modelRenderable -> {
                             SpectatorActivity activity = weakActivity.get();
                             if (activity != null) {
-                                activity.renderable = modelRenderable;
+                                activity.dragonRenderableOne = modelRenderable;
                             }
                         })
                 .exceptionally(
@@ -93,6 +97,46 @@ public class SpectatorActivity extends AppCompatActivity {
 
                             return null;
                         });
+
+        ModelRenderable.builder()
+                .setSource(
+                        this, R.raw.dragon65_two)
+                .setIsFilamentGltf(true)
+                .build()
+                .thenAccept(
+                        modelRenderable -> {
+                            SpectatorActivity activity = weakActivity.get();
+                            if (activity != null) {
+                                activity.dragonRenderableTwo = modelRenderable;
+                            }
+                        })
+                .exceptionally(
+                        throwable -> {
+
+                            // showToast("while loading an error occurred.");
+
+                            return null;
+                        });
+        ModelRenderable.builder()
+                .setSource(
+                        this, R.raw.meat)
+                .setIsFilamentGltf(true)
+                .build()
+                .thenAccept(
+                        modelRenderable -> {
+                            SpectatorActivity activity = weakActivity.get();
+                            if (activity != null) {
+                                activity.meatRenderable = modelRenderable;
+                            }
+                        })
+                .exceptionally(
+                        throwable -> {
+
+                            // showToast("while loading an error occurred.");
+
+                            return null;
+                        });
+
 
 
         // Resolve Button Listener
@@ -121,7 +165,7 @@ public class SpectatorActivity extends AppCompatActivity {
                 anchorNode.setParent(arFragment.getArSceneView().getScene());
 
                 // Place Resolved Anchor
-                dragon = new Dragon(arFragment, anchorNode, renderable);
+                dragon = new Dragon(arFragment, anchorNode, dragonRenderableOne, dragonRenderableTwo, control);
                 dragon.select();
 
                 dragonCreated = true;

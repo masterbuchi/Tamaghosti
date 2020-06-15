@@ -34,6 +34,7 @@ class DragPettingController(private var dragon: Dragon, transformableNode: BaseT
                 startTimeOfCurrentAnimation = System.nanoTime();
                 control.setNeed("social",10)
                 control.setNeed("hunger",-5)
+                control.showPlus(500)
             }
         }
 

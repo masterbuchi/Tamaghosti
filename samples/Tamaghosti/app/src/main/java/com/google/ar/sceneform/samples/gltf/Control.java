@@ -59,18 +59,23 @@ public class Control {
 
         setButtonListeners();
 
-        setRestrictions();
+        updateRestrictions();
 
         showHint("call");
     }
 
-    public void setRestrictions() {
 
-        updateRestrictions();
+
+
+    public void updateRestrictions() {
+
+        setBooleans();
+        calculateRestrictions();
+        setProcessBars();
 
         energy.setEnabled(restrictions[0]);
         hunger.setEnabled(restrictions[1]);
-        arActivity.getDragon().setSocial(restrictions[2]);
+      if (arActivity.getDragon() != null)  arActivity.getDragon().setSocial(restrictions[2]);
         fun.setEnabled(restrictions[3]);
 
     }
@@ -131,12 +136,20 @@ public class Control {
 
     }
 
-    public void updateRestrictions() {
+    public void calculateRestrictions() {
 
        restrictions = new Boolean[4];
 
         // Status
-        if (fit && full && friendly && exited) happyAnimation = true;
+        if (!tired && full && friendly && exited) {
+
+            happyAnimation = true;
+
+            restrictions[0] = true;
+            restrictions[1] = false;
+            restrictions[2] = true;
+            restrictions[3] = true;
+        }
         else {
             happyAnimation = false;
             if (tired) {
@@ -227,8 +240,8 @@ public class Control {
         energy.setOnClickListener(v -> {
 
             Intent intent = new Intent(arActivity, SleepActivity.class);
+            arActivity.startActivityForResult(intent, 1);
 
-            arActivity.startActivity(intent);
         });
 
         fun.setOnClickListener(v -> {
@@ -242,6 +255,9 @@ public class Control {
         });
     }
 
+
+
+
     @SuppressLint("SetTextI18n")
     void updateCurrentDragonPositionWindow() {
 
@@ -251,7 +267,12 @@ public class Control {
         textView.setText(dragonPosition.x + "\n" + dragonPosition.y + "\n" + dragonPosition.z);
     }
 
+    Boolean getHappyAnimation() {
+        return happyAnimation;
+    }
+
     public void createDragon() {
+        updateRestrictions();
         showHint("welcome");
         updateCurrentDragonPositionWindow();
     }
@@ -311,7 +332,9 @@ public class Control {
                 FirebaseManager firebaseManager = arActivity.getFirebaseManager();
                 Node meatNode = arActivity.getMeatNode();
                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE);
+
                 showPlus(2000);
+                meatActivated = false;
 
                 // Value Change
                 setNeed("hunger",20);
@@ -364,8 +387,7 @@ public class Control {
         else if (pm.getInt(key, 0) + value > 100) pm.saveInt(key, 100);
         else pm.saveInt(key, pm.getInt(key, 0) + value);
 
-        setRestrictions();
-        setProcessBars();
+        updateRestrictions();
 
     }
 

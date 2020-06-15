@@ -19,6 +19,7 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -80,8 +81,7 @@ public class ArActivity extends AppCompatActivity {
 
     private boolean dragonSet = false;
     private ArFragment arFragment;
-    private Renderable renderable;
-    private Renderable meatRenderable;
+    private Renderable dragonRenderableOne, dragonRenderableTwo, meatRenderable;
 
 
     //volatile == immer aktuellsten wert, nicht cache
@@ -162,7 +162,27 @@ public class ArActivity extends AppCompatActivity {
                         modelRenderable -> {
                             ArActivity activity = weakActivity.get();
                             if (activity != null) {
-                                activity.renderable = modelRenderable;
+                                activity.dragonRenderableOne = modelRenderable;
+                            }
+                        })
+                .exceptionally(
+                        throwable -> {
+
+                            showToast("while loading an error occurred.");
+
+                            return null;
+                        });
+
+        ModelRenderable.builder()
+                .setSource(
+                        this, R.raw.dragon65_two)
+                .setIsFilamentGltf(true)
+                .build()
+                .thenAccept(
+                        modelRenderable -> {
+                            ArActivity activity = weakActivity.get();
+                            if (activity != null) {
+                                activity.dragonRenderableTwo = modelRenderable;
                             }
                         })
                 .exceptionally(
@@ -176,7 +196,7 @@ public class ArActivity extends AppCompatActivity {
 
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
-                    if (renderable == null) {
+                    if (dragonRenderableOne == null) {
                         showToast("model failed to load");
                         return;
                     }
@@ -222,6 +242,18 @@ public class ArActivity extends AppCompatActivity {
         });
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_CANCELED) {
+             control.updateRestrictions();
+             control.setProcessBars();
+            }
+        }
+    }//onActivityResult
 
     private void CheckIfUploaded(Anchor anchor, AppAnchorState state) {
 
@@ -393,7 +425,7 @@ public class ArActivity extends AppCompatActivity {
         // Create the Anchor.
         AnchorNode anchorNode = createAnchor(hitResult);
         // Create the transformable model and add it to the anchorNode.
-        dragon = new Dragon(arFragment, anchorNode, renderable, control);
+        dragon = new Dragon(arFragment, anchorNode, dragonRenderableOne, dragonRenderableTwo, control);
 
         // Configuration for Main Window
         control.createDragon();
