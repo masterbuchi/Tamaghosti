@@ -35,11 +35,14 @@ public class Dragon extends TransformableNode  {
 
     private Long startTimeofCurrentAnimation;
 
-    private boolean eating;
+
     private float currentAnimationDuration;
 
     // Abfrage ob animation läuft
     boolean moving;
+    boolean pettingAllowed = false;
+
+    Control control;
 
 
     final int eat_index = 0;
@@ -64,9 +67,10 @@ public class Dragon extends TransformableNode  {
     }
 
 
-    Dragon(ArFragment arFragment, AnchorNode anchorNode, Renderable renderable) {
+    Dragon(ArFragment arFragment, AnchorNode anchorNode, Renderable renderable, Control control) {
         super(arFragment.getTransformationSystem());
         parentArFragment = arFragment;
+        this.control = control;
 
         // Deactivate Rotation and Translation
         getTranslationController().setEnabled(false);
@@ -74,12 +78,20 @@ public class Dragon extends TransformableNode  {
         //     model.getScaleController().setEnabled(false);
 
 
-        DragPettingController dragPettingController = new DragPettingController(this, this, arFragment.getTransformationSystem().getDragRecognizer());
+        DragPettingController dragPettingController = new DragPettingController(this, this, arFragment.getTransformationSystem().getDragRecognizer(), control);
         addTransformationController(dragPettingController);
 
         setParent(anchorNode);
         setRenderable(renderable);
         setDragonAnimations();
+    }
+
+    void setSocial (Boolean pettingAllowed) {
+        this.pettingAllowed = pettingAllowed;
+    }
+
+    boolean getPettingAllowed() {
+        return pettingAllowed;
     }
 
 
@@ -149,19 +161,7 @@ public class Dragon extends TransformableNode  {
     @Override
     public void onActivate() {
         updateAnimation(idle_index);
-
-
     }
-
-
-    public boolean getEating() {
-        return eating;
-    }
-
-    public void setEating (boolean eating) {
-        this.eating = eating;
-    }
-
 
 
     long moveTo(AnchorNode newPos, double distance) {
@@ -169,8 +169,6 @@ public class Dragon extends TransformableNode  {
         moving = true;
 
             updateAnimation(walk_index);
-
-
             ObjectAnimator objectAnimation = new ObjectAnimator();
             objectAnimation.setAutoCancel(true);
             objectAnimation.setTarget(this);
@@ -202,7 +200,14 @@ public class Dragon extends TransformableNode  {
                 @Override
                 public void onAnimationEnd(android.animation.Animator animation) {
                     setNewPosition(newPos);
-                    if (eating) updateAnimation(eat_index);
+                    if (control.getRestrictions()[1]) {
+
+                        updateAnimation(eat_index);
+
+                        // Notify Database!
+                       // firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
+                       // firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
+                    }
                     else updateAnimation(idle_index);
                     moving = false;
 

@@ -40,7 +40,7 @@
       app:layout_constraintTop_toTopOf="@+id/ux_fragment" />
 
   <ImageButton
-      android:id="@+id/needsShow"
+      android:id="@+id/showNeeds"
       android:layout_width="68dp"
       android:layout_height="43dp"
       android:contentDescription="@string/showNeeds"
@@ -198,7 +198,7 @@
       android:contentDescription="@string/showMeat"
       android:elevation="10dp"
       android:scaleType="fitCenter"
-      app:layout_constraintBottom_toTopOf="@+id/needsShow"
+      app:layout_constraintBottom_toTopOf="@+id/showNeeds"
       app:layout_constraintEnd_toEndOf="parent"
       app:srcCompat="@drawable/meatimage" />
 
@@ -208,7 +208,7 @@
       android:layout_height="59dp"
       android:contentDescription="@string/showSleep"
       android:scaleType="fitCenter"
-      app:layout_constraintBottom_toTopOf="@+id/needsShow"
+      app:layout_constraintBottom_toTopOf="@+id/showNeeds"
       app:layout_constraintEnd_toEndOf="parent"
       app:srcCompat="@drawable/sleepicon" />
 

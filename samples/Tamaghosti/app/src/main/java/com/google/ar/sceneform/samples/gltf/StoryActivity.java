@@ -54,14 +54,14 @@ public class StoryActivity extends AppCompatActivity {
 
                 // Save for the first time
                 int hungerValue = 50;
-                int sleepValue = 50;
+                int energyValue = 50;
                 int socialValue = 10;
-                int trainingValue = 0;
+                int funValue = 0;
 
                 persistenceManager.saveInt("hunger", hungerValue);
-                persistenceManager.saveInt("sleep", sleepValue);
+                persistenceManager.saveInt("energy", energyValue);
                 persistenceManager.saveInt("social", socialValue);
-                persistenceManager.saveInt("training", trainingValue);
+                persistenceManager.saveInt("fun", funValue);
 
                 // Open GLTFActivity
                 Intent intent = new Intent(StoryActivity.this, ArActivity.class);
