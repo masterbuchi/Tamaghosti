@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
@@ -19,6 +20,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 
 public class SpectatorActivity extends ArActivity {
 
@@ -30,17 +32,17 @@ public class SpectatorActivity extends ArActivity {
 
     Control control;
 
+    private HashMap<String, Object> movePosition;
     private double distance;
     private String anchorId;
     private FirebaseManager.AnimationState animationState;
-
-    private boolean checkForUpdates;
 
     private boolean dragonCreated;
 
     private boolean initAnchorListener;
     private boolean initDistanceListener;
     private boolean initAnimationStateListener;
+    private boolean initMovePositionListener;
 
 
 
@@ -49,8 +51,6 @@ public class SpectatorActivity extends ArActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spectator);
 
-        checkForUpdates = false;
-
         dragonCreated = false;
 
         control = new Control(this);
@@ -58,6 +58,7 @@ public class SpectatorActivity extends ArActivity {
         initAnchorListener = true;
         initAnimationStateListener = true;
         initDistanceListener = true;
+        initMovePositionListener = true;
 
         FirebaseManager firebaseManager = new FirebaseManager();
 
@@ -170,8 +171,6 @@ public class SpectatorActivity extends ArActivity {
 
                 dragonCreated = true;
 
-                checkForUpdates = true;
-
                 Log.d("Firebase", "DragonPosition " + dragon.getWorldPosition());
 
                 Log.d("Firebase", "DragonRotation " + dragon.getWorldRotation());
@@ -207,13 +206,25 @@ public class SpectatorActivity extends ArActivity {
 
                     distance = firebaseManager.getDistance();
 
-                    // Create Cloud Anchor
+                    movePosition = firebaseManager.getMovePosition();
 
+                    movePosition.get("x");
+
+                    float x = (float) movePosition.get("x");
+                    float y = (float) movePosition.get("y");
+                    float z = (float) movePosition.get("z");
+
+                    Vector3 newPos = new Vector3(x, y, z);
+
+                    /*
+                    // Resolve Cloud Anchor from Firebase
                     assert arFragment.getArSceneView().getSession() != null;
                     Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
 
                     AnchorNode anchorNode = new AnchorNode(resolvedAnchor);
                     anchorNode.setParent(arFragment.getArSceneView().getScene());
+
+                     */
 
                     Toast.makeText(getApplicationContext(), "Move Dragon", Toast.LENGTH_SHORT).show();
 
@@ -223,10 +234,35 @@ public class SpectatorActivity extends ArActivity {
 
 
                     // NOTE: Messes up the given framework. Array Out of bounce
-                    dragon.moveTo(anchorNode, distance);
+                    dragon.moveTo(newPos, distance);
 
 
                 }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        DatabaseReference movePositionReference = firebaseManager.getMovePositionReference();
+
+        movePositionReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                if(initMovePositionListener) {
+
+                    initMovePositionListener = false;
+
+                } else {
+
+                }
+
+                Log.i("OOOOF", dataSnapshot.getValue().toString());
 
             }
 
@@ -309,61 +345,7 @@ public class SpectatorActivity extends ArActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
+
         });
-
-
-
-
-
     }
-
-
-
 }
-
-        /*
-        // Update Loop
-        arFragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
-
-            if(checkForUpdates) {
-
-                // Compare old and new stats
-
-                // Move when there is a new cloud anchor
-                if(!anchorId.equals(firebaseManager.getAnchorId())) {
-
-                    distance = firebaseManager.getDistance();
-                    anchorId = firebaseManager.getAnchorId();
-
-                    // Create Cloud Anchor
-
-                    assert arFragment.getArSceneView().getSession() != null;
-                    Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
-
-                    AnchorNode anchorNode = new AnchorNode(resolvedAnchor);
-                    anchorNode.setParent(arFragment.getArSceneView().getScene());
-
-                    Toast.makeText(getApplicationContext(), "Move Dragon", Toast.LENGTH_SHORT).show();
-
-                    Log.i("MOVE", "TRIGGERED");
-
-                    // Move Dragon
-
-
-                    // NOTE: Messes up the given framework. Array Out of bounce
-                    //dragon.moveTo(anchorNode, distance);
-
-                }
-
-                // else if compare Animation States
-
-                // Check if eating
-
-
-
-                // Check if petting
-
-            }
-        });
-
-         */

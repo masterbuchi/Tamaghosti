@@ -21,7 +21,7 @@ public class Control {
 
     private PersistenceManager pm;
 
-    private Boolean happyAnimation;
+    private Boolean happyAnimation = false;
 
     private Boolean meatActivated = false;
 
@@ -57,9 +57,18 @@ public class Control {
         prgSocial = arActivity.findViewById(R.id.progressSocial);
         prgFun = arActivity.findViewById(R.id.progressFun);
 
-        setButtonListeners();
 
-        updateRestrictions();
+        // Skip these steps for spectator mode
+        if(showNeeds != null && hunger != null && fun != null && energy !=null) {
+
+            setButtonListeners();
+
+            updateRestrictions();
+        }
+
+
+
+
 
         showHint("call");
     }

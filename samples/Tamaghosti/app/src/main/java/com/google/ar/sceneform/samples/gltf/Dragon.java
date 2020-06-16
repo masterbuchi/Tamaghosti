@@ -21,6 +21,7 @@ import com.google.ar.sceneform.ux.TransformableNode;
 
 
 import java.util.Set;
+import java.util.Vector;
 
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -172,7 +173,7 @@ public class Dragon extends TransformableNode  {
     }
 
 
-    long moveTo(AnchorNode newPos, double distance) {
+    long moveTo(Vector3 newPos, double distance) {
 
         moving = true;
 
@@ -182,7 +183,7 @@ public class Dragon extends TransformableNode  {
             objectAnimation.setTarget(this);
             // All the positions should be world positions
             // The first position is the start, and the second is the end.
-            objectAnimation.setObjectValues(this.getWorldPosition(), newPos.getWorldPosition());
+            objectAnimation.setObjectValues(this.getWorldPosition(), newPos);
             objectAnimation.setPropertyName("worldPosition");
             // The Vector3Evaluator is used to evaluator 2 vector3 and return the next
             // vector3.  The default is to use lerp.
@@ -346,8 +347,8 @@ public class Dragon extends TransformableNode  {
     }
 
 
-    private void setNewPosition(AnchorNode newPos) {
-        this.setWorldPosition(newPos.getWorldPosition());
+    private void setNewPosition(Vector3 newPos) {
+        this.setWorldPosition(newPos);
     }
 
 

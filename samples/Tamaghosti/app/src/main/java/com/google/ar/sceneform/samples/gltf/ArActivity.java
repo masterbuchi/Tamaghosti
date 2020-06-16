@@ -283,7 +283,18 @@ public class ArActivity extends AppCompatActivity {
         // GEHT DAS OHNE DEN ANCHOR ÜBER DIE HITPOSITION
         // New CloudAnchor
 
-        AnchorNode moveToNode = createAnchor(hitResult);
+
+        //AnchorNode moveToNode = createAnchor(hitResult);
+
+        AnchorNode moveToNode = new AnchorNode(hitResult.createAnchor());
+
+        // Lets give it a shot
+
+
+
+        // Upload World Position
+        firebaseManager.uploadMovePosition(moveToNode.getWorldPosition());
+
         /*anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
         // New Node on CloudAnchor
         AnchorNode moveToNode = new AnchorNode(anchor);
@@ -301,7 +312,7 @@ public class ArActivity extends AppCompatActivity {
         showToast("Distance: " + distance);
 
 
-        long time = dragon.moveTo(moveToNode, distance);
+        long time = dragon.moveTo(moveToNode.getWorldPosition(), distance);
 
         dragon.rotateDragon(rotationVect);
 
@@ -332,7 +343,9 @@ public class ArActivity extends AppCompatActivity {
         Vector3 cameraPosition = meatNode.getWorldPosition();
 
 
-        AnchorNode anchorNode = createAnchor(hitResult);
+        //AnchorNode anchorNode = createAnchor(hitResult);
+        AnchorNode anchorNode = new AnchorNode(hitResult.createAnchor());
+
         Vector3 newPosition = anchorNode.getWorldPosition();
 
 
