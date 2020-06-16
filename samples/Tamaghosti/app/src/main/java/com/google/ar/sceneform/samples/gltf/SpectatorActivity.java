@@ -20,7 +20,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class SpectatorActivity extends ArActivity {
 
@@ -53,7 +55,7 @@ public class SpectatorActivity extends ArActivity {
 
         dragonCreated = false;
 
-        control = new Control(this);
+        control = new Control(this, Control.User.SPECTATOR);
 
         initAnchorListener = true;
         initAnimationStateListener = true;
@@ -204,39 +206,6 @@ public class SpectatorActivity extends ArActivity {
 
                     firebaseManager.setAnchorId(anchorId);
 
-                    distance = firebaseManager.getDistance();
-
-                    movePosition = firebaseManager.getMovePosition();
-
-                    movePosition.get("x");
-
-                    float x = (float) movePosition.get("x");
-                    float y = (float) movePosition.get("y");
-                    float z = (float) movePosition.get("z");
-
-                    Vector3 newPos = new Vector3(x, y, z);
-
-                    /*
-                    // Resolve Cloud Anchor from Firebase
-                    assert arFragment.getArSceneView().getSession() != null;
-                    Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
-
-                    AnchorNode anchorNode = new AnchorNode(resolvedAnchor);
-                    anchorNode.setParent(arFragment.getArSceneView().getScene());
-
-                     */
-
-                    Toast.makeText(getApplicationContext(), "Move Dragon", Toast.LENGTH_SHORT).show();
-
-                    Log.i("MOVE", "TRIGGERED");
-
-                    // Move Dragon
-
-
-                    // NOTE: Messes up the given framework. Array Out of bounce
-                    dragon.moveTo(newPos, distance);
-
-
                 }
 
             }
@@ -260,9 +229,65 @@ public class SpectatorActivity extends ArActivity {
 
                 } else {
 
-                }
+                    // Set Move Position
 
-                Log.i("OOOOF", dataSnapshot.getValue().toString());
+                    //Log.i("OOOOF", dataSnapshot.getValue().toString());
+                    // PRINTS: I/OOOOF: {x=-0.09956896305084229, y=-1.2168710231781006, z=-0.5886359214782715}
+
+                /*
+                dataSnapshot.getChildren().forEach(
+                        dataSnapshot1 -> Log.i("OOOOF", dataSnapshot1.getValue().toString())
+                );
+
+                 */
+
+                    HashMap<String, Object> coordinates = new HashMap<>();
+
+                    dataSnapshot.getChildren().forEach(
+                            dataSnapshot1 -> coordinates.put(dataSnapshot1.getKey(), dataSnapshot1.getValue())
+                    );
+
+                    firebaseManager.setMovePosition(coordinates);
+
+                    distance = firebaseManager.getDistance();
+
+                    // HastMap is null
+                    movePosition = firebaseManager.getMovePosition();
+
+                    movePosition.get("x");
+
+
+                    // Object --> Double --> Float Works
+
+                    // Object --> Float doesnt work
+
+                    float x = (float) ((double) movePosition.get("x"));
+                    float y = (float) ((double) movePosition.get("y"));
+                    float z = (float) ((double) movePosition.get("z"));
+
+                    Vector3 newPos = new Vector3(x, y, z);
+
+                    /*
+                    // Resolve Cloud Anchor from Firebase
+                    assert arFragment.getArSceneView().getSession() != null;
+                    Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
+
+                    AnchorNode anchorNode = new AnchorNode(resolvedAnchor);
+                    anchorNode.setParent(arFragment.getArSceneView().getScene());
+
+                     */
+
+                    Toast.makeText(getApplicationContext(), "Move Dragon", Toast.LENGTH_SHORT).show();
+
+                    Log.i("MOVE", "TRIGGERED");
+
+                    // Move Dragon
+
+
+                    // NOTE: Messes up the given framework. Array Out of bounce
+                    dragon.moveTo(newPos, distance);
+
+                }
 
             }
 

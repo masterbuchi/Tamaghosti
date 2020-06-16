@@ -125,7 +125,7 @@ public class ArActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_ux);
 
-        control = new Control(this);
+        control = new Control(this, Control.User.CREATER);
 
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 

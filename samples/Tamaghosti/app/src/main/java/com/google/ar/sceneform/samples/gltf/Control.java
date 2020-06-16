@@ -41,7 +41,14 @@ public class Control {
 
     private boolean needsShown = true;
 
-    public Control(ArActivity arActivity) {
+    public enum User {
+
+        CREATER,
+        SPECTATOR
+
+    }
+
+    public Control(ArActivity arActivity, User user) {
         this.arActivity = arActivity;
 
         pm = new PersistenceManager(arActivity.getApplicationContext());
@@ -59,16 +66,12 @@ public class Control {
 
 
         // Skip these steps for spectator mode
-        if(showNeeds != null && hunger != null && fun != null && energy !=null) {
+        if(user == User.CREATER) {
 
             setButtonListeners();
 
             updateRestrictions();
         }
-
-
-
-
 
         showHint("call");
     }

@@ -66,6 +66,10 @@ public class FirebaseManager {
         return animationState;
     }
 
+    public void setMovePosition(HashMap<String, Object> movePosition) {
+        this.movePosition = movePosition;
+    }
+
     public void setDistance(double distance) {
         this.distance = distance;
     }
