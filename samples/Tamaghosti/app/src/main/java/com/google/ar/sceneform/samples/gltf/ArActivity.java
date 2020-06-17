@@ -370,7 +370,7 @@ public class ArActivity extends AppCompatActivity {
         float x_3 = middlePoint.x;
         float y_1 = cameraPosition.y;
         float y_2 = newPosition.y;
-        float y_3 = middlePoint.y+0.5f;
+        float y_3 = middlePoint.y+directionVector.scaled(0.2f).length();
         float x;
         float y;
         float z;
@@ -427,7 +427,7 @@ public class ArActivity extends AppCompatActivity {
         objectAnimation.setInterpolator(new LinearInterpolator());
 
         // Duration in ms of the animation.
-        objectAnimation.setDuration(time - 1000);
+        objectAnimation.setDuration(time);
         objectAnimation.start();
 
 
