@@ -46,6 +46,8 @@ public class SpectatorActivity extends ArActivity {
     private boolean initAnimationStateListener;
     private boolean initMovePositionListener;
 
+    private String currentAnchorId;
+    private String updatedAnchorId;
 
 
     @Override
@@ -173,12 +175,14 @@ public class SpectatorActivity extends ArActivity {
 
                 dragonCreated = true;
 
+                currentAnchorId = anchorId;
+
                 Log.d("Firebase", "DragonPosition " + dragon.getWorldPosition());
 
                 Log.d("Firebase", "DragonRotation " + dragon.getWorldRotation());
 
-
             } else {
+
                 Toast.makeText(getApplicationContext(), "Dragon is already created", Toast.LENGTH_SHORT).show();
                 Log.d("Firebase", "DragonPosition " + dragon.getWorldPosition());
 
@@ -186,8 +190,6 @@ public class SpectatorActivity extends ArActivity {
             }
 
         });
-
-        // Alternative... listen for changes!
 
         DatabaseReference anchorReference = firebaseManager.getAnchorReference();
 
@@ -198,6 +200,8 @@ public class SpectatorActivity extends ArActivity {
 
                 anchorId = dataSnapshot.getValue(String.class);
 
+                updatedAnchorId = anchorId;
+
                 if(initAnchorListener) {
                     initAnchorListener = false;
                 } else {
@@ -206,6 +210,32 @@ public class SpectatorActivity extends ArActivity {
 
                     firebaseManager.setAnchorId(anchorId);
 
+                    if(dragonCreated && !updatedAnchorId.equals(currentAnchorId)) {
+
+                        Toast.makeText(getApplicationContext(), "New Host! Updating Dragon Anchor", Toast.LENGTH_SHORT).show();
+
+                        assert arFragment.getArSceneView().getSession() != null;
+                        Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
+
+                        AnchorNode anchorNode = new AnchorNode(resolvedAnchor);
+                        anchorNode.setParent(arFragment.getArSceneView().getScene());
+
+                        // NOTE: Delete old dragon
+
+                        // Is nur kurzfristig nicht sichtbar
+                        //dragon.setEnabled(false);
+
+
+                        // Works
+                        dragon.setRenderable(null);
+
+
+                        dragon = new Dragon(arFragment, anchorNode, dragonRenderableOne, dragonRenderableTwo, control);
+                        dragon.select();
+
+                        currentAnchorId = anchorId;
+
+                    }
                 }
 
             }
@@ -229,17 +259,6 @@ public class SpectatorActivity extends ArActivity {
 
                 } else {
 
-                    // Set Move Position
-
-                    //Log.i("OOOOF", dataSnapshot.getValue().toString());
-                    // PRINTS: I/OOOOF: {x=-0.09956896305084229, y=-1.2168710231781006, z=-0.5886359214782715}
-
-                /*
-                dataSnapshot.getChildren().forEach(
-                        dataSnapshot1 -> Log.i("OOOOF", dataSnapshot1.getValue().toString())
-                );
-
-                 */
 
                     HashMap<String, Object> coordinates = new HashMap<>();
 
@@ -251,10 +270,9 @@ public class SpectatorActivity extends ArActivity {
 
                     distance = firebaseManager.getDistance();
 
-                    // HastMap is null
-                    movePosition = firebaseManager.getMovePosition();
+                    // Distance vllt selber berechnen?
 
-                    movePosition.get("x");
+                    movePosition = firebaseManager.getMovePosition();
 
 
                     // Object --> Double --> Float Works
@@ -267,25 +285,19 @@ public class SpectatorActivity extends ArActivity {
 
                     Vector3 newPos = new Vector3(x, y, z);
 
-                    /*
-                    // Resolve Cloud Anchor from Firebase
-                    assert arFragment.getArSceneView().getSession() != null;
-                    Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
 
-                    AnchorNode anchorNode = new AnchorNode(resolvedAnchor);
-                    anchorNode.setParent(arFragment.getArSceneView().getScene());
-
-                     */
 
                     Toast.makeText(getApplicationContext(), "Move Dragon", Toast.LENGTH_SHORT).show();
 
-                    Log.i("MOVE", "TRIGGERED");
-
-                    // Move Dragon
-
-
-                    // NOTE: Messes up the given framework. Array Out of bounce
                     dragon.moveTo(newPos, distance);
+
+                    if(animationState == FirebaseManager.AnimationState.EAT) {
+
+                        // Spawn meat
+
+                        SpectatorActivity.super.createMeat();
+
+                    }
 
                 }
 
@@ -373,4 +385,5 @@ public class SpectatorActivity extends ArActivity {
 
         });
     }
+
 }

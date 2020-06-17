@@ -220,6 +220,8 @@ public class ArActivity extends AppCompatActivity {
 
                             if (control.getMeatActivated()) {
 
+                                // Get Meat Position? Spawn meat at the dragon position?
+
                                 meatAnimation(hitResult, time);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
@@ -281,8 +283,8 @@ public class ArActivity extends AppCompatActivity {
 
 
     long moveDragon(HitResult hitResult) {
-        // GEHT DAS OHNE DEN ANCHOR ÜBER DIE HITPOSITION
-        // New CloudAnchor
+        // GEHT DAS OHNE DEN ANCHOR ÜBER DIE HITPOSITION.
+        // JA GEHT :D
 
 
         //AnchorNode moveToNode = createAnchor(hitResult);
@@ -350,9 +352,6 @@ public class ArActivity extends AppCompatActivity {
 
         Vector3 cameraPosition = meatNode.getWorldPosition();
 
-
-        //AnchorNode anchorNode = createAnchor(hitResult);
-
         //anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
 
         anchor = hitResult.createAnchor();
@@ -368,7 +367,6 @@ public class ArActivity extends AppCompatActivity {
         Vector3 newPosition = anchorNode.getWorldPosition();
 
          */
-
 
         // calculate curve
         Vector3 directionVector = new Vector3().subtract(anchorNode.getWorldPosition(), cameraPosition);
