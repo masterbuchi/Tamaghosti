@@ -348,11 +348,9 @@ public class ArActivity extends AppCompatActivity {
 
     }
 
-    void meatAnimation(HitResult hitResult, long time) {
+    void meatAnimation(HitResult hitResult, long dragontime) {
 
         Vector3 cameraPosition = meatNode.getWorldPosition();
-
-        //anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
 
         anchor = hitResult.createAnchor();
 
@@ -360,44 +358,50 @@ public class ArActivity extends AppCompatActivity {
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
 
-        // v-- this code breaks the meat
-
-        /*AnchorNode anchorNode = new AnchorNode(hitResult.createAnchor());
-
         Vector3 newPosition = anchorNode.getWorldPosition();
 
-         */
-
         // calculate curve
-        Vector3 directionVector = new Vector3().subtract(anchorNode.getWorldPosition(), cameraPosition);
+        Vector3 directionVector = new Vector3().subtract(newPosition, cameraPosition);
+
+        Vector3 middlePoint = cameraPosition.add(cameraPosition,directionVector.scaled(0.5f));
+
+        float x_1 = cameraPosition.x;
+        float x_2 = newPosition.x;
+        float x_3 = middlePoint.x;
+        float y_1 = cameraPosition.y;
+        float y_2 = newPosition.y;
+        float y_3 = middlePoint.y+0.5f;
+        float x;
+        float y;
+        float z;
+
 
         float distance = directionVector.length();
 
+        double velocity = 1;
+        long time = (long) ((distance / velocity) * 1000);
+
+        if (time > dragontime) time = dragontime;
+
 
         int steps = 200;
-        float v_y_0 = 2f;
-        float pos_y_0 = cameraPosition.y;
-        float d_t = 1f / steps * time;
 
-        float pos_y = 0;
         Vector3[] positions = new Vector3[steps];
 
         Vector3 currentPos = cameraPosition;
-        float currentPosY = 0;
 
-        float x = 0;
-        float y = 0;
 
         // 200 Steps for smooth curve
         for (int i = 0; i < steps; i++) {
-            pos_y = -0.5f * 2 * i * d_t * i * d_t + v_y_0 * (float) Math.sin(45) * i * d_t + pos_y_0;
 
-            x = x + 0.01f;
+            x = currentPos.x + directionVector.x / (float) steps;
 
-            if (i < 100) currentPosY = currentPos.y + directionVector.y / (float) steps + 0.01f;
-            else currentPosY = currentPos.y + directionVector.y / (float) steps - 0.01f;
+            y  = (x*y_2 - x*y_3 + x_2*y_3 - x_3*y_2)/(x_2 - x_3) + ((x - x_2)*(x - x_3)*(y_1 - y_2))/((x_1 - x_2)*(x_2 - x_3)) - ((x - x_2)*(x - x_3)*(y_1 - y_3))/((x_1 - x_3)*(x_2 - x_3));
 
-            currentPos = new Vector3(currentPos.x + directionVector.x / (float) steps, currentPosY, currentPos.z + directionVector.z / (float) steps);
+            z = currentPos.z + directionVector.z / (float) steps;
+
+
+            currentPos = new Vector3(x, y,z);
 
             positions[i] = currentPos;
 

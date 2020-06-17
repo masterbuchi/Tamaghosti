@@ -117,17 +117,6 @@ public class Dragon extends TransformableNode  {
     }
 
 
-    @Override
-    public void onUpdate(FrameTime frameTime) {
-        super.onUpdate(frameTime);
-
-       /* if (this!=null) {
-            Quaternion q1 = this.getLocalRotation();
-            Quaternion q2 = Quaternion.axisAngle(new Vector3(0, 1f, 0f), 2f);
-            this.setLocalRotation(Quaternion.multiply(q1, q2));
-        }*/
-
-    }
 
 
     void updateAnimation(int index) {
