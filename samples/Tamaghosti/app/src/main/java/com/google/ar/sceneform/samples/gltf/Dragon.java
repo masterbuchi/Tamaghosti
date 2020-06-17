@@ -346,20 +346,6 @@ public class Dragon extends TransformableNode  {
         return rotationAnimation;
     }
 
-    public void destroy() {
-
-        //NOTE: Destroy dragon here
-
-        /*
-        parentArFragment = null;
-        this.control = null;
-        renderableOne = null;
-        renderableTwo = null;
-
-         */
-
-    }
-
     private void setNewPosition(Vector3 newPos) {
         this.setWorldPosition(newPos);
     }

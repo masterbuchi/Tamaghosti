@@ -219,14 +219,8 @@ public class SpectatorActivity extends ArActivity {
 
                         AnchorNode anchorNode = new AnchorNode(resolvedAnchor);
                         anchorNode.setParent(arFragment.getArSceneView().getScene());
-
-                        // NOTE: Delete old dragon
-
-                        // Is nur kurzfristig nicht sichtbar
-                        //dragon.setEnabled(false);
-
-
-                        // Works
+                        
+                        // Delete old dragon
                         dragon.setRenderable(null);
 
 
