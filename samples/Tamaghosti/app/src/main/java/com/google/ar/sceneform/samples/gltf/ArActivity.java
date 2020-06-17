@@ -15,7 +15,6 @@
  */
 package com.google.ar.sceneform.samples.gltf;
 
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -27,7 +26,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
 
 
@@ -35,10 +33,6 @@ import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.Node;
-import com.google.ar.sceneform.math.Quaternion;
-import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.math.Vector3Evaluator;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
@@ -232,7 +226,7 @@ public class ArActivity extends AppCompatActivity {
 
                             if (control.getMeatActivated()) {
                                 long time = control.moveDragon(hitResult);
-                                control.getMeat().meatAnimation(hitResult, time);
+                                control.getMeat().meatThrowAnimation(hitResult, time);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
                                 // Thread with walking and Eating duration, set to IDLE afterwards

@@ -8,7 +8,6 @@ import android.view.animation.LinearInterpolator;
 import com.google.android.filament.gltfio.Animator;
 import com.google.android.filament.gltfio.FilamentAsset;
 import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.FrameTime;
 
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.QuaternionEvaluator;
@@ -21,7 +20,6 @@ import com.google.ar.sceneform.ux.TransformableNode;
 
 
 import java.util.Set;
-import java.util.Vector;
 
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -265,7 +263,7 @@ public class Dragon extends TransformableNode  {
 
       ObjectAnimator dragonRotation;
 
-       dragonRotation = createAnimator(false, rotationAxis, (float) radToDegree);
+       dragonRotation = createRotateAnimator(false, rotationAxis, (float) radToDegree);
        dragonRotation.setTarget(this);
        dragonRotation.setDuration((long)  (1000 * radToDegree / 90));
        dragonRotation.start();
@@ -296,7 +294,7 @@ public class Dragon extends TransformableNode  {
     }
 
 
-    private ObjectAnimator createAnimator(boolean clockwise, Vector3 rotationAxis, float radToDegree) {
+    private ObjectAnimator createRotateAnimator(boolean clockwise, Vector3 rotationAxis, float radToDegree) {
         // Node's setLocalRotation method accepts Quaternions as parameters.
         // First, set up orientations that will animate a circle.
 

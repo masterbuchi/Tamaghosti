@@ -239,7 +239,10 @@ public class Control {
 
                     this.meatActivated = !this.meatActivated;
 
-                    if (ballActivated) ballActivated = false;
+                    if (ballActivated)  {
+                        ball.stopAnimation();
+                        ballActivated = false;
+                    }
 
                     if (meatActivated) {
 
@@ -248,9 +251,12 @@ public class Control {
 
                         meat.setMeatToCamera();
                         meat.setEnabled(true);
+                        meat.startAnimation();
 
                     } else {
+                        meat.stopAnimation();
                         meat.setEnabled(false);
+
                     }
 
                 }
@@ -274,7 +280,10 @@ public class Control {
 
                     this.ballActivated = !this.ballActivated;
 
-                    if (meatActivated) meatActivated = false;
+                    if (meatActivated) {
+                        meat.stopAnimation();
+                        meatActivated = false;
+                    }
 
 
                     if (ballActivated) {
@@ -284,8 +293,10 @@ public class Control {
 
                         ball.setBallToCamera();
                         ball.setEnabled(true);
+                        ball.startAnimation(false);
 
                     } else {
+                        ball.stopAnimation();
                         ball.setEnabled(false);
                     }
 

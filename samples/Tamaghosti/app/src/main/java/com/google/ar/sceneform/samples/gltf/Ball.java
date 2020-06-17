@@ -9,6 +9,7 @@ import com.google.ar.core.HitResult;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.math.Quaternion;
+import com.google.ar.sceneform.math.QuaternionEvaluator;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.math.Vector3Evaluator;
 import com.google.ar.sceneform.rendering.Renderable;
@@ -19,6 +20,7 @@ public class Ball extends Node {
     ArFragment arFragment;
     Renderable renderable;
     Control control;
+    ObjectAnimator ballRotationAnimation;
 
     public Ball(ArFragment arFragment, Renderable renderable, Control control) {
 
@@ -66,6 +68,8 @@ public class Ball extends Node {
 
     void throwAnimation(Vector3 oldPosition, Vector3 newPosition, Vector3 directionVector, Vector3 middlePosition) {
 
+        stopAnimation();
+        startAnimation(true);
         float x_1 = oldPosition.x;
         float x_2 = newPosition.x;
         float x_3 = middlePosition.x;
@@ -149,8 +153,8 @@ public class Ball extends Node {
                     Vector3 dragonPosition = control.getDragon().getWorldPosition();
                     Vector3 rotationVect = new Vector3().subtract(oldPosition, dragonPosition);
                     double distance = Math.sqrt(Math.pow(dragonPosition.x - oldPosition.x, 2) + Math.pow(dragonPosition.y - oldPosition.y, 2) + Math.pow(dragonPosition.z - oldPosition.z, 2));
-
                     long time = control.getDragon().moveTo(getWorldPosition(), distance, rotationVect);
+                    stopAnimation();
                 }
 
 
@@ -166,6 +170,61 @@ public class Ball extends Node {
             }
         });
 
+    }
+
+
+    void startAnimation(boolean wurf) {
+        if (ballRotationAnimation != null) {
+            return;
+        }
+
+        ballRotationAnimation = createAnimator(wurf);
+        ballRotationAnimation.setTarget(this);
+        ballRotationAnimation.setDuration(1000 * 360 / 90);
+        ballRotationAnimation.start();
+    }
+
+    void stopAnimation() {
+        if (ballRotationAnimation == null) {
+            return;
+        }
+        ballRotationAnimation.cancel();
+        ballRotationAnimation = null;
+    }
+
+    /** Returns an ObjectAnimator that makes this node rotate. */
+    private static ObjectAnimator createAnimator(boolean wurf) {
+        // Node's setLocalRotation method accepts Quaternions as parameters.
+        // First, set up orientations that will animate a circle.
+        Quaternion[] orientations = new Quaternion[4];
+        // Rotation to apply first, to tilt its axis.
+        Quaternion baseOrientation = Quaternion.eulerAngles(new Vector3(0f, 0, 0f));
+        for (int i = 0; i < orientations.length; i++) {
+            float angle = i * 360 / (orientations.length - 1);
+            Quaternion orientation;
+if (wurf) orientation = Quaternion.axisAngle(new Vector3(1f, 0f, 0f), angle);
+else      orientation = Quaternion.axisAngle(new Vector3(0f, 1f, 0f), angle);
+
+            orientations[i] = Quaternion.multiply(baseOrientation, orientation);
+        }
+
+        ObjectAnimator orbitAnimation = new ObjectAnimator();
+        // Cast to Object[] to make sure the varargs overload is called.
+        orbitAnimation.setObjectValues((Object[]) orientations);
+
+        // Next, give it the localRotation property.
+        orbitAnimation.setPropertyName("localRotation");
+
+        // Use Sceneform's QuaternionEvaluator.
+        orbitAnimation.setEvaluator(new QuaternionEvaluator());
+
+        //  Allow orbitAnimation to repeat forever
+        orbitAnimation.setRepeatCount(ObjectAnimator.INFINITE);
+        orbitAnimation.setRepeatMode(ObjectAnimator.RESTART);
+        orbitAnimation.setInterpolator(new LinearInterpolator());
+        orbitAnimation.setAutoCancel(true);
+
+        return orbitAnimation;
     }
 
 

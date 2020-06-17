@@ -9,6 +9,7 @@ import com.google.ar.core.HitResult;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.math.Quaternion;
+import com.google.ar.sceneform.math.QuaternionEvaluator;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.math.Vector3Evaluator;
 import com.google.ar.sceneform.rendering.Renderable;
@@ -18,6 +19,7 @@ public class Meat extends Node {
 
 ArFragment arFragment;
 Renderable renderable;
+ObjectAnimator meatRotationAnimation = null;
 
     public Meat(ArFragment arFragment, Renderable renderable) {
 
@@ -42,8 +44,8 @@ Renderable renderable;
 
     }
 
-    void meatAnimation(HitResult hitResult, long dragontime) {
-
+    void meatThrowAnimation(HitResult hitResult, long dragontime) {
+        stopAnimation();
         Vector3 cameraPosition = getWorldPosition();
 
         Anchor anchor = hitResult.createAnchor();
@@ -141,5 +143,59 @@ Renderable renderable;
             }
         });
 
+    }
+
+    void startAnimation() {
+        if (meatRotationAnimation != null) {
+            return;
+        }
+
+        meatRotationAnimation = createAnimator();
+        meatRotationAnimation.setTarget(this);
+        meatRotationAnimation.setDuration(1000 * 360 / 90);
+        meatRotationAnimation.start();
+    }
+
+    void stopAnimation() {
+        if (meatRotationAnimation == null) {
+            return;
+        }
+        meatRotationAnimation.cancel();
+        meatRotationAnimation = null;
+    }
+
+    /** Returns an ObjectAnimator that makes this node rotate. */
+    private static ObjectAnimator createAnimator() {
+        // Node's setLocalRotation method accepts Quaternions as parameters.
+        // First, set up orientations that will animate a circle.
+        Quaternion[] orientations = new Quaternion[4];
+        // Rotation to apply first, to tilt its axis.
+        Quaternion baseOrientation = Quaternion.eulerAngles(new Vector3(-71.508f, 0, -180.000f));
+        for (int i = 0; i < orientations.length; i++) {
+            float angle = i * 360 / (orientations.length - 1);
+
+
+            Quaternion orientation = Quaternion.axisAngle(new Vector3(0f, 0f, -1.0f), angle);
+
+            orientations[i] = Quaternion.multiply(baseOrientation, orientation);
+        }
+
+        ObjectAnimator orbitAnimation = new ObjectAnimator();
+        // Cast to Object[] to make sure the varargs overload is called.
+        orbitAnimation.setObjectValues((Object[]) orientations);
+
+        // Next, give it the localRotation property.
+        orbitAnimation.setPropertyName("localRotation");
+
+        // Use Sceneform's QuaternionEvaluator.
+        orbitAnimation.setEvaluator(new QuaternionEvaluator());
+
+        //  Allow orbitAnimation to repeat forever
+        orbitAnimation.setRepeatCount(ObjectAnimator.INFINITE);
+        orbitAnimation.setRepeatMode(ObjectAnimator.RESTART);
+        orbitAnimation.setInterpolator(new LinearInterpolator());
+        orbitAnimation.setAutoCancel(true);
+
+        return orbitAnimation;
     }
 }
