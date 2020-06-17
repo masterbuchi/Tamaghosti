@@ -66,11 +66,8 @@ public class ArActivity extends AppCompatActivity {
 
     Control control;
 
-    Dragon dragon;
-
     Meat meat;
 
-    private boolean needsShown = true;
     private AnchorNode moveToNode;
 
 
@@ -81,7 +78,6 @@ public class ArActivity extends AppCompatActivity {
 
     private FirebaseManager firebaseManager;
 
-    private boolean dragonSet = false;
     private ArFragment arFragment;
     private Renderable dragonRenderableOne, dragonRenderableTwo, meatRenderable;
 
@@ -207,8 +203,8 @@ public class ArActivity extends AppCompatActivity {
                     }
 
                     //First touch on Plane
-                    if (dragon == null) {
-                        createDragon(hitResult);
+                    if (control.getDragon() == null) {
+                        control.createDragon(hitResult, dragonRenderableOne, dragonRenderableTwo);
 
                         // Spectator: Create a standing dragon
                         firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE);
@@ -217,20 +213,12 @@ public class ArActivity extends AppCompatActivity {
                     } else {
 
                         // If no Moving Animation
-                        if (!dragon.moving) {
-
-                            long time = moveDragon(hitResult);
-
-
+                        if (!control.getDragon().moving) {
+                            long time = control.moveDragon(hitResult);
                             if (control.getMeatActivated()) {
-
-
-
-                                meat.meatAnimation(hitResult, time);
+                                control.getMeat().meatAnimation(hitResult, time);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
-
-
                                 // Thread with walking and Eating duration, set to IDLE afterwards
                                 control.startThread((float) time);
 
@@ -288,80 +276,7 @@ public class ArActivity extends AppCompatActivity {
     }
 
 
-    long moveDragon(HitResult hitResult) {
-
-
-        //AnchorNode moveToNode = createAnchor(hitResult);
-
-        moveToNode = new AnchorNode(hitResult.createAnchor());
-
-        // Lets give it a shot
-
-
-
-        // Upload World Position
-        firebaseManager.uploadMovePosition(moveToNode.getWorldPosition());
-
-        /*anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
-        // New Node on CloudAnchor
-        AnchorNode moveToNode = new AnchorNode(anchor);
-        // Set Parent of Node
-        moveToNode.setParent(arFragment.getArSceneView().getScene());
-        appAnchorState = AppAnchorState.HOSTING;*/
-
-        Vector3 rotationVect = new Vector3().subtract(moveToNode.getWorldPosition(), dragon.getWorldPosition());
-        double distance = Math.sqrt(Math.pow(dragon.getWorldPosition().x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragon.getWorldPosition().y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragon.getWorldPosition().z - moveToNode.getWorldPosition().z, 2));
-
-        // showToast("Distance: " + distance);
-        // Upload distance to Firebase
-        firebaseManager.uploadDistance(distance);
-
-        showToast("Distance: " + distance);
-
-
-        long time = dragon.moveTo(moveToNode.getWorldPosition(), distance);
-
-        dragon.rotateDragon(rotationVect);
-
-        return time;
-
-
-    }
-
-
-    void createMeat() {
-
-        meat.setParent(arFragment.getArSceneView().getScene().getCamera());
-        meat.setRenderable(meatRenderable);
-
-
-        meat.setLocalRotation(new Quaternion(0, 180, 250, 0));
-        meat.setLocalPosition(new Vector3(0, -0.3f, -1));
-        meat.setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
-
-
-    }
-
-
-
-    void createDragon(HitResult hitResult) {
-
-        //This function is not called, after this is set to true
-        dragonSet = true;
-
-        // Create the Anchor.
-        AnchorNode anchorNode = createAnchor(hitResult);
-        // Create the transformable model and add it to the anchorNode.
-        dragon = new Dragon(arFragment, anchorNode, dragonRenderableOne, dragonRenderableTwo, control);
-
-        // Configuration for Main Window
-        control.createDragon();
-
-    }
-
-// HIER
-
-    // Create Cloud Anchor
+        // Create Cloud Anchor
     AnchorNode createAnchor(HitResult hitResult) {
         anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
         appAnchorState = AppAnchorState.HOSTING;
@@ -376,14 +291,6 @@ public class ArActivity extends AppCompatActivity {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
-    public Dragon getDragon() {
-        return dragon;
-    }
-
-    public Meat getMeat() {
-        if(meat == null) meat = new Meat(arFragment, meatRenderable);
-        return meat;
-    }
 
     public FirebaseManager getFirebaseManager() {
         return firebaseManager;
@@ -392,6 +299,11 @@ public class ArActivity extends AppCompatActivity {
     public ArFragment getArFragment() {
         return arFragment;
     }
+
+    public Renderable getMeatRenderable() {
+        return meatRenderable;
+    }
+
 
 
 

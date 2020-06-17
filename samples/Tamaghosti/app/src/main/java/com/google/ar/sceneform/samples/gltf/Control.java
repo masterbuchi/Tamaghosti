@@ -10,14 +10,19 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.ar.core.Anchor;
+import com.google.ar.core.HitResult;
+import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
+import com.google.ar.sceneform.rendering.Renderable;
 
 import androidx.cardview.widget.CardView;
 
 public class Control {
     private ArActivity arActivity;
+    private SpectatorActivity spectatorActivity;
 
     private PersistenceManager pm;
 
@@ -29,6 +34,8 @@ public class Control {
     private Boolean tired, hungry, shy, bored, fit, full, friendly, exited;
     private Boolean[] restrictions;
 
+    Dragon dragon;
+    Meat meat;
 
     private String dragonName;
 
@@ -48,9 +55,12 @@ public class Control {
 
     }
 
-    public Control(ArActivity arActivity, User user) {
-        this.arActivity = arActivity;
+    User user;
 
+
+    public Control(ArActivity arActivity, User user) {
+        if (user == User.SPECTATOR) this.spectatorActivity = (SpectatorActivity) arActivity;
+        this.arActivity = arActivity;
         pm = new PersistenceManager(arActivity.getApplicationContext());
 
         dragonName = pm.getString("dragon_name", null);
@@ -63,7 +73,7 @@ public class Control {
         prgEnergy = arActivity.findViewById(R.id.progressEnergy);
         prgSocial = arActivity.findViewById(R.id.progressSocial);
         prgFun = arActivity.findViewById(R.id.progressFun);
-
+        this.user = user;
 
         // Skip these steps for spectator mode
         if(user == User.CREATOR) {
@@ -87,7 +97,7 @@ public class Control {
 
         energy.setEnabled(restrictions[0]);
         hunger.setEnabled(restrictions[1]);
-      if (arActivity.getDragon() != null)  arActivity.getDragon().setSocial(restrictions[2]);
+      if (dragon != null)  dragon.setSocial(restrictions[2]);
         fun.setEnabled(restrictions[3]);
 
     }
@@ -223,15 +233,13 @@ public class Control {
 
         hunger.setOnClickListener(v -> {
 
-                if (!arActivity.getDragon().moving) {
-
-                    Meat meat = arActivity.getMeat();
-
-
+                if (!dragon.moving) {
 
                     this.meatActivated = !this.meatActivated;
 
                     if (meatActivated) {
+
+                        if(meat == null) meat = new Meat(arActivity.getArFragment(), arActivity.getMeatRenderable());
 
                         meat.setMeatToCamera();
                         meat.setEnabled(true);
@@ -269,7 +277,7 @@ public class Control {
     @SuppressLint("SetTextI18n")
     void updateCurrentDragonPositionWindow() {
 
-        Vector3 dragonPosition = arActivity.getDragon().getWorldPosition();
+        Vector3 dragonPosition = dragon.getWorldPosition();
         TextView textView = arActivity.findViewById(R.id.modelPosition);
         textView.setText("");
         textView.setText(dragonPosition.x + "\n" + dragonPosition.y + "\n" + dragonPosition.z);
@@ -279,10 +287,47 @@ public class Control {
         return happyAnimation;
     }
 
-    public void createDragon() {
-        updateRestrictions();
+    public void createDragon(HitResult hitResult, Renderable dragonRenderableOne, Renderable dragonRenderableTwo) {
+
+
+        if (user == User.SPECTATOR) {
+
+            Anchor resolvedAnchor = spectatorActivity.getArFragment().getArSceneView().getSession().resolveCloudAnchor(spectatorActivity.getAnchorId());
+            AnchorNode anchorNode = new AnchorNode(resolvedAnchor);
+            anchorNode.setParent(spectatorActivity.getArFragment().getArSceneView().getScene());
+            dragon = new Dragon(spectatorActivity.getArFragment(), anchorNode, dragonRenderableOne, dragonRenderableTwo, this);
+
+        } else {
+
+            AnchorNode anchorNode = arActivity.createAnchor(hitResult);
+
+            dragon = new Dragon(arActivity.getArFragment(), anchorNode, dragonRenderableOne, dragonRenderableTwo, this);
+
+            updateRestrictions();
+
+            updateCurrentDragonPositionWindow();
+        }
+
         showHint("welcome");
-        updateCurrentDragonPositionWindow();
+
+    }
+
+    long moveDragon(HitResult hitResult) {
+
+        AnchorNode moveToNode = new AnchorNode(hitResult.createAnchor());
+
+        // Upload World Position
+        arActivity.getFirebaseManager().uploadMovePosition(moveToNode.getWorldPosition());
+
+        Vector3 dragonPosition = dragon.getWorldPosition();
+        Vector3 rotationVect = new Vector3().subtract(moveToNode.getWorldPosition(), dragonPosition);
+        double distance = Math.sqrt(Math.pow(dragonPosition.x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragonPosition.y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragonPosition.z - moveToNode.getWorldPosition().z, 2));
+
+        // Upload distance to Firebase
+        arActivity.getFirebaseManager().uploadDistance(distance);
+        long time = dragon.moveTo(moveToNode.getWorldPosition(), distance);
+        dragon.rotateDragon(rotationVect);
+        return time;
     }
 
 
@@ -304,7 +349,7 @@ public class Control {
 
     public void startThread(float duration) {
 
-        Dragon dragon = arActivity.getDragon();
+
         float d = duration + dragon.getAnimationDuration() * 1000;
         int e = (int) d;
         ExampleRunnable runnable = new ExampleRunnable(e);
@@ -336,9 +381,8 @@ public class Control {
 
             arActivity.runOnUiThread(() -> {
 
-                Dragon dragon = arActivity.getDragon();
+
                 FirebaseManager firebaseManager = arActivity.getFirebaseManager();
-                Node meatNode = arActivity.getMeat();
                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE);
 
                 showPlus(2000);
@@ -350,7 +394,7 @@ public class Control {
 
 
                 dragon.updateAnimation(dragon.idle_index);
-                meatNode.setEnabled(false);
+                meat.setEnabled(false);
             });
         }
     }
@@ -407,4 +451,11 @@ public class Control {
         return meatActivated;
     }
 
+    public Dragon getDragon() {
+        return dragon;
+    }
+
+    public Meat getMeat() {
+        return meat;
+    }
 }

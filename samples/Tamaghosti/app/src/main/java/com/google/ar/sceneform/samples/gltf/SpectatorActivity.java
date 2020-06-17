@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.ar.core.Anchor;
+import com.google.ar.core.HitResult;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
@@ -30,16 +31,12 @@ public class SpectatorActivity extends ArActivity {
 
     private Renderable dragonRenderableOne, dragonRenderableTwo, meatRenderable;
 
-    private Dragon dragon;
-
     Control control;
 
     private HashMap<String, Object> movePosition;
     private double distance;
     private String anchorId;
     private FirebaseManager.AnimationState animationState;
-
-    private boolean dragonCreated;
 
     private boolean initAnchorListener;
     private boolean initDistanceListener;
@@ -49,13 +46,13 @@ public class SpectatorActivity extends ArActivity {
     private String currentAnchorId;
     private String updatedAnchorId;
 
+    FirebaseManager firebaseManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spectator);
-
-        dragonCreated = false;
 
         control = new Control(this, Control.User.SPECTATOR);
 
@@ -64,7 +61,7 @@ public class SpectatorActivity extends ArActivity {
         initDistanceListener = true;
         initMovePositionListener = true;
 
-        FirebaseManager firebaseManager = new FirebaseManager();
+        firebaseManager = new FirebaseManager();
 
         // Init
         distance = firebaseManager.getDistance();
@@ -149,44 +146,21 @@ public class SpectatorActivity extends ArActivity {
 
         resolve.setOnClickListener(view -> {
 
-            /*
-            distance = firebaseManager.getDistance();
-            anchorId = firebaseManager.getAnchorId();
-            animationState = firebaseManager.getAnimationState();
-
-             */
 
             if(anchorId == null) {
 
                 Toast.makeText(getApplicationContext(), "Please wait a second", Toast.LENGTH_SHORT).show();
-            } else if(dragonCreated == false) {
+            } else if (control.getDragon() == null) {
 
                 Toast.makeText(getApplicationContext(), "Dragon created", Toast.LENGTH_SHORT).show();
 
-                assert arFragment.getArSceneView().getSession() != null;
-                Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
-
-                AnchorNode anchorNode = new AnchorNode(resolvedAnchor);
-                anchorNode.setParent(arFragment.getArSceneView().getScene());
-
-                // Place Resolved Anchor
-                dragon = new Dragon(arFragment, anchorNode, dragonRenderableOne, dragonRenderableTwo, control);
-                dragon.select();
-
-                dragonCreated = true;
+                control.createDragon(null, dragonRenderableOne, dragonRenderableTwo);
 
                 currentAnchorId = anchorId;
 
-                Log.d("Firebase", "DragonPosition " + dragon.getWorldPosition());
-
-                Log.d("Firebase", "DragonRotation " + dragon.getWorldRotation());
 
             } else {
-
                 Toast.makeText(getApplicationContext(), "Dragon is already created", Toast.LENGTH_SHORT).show();
-                Log.d("Firebase", "DragonPosition " + dragon.getWorldPosition());
-
-                Log.d("Firebase", "DragonRotation " + dragon.getWorldRotation());
             }
 
         });
@@ -210,7 +184,7 @@ public class SpectatorActivity extends ArActivity {
 
                     firebaseManager.setAnchorId(anchorId);
 
-                    if(dragonCreated && !updatedAnchorId.equals(currentAnchorId)) {
+                    if(control.getDragon() != null && !updatedAnchorId.equals(currentAnchorId)) {
 
                         Toast.makeText(getApplicationContext(), "New Host! Updating Dragon Anchor", Toast.LENGTH_SHORT).show();
 
@@ -221,11 +195,9 @@ public class SpectatorActivity extends ArActivity {
                         anchorNode.setParent(arFragment.getArSceneView().getScene());
                         
                         // Delete old dragon
-                        dragon.setRenderable(null);
+                        control.getDragon().setRenderable(null);
 
-
-                        dragon = new Dragon(arFragment, anchorNode, dragonRenderableOne, dragonRenderableTwo, control);
-                        dragon.select();
+                        control.createDragon(null, dragonRenderableOne, dragonRenderableTwo);
 
                         currentAnchorId = anchorId;
 
@@ -283,13 +255,13 @@ public class SpectatorActivity extends ArActivity {
 
                     Toast.makeText(getApplicationContext(), "Move Dragon", Toast.LENGTH_SHORT).show();
 
-                    dragon.moveTo(newPos, distance);
+                    control.getDragon().moveTo(newPos, distance);
 
                     if(animationState == FirebaseManager.AnimationState.EAT) {
 
                         // Spawn meat
 
-                        SpectatorActivity.super.createMeat();
+                       // SpectatorActivity.super.createMeat();
 
                     }
 
@@ -345,17 +317,17 @@ public class SpectatorActivity extends ArActivity {
 
                         case IDLE:
 
-                            dragon.updateAnimation(dragon.idle_index);
+                            control.getDragon().updateAnimation(control.getDragon().idle_index);
                             break;
 
                         case PET:
 
-                            dragon.updateAnimation(dragon.getPet_index);
+                            control.getDragon().updateAnimation(control.getDragon().getPet_index);
                             break;
 
                         case EAT:
 
-                            dragon.updateAnimation(dragon.eat_index);
+                            control.getDragon().updateAnimation(control.getDragon().eat_index);
                             break;
 
                         case RESET:
@@ -380,4 +352,20 @@ public class SpectatorActivity extends ArActivity {
         });
     }
 
+
+    public FirebaseManager getFirebaseManager() {
+        return firebaseManager;
+    }
+
+    public ArFragment getArFragment() {
+        return arFragment;
+    }
+
+    public Renderable getMeatRenderable() {
+        return meatRenderable;
+    }
+
+    public String getAnchorId() {
+        return anchorId;
+    }
 }
