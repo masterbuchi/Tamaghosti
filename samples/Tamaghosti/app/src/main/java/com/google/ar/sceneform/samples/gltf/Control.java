@@ -225,23 +225,20 @@ public class Control {
 
                 if (!arActivity.getDragon().moving) {
 
-                    Node meatNode = arActivity.getMeatNode();
+                    Meat meat = arActivity.getMeat();
+
+
 
                     this.meatActivated = !this.meatActivated;
 
                     if (meatActivated) {
 
-                        if (meatNode == null) arActivity.createMeat();
-                        else {
-                            meatNode.setParent(arActivity.getArFragment().getArSceneView().getScene().getCamera());
-                            meatNode.setLocalRotation(new Quaternion(0, 180, 250, 0));
-                            meatNode.setLocalPosition(new Vector3(0, -0.3f, -1));
-                            meatNode.setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
-                            meatNode.setEnabled(true);
-                        }
+                        meat.setMeatToCamera();
+                        meat.setEnabled(true);
+
                     }
                     else {
-                        meatNode.setEnabled(false);
+                        meat.setEnabled(false);
                     }
 
                 }
@@ -341,7 +338,7 @@ public class Control {
 
                 Dragon dragon = arActivity.getDragon();
                 FirebaseManager firebaseManager = arActivity.getFirebaseManager();
-                Node meatNode = arActivity.getMeatNode();
+                Node meatNode = arActivity.getMeat();
                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE);
 
                 showPlus(2000);

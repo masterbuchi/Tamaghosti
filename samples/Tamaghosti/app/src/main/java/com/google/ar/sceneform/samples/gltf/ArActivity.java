@@ -67,7 +67,8 @@ public class ArActivity extends AppCompatActivity {
     Control control;
 
     Dragon dragon;
-    Node meatNode;
+
+    Meat meat;
 
     private boolean needsShown = true;
     private AnchorNode moveToNode;
@@ -195,6 +196,9 @@ public class ArActivity extends AppCompatActivity {
                         });
 
 
+
+
+
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
                     if (dragonRenderableOne == null) {
@@ -220,9 +224,9 @@ public class ArActivity extends AppCompatActivity {
 
                             if (control.getMeatActivated()) {
 
-                                // Get Meat Position? Spawn meat at the dragon position?
 
-                                meatAnimation(hitResult, time);
+
+                                meat.meatAnimation(hitResult, time);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
 
@@ -235,6 +239,8 @@ public class ArActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+
 
 
         // Cloud Anchor Update Loop
@@ -283,8 +289,6 @@ public class ArActivity extends AppCompatActivity {
 
 
     long moveDragon(HitResult hitResult) {
-        // GEHT DAS OHNE DEN ANCHOR ÜBER DIE HITPOSITION.
-        // JA GEHT :D
 
 
         //AnchorNode moveToNode = createAnchor(hitResult);
@@ -327,131 +331,18 @@ public class ArActivity extends AppCompatActivity {
 
     void createMeat() {
 
-
-        //create a new TranformableNode that will carry our object
-
-        // Use the move to node to set the goal
-
-        //meatNode = moveToNode;
+        meat.setParent(arFragment.getArSceneView().getScene().getCamera());
+        meat.setRenderable(meatRenderable);
 
 
-        meatNode = new Node();
-
-        meatNode.setParent(arFragment.getArSceneView().getScene().getCamera());
-        meatNode.setRenderable(meatRenderable);
-
-
-        meatNode.setLocalRotation(new Quaternion(0, 180, 250, 0));
-        meatNode.setLocalPosition(new Vector3(0, -0.3f, -1));
-        meatNode.setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
+        meat.setLocalRotation(new Quaternion(0, 180, 250, 0));
+        meat.setLocalPosition(new Vector3(0, -0.3f, -1));
+        meat.setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
 
 
     }
 
-    void meatAnimation(HitResult hitResult, long dragontime) {
 
-        Vector3 cameraPosition = meatNode.getWorldPosition();
-
-        anchor = hitResult.createAnchor();
-
-        AnchorNode anchorNode = new AnchorNode(anchor);
-        anchorNode.setParent(arFragment.getArSceneView().getScene());
-
-
-        Vector3 newPosition = anchorNode.getWorldPosition();
-
-        // calculate curve
-        Vector3 directionVector = new Vector3().subtract(newPosition, cameraPosition);
-
-        Vector3 middlePoint = cameraPosition.add(cameraPosition,directionVector.scaled(0.5f));
-
-        float x_1 = cameraPosition.x;
-        float x_2 = newPosition.x;
-        float x_3 = middlePoint.x;
-        float y_1 = cameraPosition.y;
-        float y_2 = newPosition.y;
-        float y_3 = middlePoint.y+directionVector.scaled(0.2f).length();
-        float x;
-        float y;
-        float z;
-
-
-        float distance = directionVector.length();
-
-        double velocity = 1;
-        long time = (long) ((distance / velocity) * 1000);
-
-        if (time > dragontime) time = dragontime;
-
-
-        int steps = 200;
-
-        Vector3[] positions = new Vector3[steps];
-
-        Vector3 currentPos = cameraPosition;
-
-
-        // 200 Steps for smooth curve
-        for (int i = 0; i < steps; i++) {
-
-            x = currentPos.x + directionVector.x / (float) steps;
-
-            y  = (x*y_2 - x*y_3 + x_2*y_3 - x_3*y_2)/(x_2 - x_3) + ((x - x_2)*(x - x_3)*(y_1 - y_2))/((x_1 - x_2)*(x_2 - x_3)) - ((x - x_2)*(x - x_3)*(y_1 - y_3))/((x_1 - x_3)*(x_2 - x_3));
-
-            z = currentPos.z + directionVector.z / (float) steps;
-
-
-            currentPos = new Vector3(x, y,z);
-
-            positions[i] = currentPos;
-
-        }
-
-        meatNode.setParent(anchorNode);
-
-        meatNode.setWorldPosition(cameraPosition);
-
-        meatNode.setLocalRotation(new Quaternion(0, 180, 180, 0));
-
-        meatNode.setLocalScale(new Vector3(0.25f, 0.25f, 0.25f));
-
-        ObjectAnimator objectAnimation = new ObjectAnimator();
-        objectAnimation.setAutoCancel(true);
-        objectAnimation.setTarget(meatNode);
-        objectAnimation.setObjectValues(positions);
-        objectAnimation.setPropertyName("WorldPosition");
-        // The Vector3Evaluator is used to evaluator 2 vector3 and return the next
-        // vector3.  The default is to use lerp.
-        objectAnimation.setEvaluator(new Vector3Evaluator());
-        // This makes the animation linear (smooth and uniform).
-        objectAnimation.setInterpolator(new LinearInterpolator());
-
-        // Duration in ms of the animation.
-        objectAnimation.setDuration(time);
-        objectAnimation.start();
-
-
-        objectAnimation.addListener(new android.animation.Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(android.animation.Animator animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(android.animation.Animator animation) {
-                meatNode.setLocalPosition(new Vector3(0, 0.05f, 0));
-            }
-
-            @Override
-            public void onAnimationCancel(android.animation.Animator animation) {
-            }
-
-            @Override
-            public void onAnimationRepeat(android.animation.Animator animation) {
-
-            }
-        });
-
-    }
 
     void createDragon(HitResult hitResult) {
 
@@ -489,8 +380,9 @@ public class ArActivity extends AppCompatActivity {
         return dragon;
     }
 
-    public Node getMeatNode() {
-        return meatNode;
+    public Meat getMeat() {
+        if(meat == null) meat = new Meat(arFragment, meatRenderable);
+        return meat;
     }
 
     public FirebaseManager getFirebaseManager() {
@@ -500,6 +392,10 @@ public class ArActivity extends AppCompatActivity {
     public ArFragment getArFragment() {
         return arFragment;
     }
+
+
+
+
 }
 
 
