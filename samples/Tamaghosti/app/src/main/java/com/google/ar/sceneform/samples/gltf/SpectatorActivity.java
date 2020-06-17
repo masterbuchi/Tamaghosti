@@ -255,7 +255,8 @@ public class SpectatorActivity extends ArActivity {
 
                     Toast.makeText(getApplicationContext(), "Move Dragon", Toast.LENGTH_SHORT).show();
 
-                    control.getDragon().moveTo(newPos, distance);
+                    //Vector3 rotationVect = new Vector3().subtract(oldPosition, dragonPosition);
+                    //control.getDragon().moveTo(newPos, distance);
 
                     if(animationState == FirebaseManager.AnimationState.EAT) {
 

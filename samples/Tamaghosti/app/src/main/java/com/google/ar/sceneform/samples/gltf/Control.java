@@ -29,6 +29,7 @@ public class Control {
     private Boolean happyAnimation = false;
 
     private Boolean meatActivated = false;
+    private Boolean ballActivated = false;
 
     // StatusBooleans
     private Boolean tired, hungry, shy, bored, fit, full, friendly, exited;
@@ -36,6 +37,7 @@ public class Control {
 
     Dragon dragon;
     Meat meat;
+    Ball ball;
 
     private String dragonName;
 
@@ -232,42 +234,70 @@ public class Control {
         });
 
         hunger.setOnClickListener(v -> {
-
+            if (dragon != null) {
                 if (!dragon.moving) {
 
                     this.meatActivated = !this.meatActivated;
 
+                    if (ballActivated) ballActivated = false;
+
                     if (meatActivated) {
 
-                        if(meat == null) meat = new Meat(arActivity.getArFragment(), arActivity.getMeatRenderable());
+                        if (meat == null)
+                            meat = new Meat(arActivity.getArFragment(), arActivity.getMeatRenderable());
 
                         meat.setMeatToCamera();
                         meat.setEnabled(true);
 
-                    }
-                    else {
+                    } else {
                         meat.setEnabled(false);
                     }
 
                 }
+            }
 
         });
 
         energy.setOnClickListener(v -> {
 
-            Intent intent = new Intent(arActivity, SleepActivity.class);
-            arActivity.startActivityForResult(intent, 1);
+            if (dragon != null) {
+                Intent intent = new Intent(arActivity, SleepActivity.class);
+                arActivity.startActivityForResult(intent, 1);
+            }
 
         });
 
         fun.setOnClickListener(v -> {
-                // Play Method STILL MISSING
 
-                // Value Change
-                setNeed("fun",10);
-                setNeed("hunger",-5);
-                setNeed("energy",-5);
-                showPlus(3000);
+            if (dragon != null) {
+                if (!dragon.moving) {
+
+                    this.ballActivated = !this.ballActivated;
+
+                    if (meatActivated) meatActivated = false;
+
+
+                    if (ballActivated) {
+
+                        if (ball == null)
+                            ball = new Ball(arActivity.getArFragment(), arActivity.getBallRenderable(), this);
+
+                        ball.setBallToCamera();
+                        ball.setEnabled(true);
+
+                    } else {
+                        ball.setEnabled(false);
+                    }
+
+                }
+
+                /*// Value Change
+                setNeed("fun", 10);
+                setNeed("hunger", -5);
+                setNeed("energy", -5);
+                showPlus(3000);*/
+
+            }
         });
     }
 
@@ -325,8 +355,7 @@ public class Control {
 
         // Upload distance to Firebase
         arActivity.getFirebaseManager().uploadDistance(distance);
-        long time = dragon.moveTo(moveToNode.getWorldPosition(), distance);
-        dragon.rotateDragon(rotationVect);
+        long time = dragon.moveTo(moveToNode.getWorldPosition(), distance, rotationVect);
         return time;
     }
 
@@ -450,6 +479,9 @@ public class Control {
     public Boolean getMeatActivated() {
         return meatActivated;
     }
+    public Boolean getBallActivated() {
+        return ballActivated;
+    }
 
     public Dragon getDragon() {
         return dragon;
@@ -457,5 +489,9 @@ public class Control {
 
     public Meat getMeat() {
         return meat;
+    }
+
+    public Ball getBall() {
+        return ball;
     }
 }

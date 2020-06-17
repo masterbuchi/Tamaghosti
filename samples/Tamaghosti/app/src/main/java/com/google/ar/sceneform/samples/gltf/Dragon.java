@@ -162,9 +162,11 @@ public class Dragon extends TransformableNode  {
     }
 
 
-    long moveTo(Vector3 newPos, double distance) {
+    long moveTo(Vector3 newPos, double distance, Vector3 rotationVector) {
 
         moving = true;
+
+        rotateDragon(rotationVector);
 
             updateAnimation(walk_index);
             ObjectAnimator objectAnimation = new ObjectAnimator();

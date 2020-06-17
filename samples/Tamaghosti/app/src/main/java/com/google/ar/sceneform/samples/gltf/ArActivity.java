@@ -66,11 +66,6 @@ public class ArActivity extends AppCompatActivity {
 
     Control control;
 
-    Meat meat;
-
-    private AnchorNode moveToNode;
-
-
     private AppAnchorState appAnchorState = AppAnchorState.NONE;
     private Anchor anchor;
 
@@ -79,7 +74,7 @@ public class ArActivity extends AppCompatActivity {
     private FirebaseManager firebaseManager;
 
     private ArFragment arFragment;
-    private Renderable dragonRenderableOne, dragonRenderableTwo, meatRenderable;
+    private Renderable dragonRenderableOne, dragonRenderableTwo, meatRenderable, ballRenderable;
 
 
     //volatile == immer aktuellsten wert, nicht cache
@@ -140,6 +135,26 @@ public class ArActivity extends AppCompatActivity {
                             ArActivity activity = weakActivity.get();
                             if (activity != null) {
                                 activity.meatRenderable = modelRenderable;
+                            }
+                        })
+                .exceptionally(
+                        throwable -> {
+
+                            showToast("while loading an error occurred.");
+
+                            return null;
+                        });
+
+        ModelRenderable.builder()
+                .setSource(
+                        this, R.raw.ball)
+                .setIsFilamentGltf(true)
+                .build()
+                .thenAccept(
+                        modelRenderable -> {
+                            ArActivity activity = weakActivity.get();
+                            if (activity != null) {
+                                activity.ballRenderable = modelRenderable;
                             }
                         })
                 .exceptionally(
@@ -214,14 +229,28 @@ public class ArActivity extends AppCompatActivity {
 
                         // If no Moving Animation
                         if (!control.getDragon().moving) {
-                            long time = control.moveDragon(hitResult);
+
                             if (control.getMeatActivated()) {
+                                long time = control.moveDragon(hitResult);
                                 control.getMeat().meatAnimation(hitResult, time);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
                                 // Thread with walking and Eating duration, set to IDLE afterwards
                                 control.startThread((float) time);
+                            } else if (control.getBallActivated()) {
 
+                                control.getBall().ballAnimation(hitResult);
+
+                              // ANPASSEN!!
+                                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
+                                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
+
+
+
+                                // Thread with walking and Eating duration, set to IDLE afterwards
+                               // control.startThread((float) time);
+                            } else {
+                                long time = control.moveDragon(hitResult);
                             }
 
                         }
@@ -304,10 +333,9 @@ public class ArActivity extends AppCompatActivity {
         return meatRenderable;
     }
 
-
-
-
-
+    public Renderable getBallRenderable() {
+        return ballRenderable;
+    }
 }
 
 

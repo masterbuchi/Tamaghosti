@@ -18,19 +18,21 @@ public class Ball extends Node {
 
     ArFragment arFragment;
     Renderable renderable;
+    Control control;
 
-    public Ball(ArFragment arFragment, Renderable renderable) {
+    public Ball(ArFragment arFragment, Renderable renderable, Control control) {
 
         this.arFragment = arFragment;
         this.renderable = renderable;
+        this.control = control;
     }
 
 
-    public void setMeatToCamera() {
+    public void setBallToCamera() {
 
         setParent(arFragment.getArSceneView().getScene().getCamera());
 
-        Log.d("Meat", "Position: " + getWorldPosition());
+        Log.d("Ball", "Position: " + getWorldPosition());
 
 
         setRenderable(renderable);
@@ -42,29 +44,34 @@ public class Ball extends Node {
 
     }
 
-    void meatAnimation(HitResult hitResult, long dragontime) {
-
-        Vector3 cameraPosition = getWorldPosition();
-
+    void ballAnimation(HitResult hitResult) {
         Anchor anchor = hitResult.createAnchor();
 
         AnchorNode anchorNode = new AnchorNode(anchor);
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
 
+
+        Vector3 oldPosition = getWorldPosition();
         Vector3 newPosition = anchorNode.getWorldPosition();
+        Vector3 directionVector = new Vector3().subtract(newPosition, oldPosition);
 
-        // calculate curve
-        Vector3 directionVector = new Vector3().subtract(newPosition, cameraPosition);
+        Vector3 middlePosition = oldPosition.add(oldPosition,directionVector.scaled(0.5f));
 
-        Vector3 middlePoint = cameraPosition.add(cameraPosition,directionVector.scaled(0.5f));
+        setParent(anchorNode);
 
-        float x_1 = cameraPosition.x;
+        throwAnimation(oldPosition,newPosition,directionVector,middlePosition);
+
+    }
+
+    void throwAnimation(Vector3 oldPosition, Vector3 newPosition, Vector3 directionVector, Vector3 middlePosition) {
+
+        float x_1 = oldPosition.x;
         float x_2 = newPosition.x;
-        float x_3 = middlePoint.x;
-        float y_1 = cameraPosition.y;
+        float x_3 = middlePosition.x;
+        float y_1 = oldPosition.y;
         float y_2 = newPosition.y;
-        float y_3 = middlePoint.y+directionVector.scaled(0.2f).length();
+        float y_3 = middlePosition.y+directionVector.scaled(0.2f).length();
         float x;
         float y;
         float z;
@@ -75,13 +82,12 @@ public class Ball extends Node {
         double velocity = 1;
         long time = (long) ((distance / velocity) * 1000);
 
-        if (time > dragontime) time = dragontime;
 
         int steps = 200;
 
         Vector3[] positions = new Vector3[steps];
 
-        Vector3 currentPos = cameraPosition;
+        Vector3 currentPos = oldPosition;
 
 
         // 200 Steps for smooth curve
@@ -100,10 +106,9 @@ public class Ball extends Node {
 
         }
 
-        setParent(anchorNode);
-        setWorldPosition(cameraPosition);
+        setWorldPosition(oldPosition);
         setLocalRotation(new Quaternion(0, 180, 180, 0));
-        setLocalScale(new Vector3(0.25f, 0.25f, 0.25f));
+        setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
 
         ObjectAnimator objectAnimation = new ObjectAnimator();
         objectAnimation.setAutoCancel(true);
@@ -128,7 +133,27 @@ public class Ball extends Node {
 
             @Override
             public void onAnimationEnd(android.animation.Animator animation) {
-                setLocalPosition(new Vector3(0, 0.05f, 0));
+
+                Vector3 oldPosition = getWorldPosition();
+                Vector3 newdirectionVector = new Vector3(directionVector.scaled(0.5f).x,0,directionVector.scaled(0.5f).z);
+                Vector3 newPosition = oldPosition.add(oldPosition,newdirectionVector);
+                Vector3 directionVector = new Vector3().subtract(newPosition, oldPosition);
+
+
+                Vector3 middlePosition = oldPosition.add(oldPosition,directionVector.scaled(0.5f));
+
+                if (directionVector.length() > 0.05) {
+                    throwAnimation(oldPosition,newPosition,directionVector,middlePosition);
+                } else {
+
+                    Vector3 dragonPosition = control.getDragon().getWorldPosition();
+                    Vector3 rotationVect = new Vector3().subtract(oldPosition, dragonPosition);
+                    double distance = Math.sqrt(Math.pow(dragonPosition.x - oldPosition.x, 2) + Math.pow(dragonPosition.y - oldPosition.y, 2) + Math.pow(dragonPosition.z - oldPosition.z, 2));
+
+                    long time = control.getDragon().moveTo(getWorldPosition(), distance, rotationVect);
+                }
+
+
             }
 
             @Override
@@ -142,4 +167,6 @@ public class Ball extends Node {
         });
 
     }
+
+
 }

@@ -55,8 +55,8 @@ public class StoryActivity extends AppCompatActivity {
                 // Save for the first time
                 int hungerValue = 50;
                 int energyValue = 50;
-                int socialValue = 10;
-                int funValue = 0;
+                int socialValue = 100;
+                int funValue = 30;
 
                 persistenceManager.saveInt("hunger", hungerValue);
                 persistenceManager.saveInt("energy", energyValue);
