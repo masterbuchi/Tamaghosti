@@ -43,7 +43,7 @@ public class Control {
 
     public enum User {
 
-        CREATER,
+        CREATOR,
         SPECTATOR
 
     }
@@ -66,7 +66,7 @@ public class Control {
 
 
         // Skip these steps for spectator mode
-        if(user == User.CREATER) {
+        if(user == User.CREATOR) {
 
             setButtonListeners();
 
@@ -224,7 +224,6 @@ public class Control {
         hunger.setOnClickListener(v -> {
 
                 if (!arActivity.getDragon().moving) {
-
 
                     Node meatNode = arActivity.getMeatNode();
 

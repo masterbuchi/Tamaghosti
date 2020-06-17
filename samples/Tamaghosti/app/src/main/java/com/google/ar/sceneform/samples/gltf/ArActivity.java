@@ -70,6 +70,7 @@ public class ArActivity extends AppCompatActivity {
     Node meatNode;
 
     private boolean needsShown = true;
+    private AnchorNode moveToNode;
 
 
     private AppAnchorState appAnchorState = AppAnchorState.NONE;
@@ -125,7 +126,7 @@ public class ArActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_ux);
 
-        control = new Control(this, Control.User.CREATER);
+        control = new Control(this, Control.User.CREATOR);
 
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
@@ -286,7 +287,7 @@ public class ArActivity extends AppCompatActivity {
 
         //AnchorNode moveToNode = createAnchor(hitResult);
 
-        AnchorNode moveToNode = new AnchorNode(hitResult.createAnchor());
+        moveToNode = new AnchorNode(hitResult.createAnchor());
 
         // Lets give it a shot
 
@@ -326,7 +327,14 @@ public class ArActivity extends AppCompatActivity {
 
 
         //create a new TranformableNode that will carry our object
+
+        // Use the move to node to set the goal
+
+        //meatNode = moveToNode;
+
+
         meatNode = new Node();
+
         meatNode.setParent(arFragment.getArSceneView().getScene().getCamera());
         meatNode.setRenderable(meatRenderable);
 
@@ -344,13 +352,26 @@ public class ArActivity extends AppCompatActivity {
 
 
         //AnchorNode anchorNode = createAnchor(hitResult);
-        AnchorNode anchorNode = new AnchorNode(hitResult.createAnchor());
+
+        //anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
+
+        anchor = hitResult.createAnchor();
+
+        AnchorNode anchorNode = new AnchorNode(anchor);
+        anchorNode.setParent(arFragment.getArSceneView().getScene());
+
+
+        // v-- this code breaks the meat
+
+        /*AnchorNode anchorNode = new AnchorNode(hitResult.createAnchor());
 
         Vector3 newPosition = anchorNode.getWorldPosition();
 
+         */
+
 
         // calculate curve
-        Vector3 directionVector = new Vector3().subtract(newPosition, cameraPosition);
+        Vector3 directionVector = new Vector3().subtract(anchorNode.getWorldPosition(), cameraPosition);
 
         float distance = directionVector.length();
 
@@ -446,7 +467,6 @@ public class ArActivity extends AppCompatActivity {
     }
 
 // HIER
-
 
     // Create Cloud Anchor
     AnchorNode createAnchor(HitResult hitResult) {
