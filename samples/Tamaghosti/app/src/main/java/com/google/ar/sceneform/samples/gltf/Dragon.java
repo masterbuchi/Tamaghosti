@@ -124,7 +124,7 @@ public class Dragon extends TransformableNode  {
                startTimeofCurrentAnimation = System.nanoTime();
 
         switch (index) {
-            case eat_index: speedFactor = 1f; break;
+            case eat_index: speedFactor = 1f; break; // when eat index finished ... set meat null
             case getPet_index: speedFactor = 2f; break;
             case idle_index: speedFactor = 2f; break;
             case walk_index: speedFactor = 4f; break;

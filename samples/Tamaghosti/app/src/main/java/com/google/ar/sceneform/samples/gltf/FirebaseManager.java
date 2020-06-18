@@ -11,7 +11,7 @@ public class FirebaseManager {
 
     private String anchorId;
     private AnimationState animationState;
-    private HashMap<String, Object> movePosition;
+    private HashMap<String, Object> updatePosition;
 
 
 
@@ -44,7 +44,7 @@ public class FirebaseManager {
 
     }
 
-    public void uploadMovePosition( Vector3 oldPosition, Vector3 movePosition) {
+    public void uploadUpdatePosition(Vector3 oldPosition, Vector3 movePosition, Vector3 cameraPosition) {
 
         Map<String,Object> taskMap = new HashMap<>();
         taskMap.put("oldPosition_x", oldPosition.x);
@@ -53,6 +53,9 @@ public class FirebaseManager {
         taskMap.put("moveTo_x", movePosition.x);
         taskMap.put("moveTo_y", movePosition.y);
         taskMap.put("moveTo_z", movePosition.z);
+        taskMap.put("camera_x", cameraPosition.x);
+        taskMap.put("camera_y", cameraPosition.y);
+        taskMap.put("camera_z", cameraPosition.z);
 
         movePositionReference.updateChildren(taskMap);
 
@@ -63,8 +66,8 @@ public class FirebaseManager {
         return animationState;
     }
 
-    public void setMovePosition(HashMap<String, Object> movePosition) {
-        this.movePosition = movePosition;
+    public void setUpdatePosition(HashMap<String, Object> updatePosition) {
+        this.updatePosition = updatePosition;
     }
 
 
@@ -83,11 +86,11 @@ public class FirebaseManager {
 
     }
 
-    public HashMap<String, Object> getMovePosition() {
-        return movePosition;
+    public HashMap<String, Object> getUpdatePosition() {
+        return updatePosition;
     }
 
-    public DatabaseReference getMovePositionReference() { return movePositionReference; }
+    public DatabaseReference getUpdatePositionReference() { return movePositionReference; }
 
     public DatabaseReference getAnchorReference() {
         return anchorReference;

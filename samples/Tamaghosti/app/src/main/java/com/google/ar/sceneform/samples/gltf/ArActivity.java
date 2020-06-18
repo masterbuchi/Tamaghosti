@@ -68,9 +68,6 @@ public class ArActivity extends AppCompatActivity {
     private Renderable dragonRenderableOne, dragonRenderableTwo, meatRenderable, ballRenderable;
 
 
-    //volatile == immer aktuellsten wert, nicht cache
-    private volatile boolean stopThread = false;
-
     /**
      * Returns false and displays an error message if Sceneform can not run, true if Sceneform can run
      * on this device.
@@ -224,24 +221,30 @@ public class ArActivity extends AppCompatActivity {
                             if (control.getMeatActivated()) {
 
                                 long time = control.moveDragon(hitResult);
+                                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
+                                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.WALK);
 
                                 // Throw Animation
                                 control.getMeat().meatThrowAnimation(hitResult, time);
-
+                                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.THROW_MEAT);
 
                                 control.startThread((float) time);
                             } else if (control.getBallActivated()) {
 
                                 control.getBall().ballAnimation(hitResult);
-
+                                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.THROW_BALL);
 
 
                                 // Thread with walking and Eating duration, set to IDLE afterwards
                                // control.startThread((float) time);
                             } else {
+
+                                Toast.makeText(getApplicationContext(), "y_dragon: " + control.getDragon().getWorldPosition().y, Toast.LENGTH_SHORT).show();
                                 long time = control.moveDragon(hitResult);
+                                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
+                                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.WALK);
                             }
 
                         }

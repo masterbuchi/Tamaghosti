@@ -13,8 +13,6 @@ import android.widget.TextView;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.Node;
-import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.Renderable;
 
@@ -255,7 +253,7 @@ public class Control {
                     if (meatActivated) {
 
                         if (meat == null)
-                            meat = new Meat(arActivity.getArFragment(), arActivity.getMeatRenderable());
+                            meat = new Meat(arActivity.getArFragment(), arActivity.getMeatRenderable(), this);
 
                         meat.setMeatToCamera();
                         meat.setEnabled(true);
@@ -341,16 +339,20 @@ public class Control {
 
         if (user == User.SPECTATOR) {
 
-            Anchor resolvedAnchor = spectatorActivity.getArFragment().getArSceneView().getSession().resolveCloudAnchor(spectatorActivity.getAnchorId());
+            Anchor resolvedAnchor = spectatorActivity.getResolvedAnchor();
             AnchorNode anchorNode = new AnchorNode(resolvedAnchor);
             anchorNode.setParent(spectatorActivity.getArFragment().getArSceneView().getScene());
             dragon = new Dragon(spectatorActivity.getArFragment(), anchorNode, dragonRenderableOne, dragonRenderableTwo, this);
+
+
 
         } else {
 
             AnchorNode anchorNode = arActivity.createAnchor(hitResult);
 
             dragon = new Dragon(arActivity.getArFragment(), anchorNode, dragonRenderableOne, dragonRenderableTwo, this);
+
+            updatePositions(anchorNode.getWorldPosition());
 
             updateRestrictions();
 
@@ -366,7 +368,9 @@ public class Control {
         AnchorNode moveToNode = new AnchorNode(hitResult.createAnchor());
 
         // Upload World Position
-        arActivity.getFirebaseManager().uploadMovePosition(dragon.getWorldPosition(),moveToNode.getWorldPosition());
+
+        updatePositions(moveToNode.getWorldPosition());
+
 
         Vector3 dragonPosition = dragon.getWorldPosition();
         Vector3 rotationVect = new Vector3().subtract(moveToNode.getWorldPosition(), dragonPosition);
@@ -375,6 +379,11 @@ public class Control {
 
         long time = dragon.moveTo(moveToNode.getWorldPosition(), distance, rotationVect);
         return time;
+    }
+
+    void updatePositions(Vector3 newPosition) {
+
+        arActivity.getFirebaseManager().uploadUpdatePosition(dragon.getWorldPosition(),newPosition,arActivity.getArFragment().getArSceneView().getScene().getCamera().getWorldPosition());
     }
 
     // Created for Spectator Activity
@@ -434,7 +443,6 @@ public class Control {
 
                 hunger.post(() -> {
 
-
                     hunger.setEnabled(false);
                 });
 
@@ -465,7 +473,8 @@ public class Control {
                 meatActivated = false;
 
                 dragon.updateAnimation(dragon.idle_index);
-                meat.setEnabled(false);
+
+                meat.setRenderable(null);
             });
         }
     }

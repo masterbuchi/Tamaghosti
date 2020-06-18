@@ -1,17 +1,12 @@
 package com.google.ar.sceneform.samples.gltf;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.ar.core.Anchor;
-import com.google.ar.core.HitResult;
-import com.google.ar.core.Pose;
-import com.google.ar.core.Session;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
@@ -23,9 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class SpectatorActivity extends ArActivity {
 
@@ -39,6 +32,7 @@ public class SpectatorActivity extends ArActivity {
     private String anchorId;
     private FirebaseManager.AnimationState animationState;
 
+    private Anchor resolvedAnchor;
     private boolean initAnchorListener;
     private boolean initAnimationStateListener;
     private boolean initMovePositionListener;
@@ -49,10 +43,23 @@ public class SpectatorActivity extends ArActivity {
 
     FirebaseManager firebaseManager;
 
+    private enum AppAnchorState {
+        SPECTATING,
+        RESOLVING,
+        NONE
+    }
+
+    private AppAnchorState appAnchorState = AppAnchorState.NONE;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!checkIsSupportedDeviceOrFinish(this)) {
+            return;
+        }
+
         setContentView(R.layout.activity_spectator);
 
         time = 1;
@@ -66,13 +73,9 @@ public class SpectatorActivity extends ArActivity {
         firebaseManager = new FirebaseManager();
 
         // Init
-        anchorId = firebaseManager.getAnchorId();
-        animationState = firebaseManager.getAnimationState();
+       //anchorId = firebaseManager.getAnchorId();
+        //animationState = firebaseManager.getAnimationState();
 
-
-
-        Log.i("MOVE", "ANCHOR ID: " + anchorId);
-        Log.i("MOVE", "ANIMATION STATE: " + animationState);
 
 
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.spectator_fragment);
@@ -165,7 +168,16 @@ public class SpectatorActivity extends ArActivity {
 
         resolve.setOnClickListener(view -> {
 
-            if (anchorId == null) {
+            Toast.makeText(getApplicationContext(), "Anchorstate: " + appAnchorState, Toast.LENGTH_SHORT).show();
+
+            appAnchorState = AppAnchorState.NONE;
+
+            if (appAnchorState == AppAnchorState.NONE) {
+                resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
+                appAnchorState = AppAnchorState.RESOLVING;
+            }
+
+            if (appAnchorState != AppAnchorState.SPECTATING) {
 
                 Toast.makeText(getApplicationContext(), "Please wait a second", Toast.LENGTH_SHORT).show();
             } else if (control.getDragon() == null) {
@@ -177,10 +189,19 @@ public class SpectatorActivity extends ArActivity {
                 currentAnchorId = anchorId;
 
             } else {
+
+
+
+
+
+
                 Toast.makeText(getApplicationContext(), "Dragon is already created", Toast.LENGTH_SHORT).show();
             }
 
         });
+
+
+
 
         DatabaseReference anchorReference = firebaseManager.getAnchorReference();
 
@@ -188,6 +209,8 @@ public class SpectatorActivity extends ArActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // Init and Change
+
+                Toast.makeText(getApplicationContext(), "Initalisierung der AnchorID", Toast.LENGTH_SHORT).show();
 
                 anchorId = dataSnapshot.getValue(String.class);
 
@@ -206,17 +229,10 @@ public class SpectatorActivity extends ArActivity {
                         Toast.makeText(getApplicationContext(), "New Host! Updating Dragon Anchor", Toast.LENGTH_SHORT).show();
 
                         assert arFragment.getArSceneView().getSession() != null;
-                        Anchor resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
+                        resolvedAnchor = arFragment.getArSceneView().getSession().resolveCloudAnchor(anchorId);
+                        appAnchorState = AppAnchorState.RESOLVING;
 
-                        AnchorNode anchorNode = new AnchorNode(resolvedAnchor);
-                        anchorNode.setParent(arFragment.getArSceneView().getScene());
 
-                        // Delete old dragon
-                        control.getDragon().setRenderable(null);
-
-                        control.createDragon(null, dragonRenderableOne, dragonRenderableTwo);
-
-                        currentAnchorId = anchorId;
 
                     }
                 }
@@ -229,19 +245,20 @@ public class SpectatorActivity extends ArActivity {
             }
         });
 
+        // Cloud Anchor Update Loop
+        arFragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
 
-        DatabaseReference movePositionReference = firebaseManager.getMovePositionReference();
+            CheckIfUploaded(resolvedAnchor, appAnchorState);
 
-        movePositionReference.addValueEventListener(new ValueEventListener() {
+        });
+
+
+
+        DatabaseReference updatePositionReference = firebaseManager.getUpdatePositionReference();
+
+        updatePositionReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-
-                if (initMovePositionListener) {
-
-                    initMovePositionListener = false;
-
-                } else {
 
 
                     HashMap<String, Object> coordinates = new HashMap<>();
@@ -250,29 +267,10 @@ public class SpectatorActivity extends ArActivity {
                             dataSnapshot1 -> coordinates.put(dataSnapshot1.getKey(), dataSnapshot1.getValue())
                     );
 
-                    firebaseManager.setMovePosition(coordinates);
+                    firebaseManager.setUpdatePosition(coordinates);
 
+                    movePosition = firebaseManager.getUpdatePosition();
 
-                    movePosition = firebaseManager.getMovePosition();
-
-
-                    float x = (float) ((double) movePosition.get("moveTo_x"));
-                    float y = (float) ((double)movePosition.get("moveTo_y"));
-                    float z = (float) ((double)movePosition.get("moveTo_z"));
-
-                    Vector3 oldPosition = new Vector3((float) ((double)movePosition.get("oldPosition_x")),(float) ((double)movePosition.get("oldPosition_y")),(float) ((double)movePosition.get("oldPosition_z")));
-
-                    Vector3 newPosition = new Vector3(x, y, z);
-
-                    control.getDragon().setWorldPosition(oldPosition);
-
-                    time = control.moveDragon(newPosition);
-
-
-                    Toast.makeText(getApplicationContext(), "Move Dragon", Toast.LENGTH_SHORT).show();
-
-
-                }
 
             }
 
@@ -293,18 +291,24 @@ public class SpectatorActivity extends ArActivity {
                 animationState = dataSnapshot.getValue(FirebaseManager.AnimationState.class);
 
 
-                float x = 0;
-                float y = 0;
-                float z = 0;
-
-                Vector3 newPosition;
 
                 if (initAnimationStateListener) {
                     initAnimationStateListener = false;
                 } else {
                     firebaseManager.setAnimationState(animationState);
+                    Vector3 oldPosition = new Vector3((float) ((double)movePosition.get("oldPosition_x")),(float) ((double)movePosition.get("oldPosition_y")),(float) ((double)movePosition.get("oldPosition_z")));
+
+                    Vector3 newPosition = new Vector3((float) ((double) movePosition.get("moveTo_x")), (float) ((double)movePosition.get("moveTo_y")), (float) ((double)movePosition.get("moveTo_z")));
+
+                    Vector3 cameraPosition = new Vector3((float) ((double) movePosition.get("camera_x")), (float) ((double)movePosition.get("camera_y")), (float) ((double)movePosition.get("camera_z")));
 
                     switch (animationState) {
+
+                        case WALK:
+                            control.getDragon().setWorldPosition(oldPosition);
+                            control.moveDragon(newPosition);
+
+                            break;
 
                         case IDLE:
 
@@ -324,43 +328,27 @@ public class SpectatorActivity extends ArActivity {
                         case THROW_MEAT:
                             // Play Throw Meat Animation
 
-                            //control.setMeat(new Meat(arFragment, meatRenderable));
+                            control.getDragon().setWorldPosition(oldPosition);
 
-                            x = (float) ((double) movePosition.get("x"));
-                            y = (float) ((double) movePosition.get("y"));
-                            z = (float) ((double) movePosition.get("z"));
+                            if (control.getMeat() != null) control.getMeat().setRenderable(null);
+                            control.setMeat(new Meat(arFragment, meatRenderable, control));
 
-                            newPosition = new Vector3(x, y, z);
-
-                            control.setMeat(new Meat(arFragment, meatRenderable));
-
-                            control.getMeat().setMeatToCamera();
                             control.getMeat().setEnabled(true);
-                            //control.getMeat().startAnimation();
 
-                            control.getMeat().meatThrowAnimation(newPosition, time);
+                            control.getMeat().meatThrowAnimation(newPosition, cameraPosition, time);
+                            control.startThread((float) time);
 
                             break;
 
                         case THROW_BALL:
                             // Play Throw Ball Animation
 
-                            //control.setMeat(new Meat(arFragment, meatRenderable));
-
-                            x = (float) ((double) movePosition.get("x"));
-                            y = (float) ((double) movePosition.get("y"));
-                            z = (float) ((double) movePosition.get("z"));
-
-                            newPosition = new Vector3(x, y, z);
-
                             control.setBall(new Ball(arFragment, ballRenderable, control));
 
-                            control.getBall().setBallToCamera();
                             control.getBall().setEnabled(true);
 
-                            //ball.startAnimation(false);
 
-                            control.getBall().ballAnimation(newPosition);
+                            control.getBall().ballAnimation(newPosition, cameraPosition);
 
                             break;
 
@@ -381,6 +369,44 @@ public class SpectatorActivity extends ArActivity {
     }
 
 
+    private void CheckIfUploaded(Anchor anchor, AppAnchorState state) {
+
+        if (state != AppAnchorState.RESOLVING) {
+            return;
+        }
+
+        Anchor.CloudAnchorState cloudAnchorState = anchor.getCloudAnchorState();
+
+        if (cloudAnchorState.isError()) {
+
+            showToast(cloudAnchorState.toString());
+
+        } else if (cloudAnchorState == Anchor.CloudAnchorState.SUCCESS) {
+
+            String anchorId = anchor.getCloudAnchorId();
+
+            appAnchorState = AppAnchorState.SPECTATING;
+            showToast("Anchor resolved sucessfully. Cloud Anchor Id: " + anchorId);
+
+
+            AnchorNode anchorNode = new AnchorNode(anchor);
+            anchorNode.setParent(arFragment.getArSceneView().getScene());
+
+            // Delete old dragon
+            if(control.getDragon()!= null) control.getDragon().setRenderable(null);
+
+            control.createDragon(null, dragonRenderableOne, dragonRenderableTwo);
+
+            movePosition = firebaseManager.getUpdatePosition();
+
+            Vector3 oldPosition = new Vector3((float) ((double)movePosition.get("oldPosition_x")),(float) ((double)movePosition.get("oldPosition_y")),(float) ((double)movePosition.get("oldPosition_z")));
+
+            control.getDragon().setWorldPosition(oldPosition);
+
+            currentAnchorId = anchorId;
+        }
+    }
+
     public FirebaseManager getFirebaseManager() {
         return firebaseManager;
     }
@@ -391,6 +417,10 @@ public class SpectatorActivity extends ArActivity {
 
     public Renderable getMeatRenderable() {
         return meatRenderable;
+    }
+
+    public Anchor getResolvedAnchor() {
+        return resolvedAnchor;
     }
 
     public String getAnchorId() {

@@ -47,15 +47,19 @@ public class Ball extends Node {
     }
 
     void ballAnimation(HitResult hitResult) {
+
+
         Anchor anchor = hitResult.createAnchor();
 
         AnchorNode anchorNode = new AnchorNode(anchor);
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
-
-
         Vector3 oldPosition = getWorldPosition();
         Vector3 newPosition = anchorNode.getWorldPosition();
+
+        control.updatePositions(newPosition);
+
+
         Vector3 directionVector = new Vector3().subtract(newPosition, oldPosition);
 
         Vector3 middlePosition = oldPosition.add(oldPosition,directionVector.scaled(0.5f));
@@ -69,15 +73,15 @@ public class Ball extends Node {
 
     // Spectator version
 
-    void ballAnimation(Vector3 newPosition) {
+    void ballAnimation(Vector3 newPosition, Vector3 oldPosition) {
 
+        setRenderable(renderable);
         AnchorNode anchorNode = new AnchorNode();
 
         anchorNode.setWorldPosition(newPosition);
 
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
-        Vector3 oldPosition = getWorldPosition();
 
         Vector3 directionVector = new Vector3().subtract(newPosition, oldPosition);
 
@@ -177,6 +181,7 @@ public class Ball extends Node {
                     Vector3 rotationVect = new Vector3().subtract(oldPosition, dragonPosition);
                     double distance = Math.sqrt(Math.pow(dragonPosition.x - oldPosition.x, 2) + Math.pow(dragonPosition.y - oldPosition.y, 2) + Math.pow(dragonPosition.z - oldPosition.z, 2));
                     long time = control.getDragon().moveTo(getWorldPosition(), distance, rotationVect);
+
                     stopAnimation();
                 }
 

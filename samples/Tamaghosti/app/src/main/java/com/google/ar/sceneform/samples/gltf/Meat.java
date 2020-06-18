@@ -20,20 +20,20 @@ public class Meat extends Node {
 
 ArFragment arFragment;
 Renderable renderable;
+Control control;
 ObjectAnimator meatRotationAnimation = null;
 
-    public Meat(ArFragment arFragment, Renderable renderable) {
+    public Meat(ArFragment arFragment, Renderable renderable, Control control) {
 
         this.arFragment = arFragment;
         this.renderable = renderable;
+        this.control = control;
     }
 
 
     public void setMeatToCamera() {
 
         setParent(arFragment.getArSceneView().getScene().getCamera());
-
-        Log.d("Meat", "Position: " + getWorldPosition());
 
 
         setRenderable(renderable);
@@ -54,8 +54,9 @@ ObjectAnimator meatRotationAnimation = null;
         AnchorNode anchorNode = new AnchorNode(anchor);
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
-
         Vector3 newPosition = anchorNode.getWorldPosition();
+
+        control.updatePositions(newPosition);
 
         // calculate curve
         Vector3 directionVector = new Vector3().subtract(newPosition, cameraPosition);
@@ -150,18 +151,17 @@ ObjectAnimator meatRotationAnimation = null;
 
 
     // Spectator Version
-    void meatThrowAnimation(Vector3 newPosition, long dragontime) {
+    void meatThrowAnimation(Vector3 newPosition, Vector3 cameraPosition, long dragontime) {
         stopAnimation();
-        Vector3 cameraPosition = getWorldPosition();
+
+
+        setRenderable(renderable);
 
         AnchorNode anchorNode = new AnchorNode();
 
         anchorNode.setWorldPosition(newPosition);
 
         anchorNode.setParent(arFragment.getArSceneView().getScene());
-
-
-        //Vector3 newPosition = anchorNode.getWorldPosition();
 
         // calculate curve
         Vector3 directionVector = new Vector3().subtract(newPosition, cameraPosition);
@@ -238,9 +238,6 @@ ObjectAnimator meatRotationAnimation = null;
             @Override
             public void onAnimationEnd(android.animation.Animator animation) {
                 setLocalPosition(new Vector3(0, 0.05f, 0));
-
-
-                // Notify Firebase?
 
             }
 

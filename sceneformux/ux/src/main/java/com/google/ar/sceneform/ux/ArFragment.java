@@ -69,6 +69,7 @@ public class ArFragment extends BaseArFragment {
     Config config = new Config(session);
     config.setCloudAnchorMode(Config.CloudAnchorMode.ENABLED);
     config.setFocusMode(Config.FocusMode.AUTO);
+    config.setUpdateMode(Config.UpdateMode.LATEST_CAMERA_IMAGE);
     session.configure(config);
 
     this.getArSceneView().setupSession(session);
