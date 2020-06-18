@@ -1,10 +1,15 @@
 package com.google.ar.sceneform.samples.gltf;
 
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.sceneform.AnchorNode;
@@ -20,13 +25,16 @@ import com.google.firebase.database.ValueEventListener;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
-public class SpectatorActivity extends ArActivity {
+public class SpectatorActivity extends AppCompatActivity {
 
     private ArFragment arFragment;
 
     private Renderable dragonRenderableOne, dragonRenderableTwo, meatRenderable, ballRenderable;
 
     Control control;
+
+    private static final String TAG = ArActivity.class.getSimpleName();
+    private static final double MIN_OPENGL_VERSION = 3.0;
 
     private HashMap<String, Object> movePosition;
     private String anchorId;
@@ -50,6 +58,21 @@ public class SpectatorActivity extends ArActivity {
     }
 
     private AppAnchorState appAnchorState = AppAnchorState.NONE;
+
+    public static boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
+        String openGlVersionString =
+                ((ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE))
+                        .getDeviceConfigurationInfo()
+                        .getGlEsVersion();
+        if (Double.parseDouble(openGlVersionString) < MIN_OPENGL_VERSION) {
+            Log.e(TAG, "Sceneform requires OpenGL ES 3.0 later");
+            Toast.makeText(activity, "Sceneform requires OpenGL ES 3.0 or later", Toast.LENGTH_LONG)
+                    .show();
+            activity.finish();
+            return false;
+        }
+        return true;
+    }
 
 
     @Override
@@ -426,4 +449,10 @@ public class SpectatorActivity extends ArActivity {
     public String getAnchorId() {
         return anchorId;
     }
+
+
+    public void showToast(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+    }
+
 }

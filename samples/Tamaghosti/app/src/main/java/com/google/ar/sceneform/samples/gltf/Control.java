@@ -59,7 +59,6 @@ public class Control {
 
 
     public Control(ArActivity arActivity, User user) {
-        if (user == User.SPECTATOR) this.spectatorActivity = (SpectatorActivity) arActivity;
         this.arActivity = arActivity;
         pm = new PersistenceManager(arActivity.getApplicationContext());
 
@@ -77,22 +76,24 @@ public class Control {
 
         // Skip these steps for spectator mode
 
-        switch(user) {
 
-            case CREATOR:
                 setButtonListeners();
                 updateRestrictions();
-                break;
-
-            case SPECTATOR:
-
-
-                break;
-        }
-
 
         showHint("call");
     }
+    public Control(SpectatorActivity spectatorActivity, User user) {
+
+        this.spectatorActivity = spectatorActivity;
+        pm = new PersistenceManager(spectatorActivity.getApplicationContext());
+
+        dragonName = pm.getString("dragon_name", null);
+
+        this.user = user;
+
+
+    }
+
 
 
 
@@ -357,9 +358,11 @@ public class Control {
             updateRestrictions();
 
             updateCurrentDragonPositionWindow();
+
+            showHint("welcome");
         }
 
-        showHint("welcome");
+
 
     }
 
@@ -454,7 +457,7 @@ public class Control {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
+            if(user == User.CREATOR) {
             arActivity.runOnUiThread(() -> {
 
 
@@ -462,13 +465,13 @@ public class Control {
                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE);
 
 
-                if(user == User.CREATOR) {
+
                     showPlus(2000);
 
                     // Value Change
                     setNeed("hunger",20);
                     setNeed("energy",-5);
-                }
+
 
                 meatActivated = false;
 
@@ -476,6 +479,18 @@ public class Control {
 
                 meat.setRenderable(null);
             });
+            } else {
+
+                spectatorActivity.runOnUiThread(() -> {
+
+                    spectatorActivity.getFirebaseManager().uploadAnimationState(FirebaseManager.AnimationState.IDLE);
+
+                    dragon.updateAnimation(dragon.idle_index);
+
+                    meat.setRenderable(null);
+                });
+
+            }
         }
     }
 
