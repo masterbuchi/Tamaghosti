@@ -78,12 +78,20 @@ public class Control {
         this.user = user;
 
         // Skip these steps for spectator mode
-        if(user == User.CREATOR) {
 
-            setButtonListeners();
+        switch(user) {
 
-            updateRestrictions();
+            case CREATOR:
+                setButtonListeners();
+                updateRestrictions();
+                break;
+
+            case SPECTATOR:
+
+
+                break;
         }
+
 
         showHint("call");
     }
@@ -366,7 +374,22 @@ public class Control {
 
         // Upload distance to Firebase
         arActivity.getFirebaseManager().uploadDistance(distance);
+
+
         long time = dragon.moveTo(moveToNode.getWorldPosition(), distance, rotationVect);
+        return time;
+    }
+
+    // Created for Spectator Activity
+    long moveDragon(Vector3 position) {
+
+
+        Vector3 dragonPosition = dragon.getWorldPosition();
+        Vector3 rotationVect = new Vector3().subtract(position, dragonPosition);
+        double distance = Math.sqrt(Math.pow(dragonPosition.x - position.x, 2) + Math.pow(dragonPosition.y - position.y, 2) + Math.pow(dragonPosition.z - position.z, 2));
+
+
+        long time = dragon.moveTo(position, distance, rotationVect);
         return time;
     }
 
@@ -408,11 +431,19 @@ public class Control {
 
             Log.d("ANIMATION", "new thread count: " + milliseconds);
 
-            hunger.post(() -> {
+            // Nullpointer exception
+
+            if(user == User.CREATOR) {
+
+                hunger.post(() -> {
 
 
-                hunger.setEnabled(false);
-            });
+                    hunger.setEnabled(false);
+                });
+
+            }
+
+
             try {
                 Thread.sleep(milliseconds);
             } catch (InterruptedException e) {
@@ -425,13 +456,16 @@ public class Control {
                 FirebaseManager firebaseManager = arActivity.getFirebaseManager();
                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE);
 
-                showPlus(2000);
+
+                if(user == User.CREATOR) {
+                    showPlus(2000);
+
+                    // Value Change
+                    setNeed("hunger",20);
+                    setNeed("energy",-5);
+                }
+
                 meatActivated = false;
-
-                // Value Change
-                setNeed("hunger",20);
-                setNeed("energy",-5);
-
 
                 dragon.updateAnimation(dragon.idle_index);
                 meat.setEnabled(false);
@@ -467,7 +501,7 @@ public class Control {
 
                 ToasterLong.makeLongToast(arActivity, "Welcome to Dragon Care. Check what " + dragonName + " currently needs.", 9000);
             default:
-                ;
+
                 break;
         }
 
@@ -500,6 +534,10 @@ public class Control {
 
     public Meat getMeat() {
         return meat;
+    }
+
+    public void setMeat(Meat meat) {
+        this.meat = meat;
     }
 
     public Ball getBall() {

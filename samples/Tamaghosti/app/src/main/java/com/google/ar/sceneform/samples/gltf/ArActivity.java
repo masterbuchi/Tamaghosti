@@ -226,10 +226,14 @@ public class ArActivity extends AppCompatActivity {
 
                             if (control.getMeatActivated()) {
                                 long time = control.moveDragon(hitResult);
+
                                 control.getMeat().meatThrowAnimation(hitResult, time);
+
+                                // Update Firebase Code
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
                                 // Thread with walking and Eating duration, set to IDLE afterwards
+
                                 control.startThread((float) time);
                             } else if (control.getBallActivated()) {
 
