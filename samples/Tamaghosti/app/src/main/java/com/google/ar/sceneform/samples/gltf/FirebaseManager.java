@@ -29,8 +29,8 @@ public class FirebaseManager {
         PET,
         IDLE,
         EAT,
-        RESET
-
+        RESET,
+        THROW_MEAT
     }
 
     public void uploadAnimationState(AnimationState type) {

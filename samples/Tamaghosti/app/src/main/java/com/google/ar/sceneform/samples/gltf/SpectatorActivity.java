@@ -47,6 +47,7 @@ public class SpectatorActivity extends ArActivity {
 
     private String currentAnchorId;
     private String updatedAnchorId;
+    private long time;
 
     FirebaseManager firebaseManager;
 
@@ -55,6 +56,8 @@ public class SpectatorActivity extends ArActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spectator);
+
+        time = 1;
 
         control = new Control(this, Control.User.SPECTATOR);
 
@@ -147,7 +150,6 @@ public class SpectatorActivity extends ArActivity {
         Button resolve = findViewById(R.id.resolve);
 
         resolve.setOnClickListener(view -> {
-
 
             if(anchorId == null) {
 
@@ -254,7 +256,7 @@ public class SpectatorActivity extends ArActivity {
 
                     Vector3 newPosition = new Vector3(x, y, z);
 
-                    long time = control.moveDragon(newPosition);
+                    time = control.moveDragon(newPosition);
 
 
                     Toast.makeText(getApplicationContext(), "Move Dragon", Toast.LENGTH_SHORT).show();
@@ -266,17 +268,9 @@ public class SpectatorActivity extends ArActivity {
 
                     // Spawn meat when dragon is moving
 
-                    control.setMeat(new Meat(arFragment, meatRenderable));
 
-                    Session session = arFragment.getArSceneView().getSession();
-
-                    float[] pos = { newPosition.x, newPosition.y, newPosition.z };
-                    float[] rotation = { 0, 0, 0, 1 };
-
-                    Anchor anchor = session.createAnchor(new Pose( pos, rotation));
-
-
-                    control.getMeat().meatThrowAnimation(newPosition, anchor, time);
+                    /*
+                    control.getMeat().meatThrowAnimation(newPosition, time);
                     control.startThread((float) time);
 
 
@@ -284,6 +278,8 @@ public class SpectatorActivity extends ArActivity {
                     control.getMeat().setMeatToCamera();
                     control.getMeat().setEnabled(true);
                     control.getMeat().startAnimation();
+
+                    */
 
 
                 }
@@ -348,9 +344,29 @@ public class SpectatorActivity extends ArActivity {
 
                         case EAT:
 
-                            // Note: Start eating animation when dragon arrived his destination, not when the update is received
-
                             control.getDragon().updateAnimation(control.getDragon().eat_index);
+                            break;
+
+                        case THROW_MEAT:
+                            // Play Throw Meat Animation
+
+                            //control.setMeat(new Meat(arFragment, meatRenderable));
+
+                            float x = (float) ((double) movePosition.get("x"));
+                            float y = (float) ((double) movePosition.get("y"));
+                            float z = (float) ((double) movePosition.get("z"));
+
+                            Vector3 newPosition = new Vector3(x, y, z);
+
+                            control.setMeat(new Meat(arFragment, meatRenderable));
+
+                            control.getMeat().setMeatToCamera();
+                            control.getMeat().setEnabled(true);
+                            //control.getMeat().startAnimation();
+                            
+
+                            control.getMeat().meatThrowAnimation(newPosition, time);
+
                             break;
 
                         case RESET:

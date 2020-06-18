@@ -27,6 +27,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class Dragon extends TransformableNode  {
 
+    private FirebaseManager firebaseManager = new FirebaseManager();
+
 
     private volatile FilamentAsset filamentAsset;
     private final Set<AnimationInstance> animators = new ArraySet<>();
@@ -201,9 +203,9 @@ public class Dragon extends TransformableNode  {
                     if (control.getMeatActivated()) {
                         updateAnimation(eat_index);
 
-                        // Notify Database!
-                       // firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
-                       // firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
+                        // Notify Database
+                        firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
+                        firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.EAT);
                     }
                     else updateAnimation(idle_index);
                     moving = false;

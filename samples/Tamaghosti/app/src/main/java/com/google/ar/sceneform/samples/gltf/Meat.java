@@ -134,8 +134,6 @@ ObjectAnimator meatRotationAnimation = null;
                 setLocalPosition(new Vector3(0, 0.05f, 0));
 
 
-                // Notify Firebase?
-
             }
 
             @Override
@@ -153,12 +151,12 @@ ObjectAnimator meatRotationAnimation = null;
 
     // Spectator Version
 
-    void meatThrowAnimation(Vector3 newPosition, Anchor anchor, long dragontime) {
+    void meatThrowAnimation(Vector3 newPosition, long dragontime) {
         stopAnimation();
         Vector3 cameraPosition = getWorldPosition();
 
 
-        AnchorNode anchorNode = new AnchorNode(anchor);
+        AnchorNode anchorNode = new AnchorNode();
 
         anchorNode.setWorldPosition(newPosition);
 

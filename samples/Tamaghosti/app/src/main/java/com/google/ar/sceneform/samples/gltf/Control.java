@@ -245,7 +245,7 @@ public class Control {
             if (dragon != null) {
                 if (!dragon.moving) {
 
-                    this.meatActivated = !this.meatActivated;
+                    this.meatActivated = !this.meatActivated; // always true?
 
                     if (ballActivated)  {
                         ball.stopAnimation();
