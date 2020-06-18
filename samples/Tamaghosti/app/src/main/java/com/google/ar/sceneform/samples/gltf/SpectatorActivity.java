@@ -36,12 +36,10 @@ public class SpectatorActivity extends ArActivity {
     Control control;
 
     private HashMap<String, Object> movePosition;
-    private double distance;
     private String anchorId;
     private FirebaseManager.AnimationState animationState;
 
     private boolean initAnchorListener;
-    private boolean initDistanceListener;
     private boolean initAnimationStateListener;
     private boolean initMovePositionListener;
 
@@ -63,24 +61,21 @@ public class SpectatorActivity extends ArActivity {
 
         initAnchorListener = true;
         initAnimationStateListener = true;
-        initDistanceListener = true;
         initMovePositionListener = true;
 
         firebaseManager = new FirebaseManager();
 
         // Init
-        distance = firebaseManager.getDistance();
         anchorId = firebaseManager.getAnchorId();
         animationState = firebaseManager.getAnimationState();
 
 
-        Log.i("MOVE", "DISTANCE: " + distance);
+
         Log.i("MOVE", "ANCHOR ID: " + anchorId);
         Log.i("MOVE", "ANIMATION STATE: " + animationState);
 
 
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.spectator_fragment);
-
 
 
         WeakReference<SpectatorActivity> weakActivity = new WeakReference<>(this);
@@ -165,13 +160,12 @@ public class SpectatorActivity extends ArActivity {
                         });
 
 
-
         // Resolve Button Listener
         Button resolve = findViewById(R.id.resolve);
 
         resolve.setOnClickListener(view -> {
 
-            if(anchorId == null) {
+            if (anchorId == null) {
 
                 Toast.makeText(getApplicationContext(), "Please wait a second", Toast.LENGTH_SHORT).show();
             } else if (control.getDragon() == null) {
@@ -181,7 +175,6 @@ public class SpectatorActivity extends ArActivity {
                 control.createDragon(null, dragonRenderableOne, dragonRenderableTwo);
 
                 currentAnchorId = anchorId;
-
 
             } else {
                 Toast.makeText(getApplicationContext(), "Dragon is already created", Toast.LENGTH_SHORT).show();
@@ -200,7 +193,7 @@ public class SpectatorActivity extends ArActivity {
 
                 updatedAnchorId = anchorId;
 
-                if(initAnchorListener) {
+                if (initAnchorListener) {
                     initAnchorListener = false;
                 } else {
 
@@ -208,7 +201,7 @@ public class SpectatorActivity extends ArActivity {
 
                     firebaseManager.setAnchorId(anchorId);
 
-                    if(control.getDragon() != null && !updatedAnchorId.equals(currentAnchorId)) {
+                    if (control.getDragon() != null && !updatedAnchorId.equals(currentAnchorId)) {
 
                         Toast.makeText(getApplicationContext(), "New Host! Updating Dragon Anchor", Toast.LENGTH_SHORT).show();
 
@@ -217,7 +210,7 @@ public class SpectatorActivity extends ArActivity {
 
                         AnchorNode anchorNode = new AnchorNode(resolvedAnchor);
                         anchorNode.setParent(arFragment.getArSceneView().getScene());
-                        
+
                         // Delete old dragon
                         control.getDragon().setRenderable(null);
 
@@ -244,7 +237,7 @@ public class SpectatorActivity extends ArActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
 
-                if(initMovePositionListener) {
+                if (initMovePositionListener) {
 
                     initMovePositionListener = false;
 
@@ -259,48 +252,25 @@ public class SpectatorActivity extends ArActivity {
 
                     firebaseManager.setMovePosition(coordinates);
 
-                    distance = firebaseManager.getDistance();
-
-                    // Distance vllt selber berechnen?
 
                     movePosition = firebaseManager.getMovePosition();
 
 
-                    // Object --> Double --> Float Works
+                    float x = (float) ((double) movePosition.get("moveTo_x"));
+                    float y = (float) ((double)movePosition.get("moveTo_y"));
+                    float z = (float) ((double)movePosition.get("moveTo_z"));
 
-                    // Object --> Float doesnt work
-
-                    float x = (float) ((double) movePosition.get("x"));
-                    float y = (float) ((double) movePosition.get("y"));
-                    float z = (float) ((double) movePosition.get("z"));
+                    Vector3 oldPosition = new Vector3((float) ((double)movePosition.get("oldPosition_x")),(float) ((double)movePosition.get("oldPosition_y")),(float) ((double)movePosition.get("oldPosition_z")));
 
                     Vector3 newPosition = new Vector3(x, y, z);
+
+                    control.getDragon().setWorldPosition(oldPosition);
 
                     time = control.moveDragon(newPosition);
 
 
                     Toast.makeText(getApplicationContext(), "Move Dragon", Toast.LENGTH_SHORT).show();
 
-                    //Vector3 rotationVect = new Vector3().subtract(oldPosition, dragonPosition);
-                    //control.getDragon().moveTo(newPos, distance);
-
-                    //if(animationState == FirebaseManager.AnimationState.EAT) {
-
-                    // Spawn meat when dragon is moving
-
-
-                    /*
-                    control.getMeat().meatThrowAnimation(newPosition, time);
-                    control.startThread((float) time);
-
-
-                    // plays animation but won't meat won't stay on the ground!
-                    control.getMeat().setMeatToCamera();
-                    control.getMeat().setEnabled(true);
-                    control.getMeat().startAnimation();
-
-                    */
-
 
                 }
 
@@ -312,29 +282,6 @@ public class SpectatorActivity extends ArActivity {
             }
         });
 
-        DatabaseReference distanceReference = firebaseManager.getDistanceReference();
-
-        distanceReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Init and Change
-
-                distance = dataSnapshot.getValue(Double.class);
-
-                if(initDistanceListener) {
-                    initDistanceListener = false;
-                } else {
-
-                    firebaseManager.setDistance(distance);
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
 
         DatabaseReference animationReference = firebaseManager.getAnimationReference();
 
@@ -352,12 +299,12 @@ public class SpectatorActivity extends ArActivity {
 
                 Vector3 newPosition;
 
-                if(initAnimationStateListener) {
+                if (initAnimationStateListener) {
                     initAnimationStateListener = false;
                 } else {
                     firebaseManager.setAnimationState(animationState);
 
-                    switch(animationState) {
+                    switch (animationState) {
 
                         case IDLE:
 

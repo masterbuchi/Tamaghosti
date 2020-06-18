@@ -366,14 +366,11 @@ public class Control {
         AnchorNode moveToNode = new AnchorNode(hitResult.createAnchor());
 
         // Upload World Position
-        arActivity.getFirebaseManager().uploadMovePosition(moveToNode.getWorldPosition());
+        arActivity.getFirebaseManager().uploadMovePosition(dragon.getWorldPosition(),moveToNode.getWorldPosition());
 
         Vector3 dragonPosition = dragon.getWorldPosition();
         Vector3 rotationVect = new Vector3().subtract(moveToNode.getWorldPosition(), dragonPosition);
         double distance = Math.sqrt(Math.pow(dragonPosition.x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragonPosition.y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragonPosition.z - moveToNode.getWorldPosition().z, 2));
-
-        // Upload distance to Firebase
-        arActivity.getFirebaseManager().uploadDistance(distance);
 
 
         long time = dragon.moveTo(moveToNode.getWorldPosition(), distance, rotationVect);

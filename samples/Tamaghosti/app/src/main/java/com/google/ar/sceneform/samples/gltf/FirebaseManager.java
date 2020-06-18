@@ -10,7 +10,6 @@ import java.util.Map;
 public class FirebaseManager {
 
     private String anchorId;
-    private double distance;
     private AnimationState animationState;
     private HashMap<String, Object> movePosition;
 
@@ -19,7 +18,6 @@ public class FirebaseManager {
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     private DatabaseReference anchorReference = createReference("Cloud Anchor");
-    private DatabaseReference distanceReference = createReference("Distance");
     private DatabaseReference animationReference = createReference("Animation");
     private DatabaseReference movePositionReference = createReference("Move Position");
 
@@ -46,22 +44,20 @@ public class FirebaseManager {
 
     }
 
-    public void uploadMovePosition(Vector3 movePosition) {
+    public void uploadMovePosition( Vector3 oldPosition, Vector3 movePosition) {
 
         Map<String,Object> taskMap = new HashMap<>();
-        taskMap.put("x", movePosition.x);
-        taskMap.put("y", movePosition.y);
-        taskMap.put("z", movePosition.z);
+        taskMap.put("oldPosition_x", oldPosition.x);
+        taskMap.put("oldPosition_y", oldPosition.y);
+        taskMap.put("oldPosition_z", oldPosition.z);
+        taskMap.put("moveTo_x", movePosition.x);
+        taskMap.put("moveTo_y", movePosition.y);
+        taskMap.put("moveTo_z", movePosition.z);
 
         movePositionReference.updateChildren(taskMap);
 
     }
 
-    public void uploadDistance(double distance) {
-
-        distanceReference.setValue(distance);
-
-    }
 
     public AnimationState getAnimationState() {
         return animationState;
@@ -71,9 +67,6 @@ public class FirebaseManager {
         this.movePosition = movePosition;
     }
 
-    public void setDistance(double distance) {
-        this.distance = distance;
-    }
 
     public void setAnchorId(String anchorId) {
         this.anchorId = anchorId;
@@ -83,11 +76,6 @@ public class FirebaseManager {
         this.animationState = animationState;
     }
 
-    public double getDistance() {
-
-        return distance;
-
-    }
 
     public String getAnchorId() {
 
@@ -105,11 +93,7 @@ public class FirebaseManager {
         return anchorReference;
     }
 
-    public DatabaseReference getDistanceReference() {
-        return distanceReference;
-    }
-
-    public DatabaseReference getAnimationReference() {
+       public DatabaseReference getAnimationReference() {
         return animationReference;
     }
 

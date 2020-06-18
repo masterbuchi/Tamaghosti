@@ -62,9 +62,6 @@ public class ArActivity extends AppCompatActivity {
 
     private AppAnchorState appAnchorState = AppAnchorState.NONE;
     private Anchor anchor;
-
-    private SharedPreferences.Editor editor;
-
     private FirebaseManager firebaseManager;
 
     private ArFragment arFragment;
