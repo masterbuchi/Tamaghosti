@@ -66,6 +66,29 @@ public class Ball extends Node {
 
     }
 
+
+    // Spectator version
+
+    void ballAnimation(Vector3 newPosition) {
+
+        AnchorNode anchorNode = new AnchorNode();
+
+        anchorNode.setWorldPosition(newPosition);
+
+        anchorNode.setParent(arFragment.getArSceneView().getScene());
+
+        Vector3 oldPosition = getWorldPosition();
+
+        Vector3 directionVector = new Vector3().subtract(newPosition, oldPosition);
+
+        Vector3 middlePosition = oldPosition.add(oldPosition,directionVector.scaled(0.5f));
+
+        setParent(anchorNode);
+
+        throwAnimation(oldPosition,newPosition,directionVector,middlePosition);
+
+    }
+
     void throwAnimation(Vector3 oldPosition, Vector3 newPosition, Vector3 directionVector, Vector3 middlePosition) {
 
         stopAnimation();

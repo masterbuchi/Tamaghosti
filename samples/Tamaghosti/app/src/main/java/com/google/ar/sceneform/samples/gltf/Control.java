@@ -540,6 +540,10 @@ public class Control {
         this.meat = meat;
     }
 
+    public void setBall(Ball ball) {
+        this.ball = ball;
+    }
+
     public Ball getBall() {
         return ball;
     }

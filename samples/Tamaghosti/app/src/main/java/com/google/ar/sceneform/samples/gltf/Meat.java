@@ -150,11 +150,9 @@ ObjectAnimator meatRotationAnimation = null;
 
 
     // Spectator Version
-
     void meatThrowAnimation(Vector3 newPosition, long dragontime) {
         stopAnimation();
         Vector3 cameraPosition = getWorldPosition();
-
 
         AnchorNode anchorNode = new AnchorNode();
 

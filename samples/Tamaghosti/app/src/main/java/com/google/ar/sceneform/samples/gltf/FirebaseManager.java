@@ -30,7 +30,8 @@ public class FirebaseManager {
         IDLE,
         EAT,
         RESET,
-        THROW_MEAT
+        THROW_MEAT,
+        THROW_BALL
     }
 
     public void uploadAnimationState(AnimationState type) {

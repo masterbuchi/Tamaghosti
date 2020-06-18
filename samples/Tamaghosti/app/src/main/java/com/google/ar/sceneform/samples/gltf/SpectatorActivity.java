@@ -31,7 +31,7 @@ public class SpectatorActivity extends ArActivity {
 
     private ArFragment arFragment;
 
-    private Renderable dragonRenderableOne, dragonRenderableTwo, meatRenderable;
+    private Renderable dragonRenderableOne, dragonRenderableTwo, meatRenderable, ballRenderable;
 
     Control control;
 
@@ -84,6 +84,26 @@ public class SpectatorActivity extends ArActivity {
 
 
         WeakReference<SpectatorActivity> weakActivity = new WeakReference<>(this);
+
+        ModelRenderable.builder()
+                .setSource(
+                        this, R.raw.ball)
+                .setIsFilamentGltf(true)
+                .build()
+                .thenAccept(
+                        modelRenderable -> {
+                            SpectatorActivity activity = weakActivity.get();
+                            if (activity != null) {
+                                activity.ballRenderable = modelRenderable;
+                            }
+                        })
+                .exceptionally(
+                        throwable -> {
+
+                            showToast("while loading an error occurred.");
+
+                            return null;
+                        });
 
         ModelRenderable.builder()
                 .setSource(
@@ -325,6 +345,13 @@ public class SpectatorActivity extends ArActivity {
 
                 animationState = dataSnapshot.getValue(FirebaseManager.AnimationState.class);
 
+
+                float x = 0;
+                float y = 0;
+                float z = 0;
+
+                Vector3 newPosition;
+
                 if(initAnimationStateListener) {
                     initAnimationStateListener = false;
                 } else {
@@ -352,20 +379,41 @@ public class SpectatorActivity extends ArActivity {
 
                             //control.setMeat(new Meat(arFragment, meatRenderable));
 
-                            float x = (float) ((double) movePosition.get("x"));
-                            float y = (float) ((double) movePosition.get("y"));
-                            float z = (float) ((double) movePosition.get("z"));
+                            x = (float) ((double) movePosition.get("x"));
+                            y = (float) ((double) movePosition.get("y"));
+                            z = (float) ((double) movePosition.get("z"));
 
-                            Vector3 newPosition = new Vector3(x, y, z);
+                            newPosition = new Vector3(x, y, z);
 
                             control.setMeat(new Meat(arFragment, meatRenderable));
 
                             control.getMeat().setMeatToCamera();
                             control.getMeat().setEnabled(true);
                             //control.getMeat().startAnimation();
-                            
 
                             control.getMeat().meatThrowAnimation(newPosition, time);
+
+                            break;
+
+                        case THROW_BALL:
+                            // Play Throw Ball Animation
+
+                            //control.setMeat(new Meat(arFragment, meatRenderable));
+
+                            x = (float) ((double) movePosition.get("x"));
+                            y = (float) ((double) movePosition.get("y"));
+                            z = (float) ((double) movePosition.get("z"));
+
+                            newPosition = new Vector3(x, y, z);
+
+                            control.setBall(new Ball(arFragment, ballRenderable, control));
+
+                            control.getBall().setBallToCamera();
+                            control.getBall().setEnabled(true);
+
+                            //ball.startAnimation(false);
+
+                            control.getBall().ballAnimation(newPosition);
 
                             break;
 
