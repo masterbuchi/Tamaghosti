@@ -236,9 +236,6 @@ public class ArActivity extends AppCompatActivity {
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.THROW_BALL);
 
-
-                                // Thread with walking and Eating duration, set to IDLE afterwards
-                               // control.startThread((float) time);
                             } else {
 
                                 Toast.makeText(getApplicationContext(), "y_dragon: " + control.getDragon().getWorldPosition().y, Toast.LENGTH_SHORT).show();

@@ -59,6 +59,7 @@ public class Ball extends Node {
 
         control.updatePositions(newPosition);
 
+        newPosition=new Vector3().add(newPosition,new Vector3(0,0.1f,0));
 
         Vector3 directionVector = new Vector3().subtract(newPosition, oldPosition);
 
@@ -82,6 +83,7 @@ public class Ball extends Node {
 
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
+        newPosition=new Vector3().add(newPosition,new Vector3(0,0.1f,0));
 
         Vector3 directionVector = new Vector3().subtract(newPosition, oldPosition);
 
@@ -94,6 +96,9 @@ public class Ball extends Node {
     }
 
     void throwAnimation(Vector3 oldPosition, Vector3 newPosition, Vector3 directionVector, Vector3 middlePosition) {
+
+
+
 
         stopAnimation();
         startAnimation(true);
@@ -138,6 +143,7 @@ public class Ball extends Node {
         }
 
         setWorldPosition(oldPosition);
+
         setLocalRotation(new Quaternion(0, 180, 180, 0));
         setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
 
@@ -180,7 +186,13 @@ public class Ball extends Node {
                     Vector3 dragonPosition = control.getDragon().getWorldPosition();
                     Vector3 rotationVect = new Vector3().subtract(oldPosition, dragonPosition);
                     double distance = Math.sqrt(Math.pow(dragonPosition.x - oldPosition.x, 2) + Math.pow(dragonPosition.y - oldPosition.y, 2) + Math.pow(dragonPosition.z - oldPosition.z, 2));
-                    long time = control.getDragon().moveTo(getWorldPosition(), distance, rotationVect);
+
+                    Vector3 moveToPosition=new Vector3().add(oldPosition,new Vector3(0,-0.1f,0));
+
+                    long time = control.getDragon().moveTo(moveToPosition, distance, rotationVect);
+
+                    control.startThread((float) time);
+
 
                     stopAnimation();
                 }

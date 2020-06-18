@@ -350,7 +350,7 @@ public class SpectatorActivity extends AppCompatActivity {
 
                         case THROW_MEAT:
                             // Play Throw Meat Animation
-
+                            control.setMeatActivated(true);
                             control.getDragon().setWorldPosition(oldPosition);
 
                             if (control.getMeat() != null) control.getMeat().setRenderable(null);

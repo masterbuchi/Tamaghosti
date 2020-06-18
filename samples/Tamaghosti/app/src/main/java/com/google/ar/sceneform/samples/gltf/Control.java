@@ -28,6 +28,7 @@ public class Control {
 
     private Boolean meatActivated = false;
     private Boolean ballActivated = false;
+    private Boolean ballBackActivated = false;
 
     // StatusBooleans
     private Boolean tired, hungry, shy, bored, fit, full, friendly, exited;
@@ -464,20 +465,21 @@ public class Control {
                 FirebaseManager firebaseManager = arActivity.getFirebaseManager();
                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE);
 
-
-
                     showPlus(2000);
-
                     // Value Change
                     setNeed("hunger",20);
                     setNeed("energy",-5);
 
-
+            if (meatActivated) {
                 meatActivated = false;
 
                 dragon.updateAnimation(dragon.idle_index);
 
                 meat.setRenderable(null);
+            }
+            if (ballActivated) {
+                dragon.bringBackBall();
+            }
             });
             } else {
 
@@ -485,9 +487,16 @@ public class Control {
 
                     spectatorActivity.getFirebaseManager().uploadAnimationState(FirebaseManager.AnimationState.IDLE);
 
-                    dragon.updateAnimation(dragon.idle_index);
+                    if (meatActivated) {
+                        meatActivated = false;
 
-                    meat.setRenderable(null);
+                        dragon.updateAnimation(dragon.idle_index);
+
+                        meat.setRenderable(null);
+                    }
+                    if (ballActivated) {
+                        dragon.bringBackBall();
+                    }
                 });
 
             }
@@ -545,8 +554,25 @@ public class Control {
     public Boolean getMeatActivated() {
         return meatActivated;
     }
+
+    public void setMeatActivated(Boolean meatActivated) {
+        this.meatActivated = meatActivated;
+    }
+
     public Boolean getBallActivated() {
         return ballActivated;
+    }
+
+    public void setBallBackActivated(Boolean ballBackActivated) {
+        this.ballBackActivated = ballBackActivated;
+    }
+
+    public Boolean getBallBackActivated() {
+        return ballBackActivated;
+    }
+
+    public void setBallActivated(Boolean ballActivated) {
+        this.ballActivated = ballActivated;
     }
 
     public Dragon getDragon() {
