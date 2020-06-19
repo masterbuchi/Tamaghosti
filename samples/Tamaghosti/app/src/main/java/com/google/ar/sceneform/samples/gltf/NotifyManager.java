@@ -36,7 +36,7 @@ public class NotifyManager {
         // Opens Ar Activity on Tap
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Tamagotchi Channel")
-                .setSmallIcon(R.drawable.ic_launcher)
+                .setSmallIcon(R.drawable.dragontransparent)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setAutoCancel(true)    // Deletes the notification when the user taps on it
