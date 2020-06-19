@@ -313,13 +313,12 @@ public class Control {
                     }
 
                 }
-
-                /*// Value Change
+                // Value Change theoretisch lieber in Ball damit die needs erst nach der aktion geupdatet werden?
                 setNeed("fun", 10);
-                setNeed("hunger", -5);
+                setNeed("hunger", -10);
                 setNeed("energy", -5);
-                showPlus(3000);*/
-
+                showPlus(3000);
+                updateRestrictions();;
             }
         });
     }

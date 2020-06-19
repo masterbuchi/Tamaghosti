@@ -60,7 +60,7 @@ public class SystemWorker extends Worker {
 
             if(social > 0) {
 
-                social -= 10;
+                social -= 15;
 
             }
 

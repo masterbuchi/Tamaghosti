@@ -35,6 +35,7 @@ class DragPettingController(private var dragon: Dragon, transformableNode: BaseT
                 control.setNeed("social",10)
                 control.setNeed("hunger",-5)
                 control.showPlus(500)
+                control.updateRestrictions()
             }
         }
 
