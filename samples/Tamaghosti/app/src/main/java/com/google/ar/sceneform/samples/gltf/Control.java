@@ -46,7 +46,7 @@ public class Control {
 
     private ImageView plus;
     private CardView card;
-
+    private CardView items;
     private boolean needsShown = true;
 
     public enum User {
@@ -228,16 +228,20 @@ public class Control {
 
     public void setButtonListeners() {
 
-
+        items=arActivity.findViewById(R.id.Items);
         card = arActivity.findViewById(R.id.cardViewNeeds);
 
         showNeeds.setOnClickListener(v -> {
             if (needsShown) {
                 needsShown = false;
-                card.setVisibility(View.INVISIBLE);
+                items.setTranslationY(240);
+                card.setTranslationY(240);
+               //card.setVisibility(View.INVISIBLE);
             } else {
                 needsShown = true;
-                card.setVisibility(View.VISIBLE);
+                items.setTranslationY(0);
+                card.setTranslationY(0);
+               // card.setVisibility(View.VISIBLE);
             }
         });
 

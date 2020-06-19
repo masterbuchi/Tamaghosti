@@ -44,7 +44,7 @@
     <string name="story_name">Name your dragon</string>
     <string name="content_Discription">Background</string>
     <string name="story_continue">Continue</string>
-
+    <string name="card_items">Items</string>
     <!-- Setting Variables -->
 
     <string name="settings_title">Settings</string>
