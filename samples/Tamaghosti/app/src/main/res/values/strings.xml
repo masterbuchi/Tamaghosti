@@ -14,7 +14,7 @@
    limitations under the License.
 -->
 <resources>
-    <string name="app_name" translation_description="App Name [CHAR LIMIT=40]">Tamaghosti</string>
+    <string name="app_name" translation_description="App Name [CHAR LIMIT=40]">Dragon Care</string>
 
     <string name="model_position">Model Position</string>
 
