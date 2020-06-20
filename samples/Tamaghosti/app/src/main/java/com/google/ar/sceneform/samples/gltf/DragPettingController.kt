@@ -28,10 +28,11 @@ class DragPettingController(private var dragon: Dragon, transformableNode: BaseT
                 dragon.updateAnimation(dragon.getPet_index)
                 animationStart = true
                 startTimeOfCurrentAnimation = System.nanoTime()
+                control.dragon.firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.PET)
             }
 
             if ((System.nanoTime() - startTimeOfCurrentAnimation) / TimeUnit.SECONDS.toNanos(1).toDouble() > 1) {
-                startTimeOfCurrentAnimation = System.nanoTime();
+                startTimeOfCurrentAnimation = System.nanoTime()
                 control.setNeed("social",10)
                 control.setNeed("hunger",-5)
                 control.showPlus(500)
@@ -46,6 +47,7 @@ class DragPettingController(private var dragon: Dragon, transformableNode: BaseT
         if (animationStart) {
             dragon.updateAnimation(dragon.idle_index)
             animationStart = false
+            control.dragon.firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE)
 
             Log.d("Petting", "Petting finished")
         }

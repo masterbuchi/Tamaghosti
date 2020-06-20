@@ -19,7 +19,7 @@ public class FirebaseManager {
 
     private DatabaseReference anchorReference = createReference("Cloud Anchor");
     private DatabaseReference animationReference = createReference("Animation");
-    private DatabaseReference movePositionReference = createReference("Move Position");
+    private DatabaseReference updatePositionReference = createReference("Move Position");
 
     public enum AnimationState {
 
@@ -57,7 +57,7 @@ public class FirebaseManager {
         taskMap.put("camera_y", cameraPosition.y);
         taskMap.put("camera_z", cameraPosition.z);
 
-        movePositionReference.updateChildren(taskMap);
+        updatePositionReference.updateChildren(taskMap);
 
     }
 
@@ -90,7 +90,7 @@ public class FirebaseManager {
         return updatePosition;
     }
 
-    public DatabaseReference getUpdatePositionReference() { return movePositionReference; }
+    public DatabaseReference getUpdatePositionReference() { return updatePositionReference; }
 
     public DatabaseReference getAnchorReference() {
         return anchorReference;

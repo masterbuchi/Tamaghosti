@@ -79,7 +79,6 @@ public class Dragon extends TransformableNode {
         getRotationController().setEnabled(false);
         //     model.getScaleController().setEnabled(false);
 
-
         DragPettingController dragPettingController = new DragPettingController(this, this, arFragment.getTransformationSystem().getDragRecognizer(), control);
         addTransformationController(dragPettingController);
 
@@ -122,7 +121,7 @@ public class Dragon extends TransformableNode {
         switch (index) {
             case eat_index:
                 speedFactor = 1f;
-                break; // when eat index finished ... set meat null
+                break;
             case getPet_index:
                 speedFactor = 2f;
                 break;
@@ -207,11 +206,19 @@ public class Dragon extends TransformableNode {
                     updateAnimation(eat_index);
                 } else if (control.getBallActivated()) {
                     updateAnimation(eat_index);
-                }else if (control.getBallBackActivated()){
+                } else if (control.getBallBackActivated()) {
 
-                    Vector3 cameraPosition = arFragment.getArSceneView().getScene().getCamera().getWorldPosition();
 
-                    cameraPosition = new Vector3(cameraPosition.x,getWorldPosition().y,cameraPosition.z);
+                    Vector3 cameraPosition;
+                    if (control.getUser() == Control.User.CREATOR) {
+                        //FALLUNTERSCHEIDUNG
+                        cameraPosition = arFragment.getArSceneView().getScene().getCamera().getWorldPosition();
+                        control.updatePositions(getWorldPosition());
+                    } else {
+                        cameraPosition = control.getCameraPosition();
+                    }
+
+                    cameraPosition = new Vector3(cameraPosition.x, getWorldPosition().y, cameraPosition.z);
 
                     double distance = Math.sqrt(Math.pow(getWorldPosition().x - cameraPosition.x, 2) + Math.pow(getWorldPosition().y - cameraPosition.y, 2) + Math.pow(getWorldPosition().z - cameraPosition.z, 2));
 
@@ -219,10 +226,13 @@ public class Dragon extends TransformableNode {
                     else {
                         control.setBallBackActivated(false);
                         updateAnimation(idle_index);
+                        moving = false;
                     }
 
-                } else updateAnimation(idle_index);
-                moving = false;
+                } else {
+                    updateAnimation(idle_index);
+                    moving = false;
+                }
 
             }
 
@@ -248,18 +258,26 @@ public class Dragon extends TransformableNode {
 
 
         control.getBall().setParent(this);
-        control.getBall().setLocalPosition(new Vector3(0,0.45f,0.3f));
+        control.getBall().setLocalPosition(new Vector3(0, 0.45f, 0.3f));
 
-        Log.d("Ball", "LocalPosition Ball: "+ control.getBall().getLocalPosition());
+        Vector3 cameraPosition;
+        if (control.getUser() == Control.User.CREATOR) {
+            //FALLUNTERSCHEIDUNG
+            cameraPosition = arFragment.getArSceneView().getScene().getCamera().getWorldPosition();
+            control.updatePositions(getWorldPosition());
+        } else {
+            cameraPosition = control.getCameraPosition();
+        }
 
-        Vector3 cameraPosition = arFragment.getArSceneView().getScene().getCamera().getWorldPosition();
 
-        cameraPosition = new Vector3(cameraPosition.x,getWorldPosition().y,cameraPosition.z);
+
+
+        cameraPosition = new Vector3(cameraPosition.x, getWorldPosition().y, cameraPosition.z);
 
         Vector3 rotationVect = new Vector3().subtract(cameraPosition, getWorldPosition());
         double distance = Math.sqrt(Math.pow(getWorldPosition().x - cameraPosition.x, 2) + Math.pow(getWorldPosition().y - cameraPosition.y, 2) + Math.pow(getWorldPosition().z - cameraPosition.z, 2));
 
-        cameraPosition = new Vector3().add(getWorldPosition(),rotationVect.scaled(0.8f));
+        cameraPosition = new Vector3().add(getWorldPosition(), rotationVect.scaled(0.8f));
 
 
         control.setBallActivated(false);
@@ -378,6 +396,8 @@ public class Dragon extends TransformableNode {
         this.setWorldPosition(newPos);
     }
 
-
+    public FirebaseManager getFirebaseManager() {
+        return firebaseManager;
+    }
 }
 

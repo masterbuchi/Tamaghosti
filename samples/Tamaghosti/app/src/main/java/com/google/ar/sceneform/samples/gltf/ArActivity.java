@@ -215,8 +215,10 @@ public class ArActivity extends AppCompatActivity {
                         // If Dragon exists
                     } else {
 
+                        if (control.getBall() != null) control.getBall().setRenderable(null);
+
                         // If no Moving Animation
-                        if (!control.getDragon().moving) {
+                        if (!control.getDragon().moving && !control.getBallBackActivated()) {
 
                             if (control.getMeatActivated()) {
 
@@ -231,7 +233,7 @@ public class ArActivity extends AppCompatActivity {
 
                                 control.startThread((float) time);
                             } else if (control.getBallActivated()) {
-
+                                control.getBall().setRenderable(ballRenderable);
                                 control.getBall().ballAnimation(hitResult);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.RESET);
                                 firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.THROW_BALL);
@@ -327,6 +329,7 @@ public class ArActivity extends AppCompatActivity {
     public Renderable getBallRenderable() {
         return ballRenderable;
     }
+
 }
 
 

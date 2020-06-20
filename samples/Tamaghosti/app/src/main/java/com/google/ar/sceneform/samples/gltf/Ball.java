@@ -83,7 +83,7 @@ public class Ball extends Node {
 
         anchorNode.setParent(arFragment.getArSceneView().getScene());
 
-        newPosition=new Vector3().add(newPosition,new Vector3(0,0.1f,0));
+        newPosition = new Vector3().add(newPosition,new Vector3(0,0.1f,0));
 
         Vector3 directionVector = new Vector3().subtract(newPosition, oldPosition);
 

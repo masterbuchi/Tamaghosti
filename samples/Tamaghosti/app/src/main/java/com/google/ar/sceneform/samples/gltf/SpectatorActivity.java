@@ -36,14 +36,15 @@ public class SpectatorActivity extends AppCompatActivity {
     private static final String TAG = ArActivity.class.getSimpleName();
     private static final double MIN_OPENGL_VERSION = 3.0;
 
-    private HashMap<String, Object> movePosition;
+    private HashMap<String, Object> updatePosition;
     private String anchorId;
     private FirebaseManager.AnimationState animationState;
 
     private Anchor resolvedAnchor;
     private boolean initAnchorListener;
     private boolean initAnimationStateListener;
-    private boolean initMovePositionListener;
+
+    private Vector3 cameraPosition;
 
     private String currentAnchorId;
     private String updatedAnchorId;
@@ -91,14 +92,12 @@ public class SpectatorActivity extends AppCompatActivity {
 
         initAnchorListener = true;
         initAnimationStateListener = true;
-        initMovePositionListener = true;
 
         firebaseManager = new FirebaseManager();
 
         // Init
-       //anchorId = firebaseManager.getAnchorId();
+        //anchorId = firebaseManager.getAnchorId();
         //animationState = firebaseManager.getAnimationState();
-
 
 
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.spectator_fragment);
@@ -214,16 +213,10 @@ public class SpectatorActivity extends AppCompatActivity {
             } else {
 
 
-
-
-
-
                 Toast.makeText(getApplicationContext(), "Dragon is already created", Toast.LENGTH_SHORT).show();
             }
 
         });
-
-
 
 
         DatabaseReference anchorReference = firebaseManager.getAnchorReference();
@@ -256,7 +249,6 @@ public class SpectatorActivity extends AppCompatActivity {
                         appAnchorState = AppAnchorState.RESOLVING;
 
 
-
                     }
                 }
 
@@ -276,7 +268,6 @@ public class SpectatorActivity extends AppCompatActivity {
         });
 
 
-
         DatabaseReference updatePositionReference = firebaseManager.getUpdatePositionReference();
 
         updatePositionReference.addValueEventListener(new ValueEventListener() {
@@ -284,16 +275,17 @@ public class SpectatorActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
 
-                    HashMap<String, Object> coordinates = new HashMap<>();
+                HashMap<String, Object> coordinates = new HashMap<>();
 
-                    dataSnapshot.getChildren().forEach(
-                            dataSnapshot1 -> coordinates.put(dataSnapshot1.getKey(), dataSnapshot1.getValue())
-                    );
+                dataSnapshot.getChildren().forEach(
+                        dataSnapshot1 -> coordinates.put(dataSnapshot1.getKey(), dataSnapshot1.getValue())
+                );
 
-                    firebaseManager.setUpdatePosition(coordinates);
+                firebaseManager.setUpdatePosition(coordinates);
 
-                    movePosition = firebaseManager.getUpdatePosition();
+                updatePosition = firebaseManager.getUpdatePosition();
 
+                cameraPosition = new Vector3((float) ((double) updatePosition.get("camera_x")), (float) ((double) updatePosition.get("camera_y")), (float) ((double) updatePosition.get("camera_z")));
 
             }
 
@@ -317,65 +309,69 @@ public class SpectatorActivity extends AppCompatActivity {
                     initAnimationStateListener = false;
                 } else {
                     firebaseManager.setAnimationState(animationState);
-                    Vector3 oldPosition = new Vector3((float) ((double)movePosition.get("oldPosition_x")),(float) ((double)movePosition.get("oldPosition_y")),(float) ((double)movePosition.get("oldPosition_z")));
+                    Vector3 oldPosition = new Vector3((float) ((double) updatePosition.get("oldPosition_x")), (float) ((double) updatePosition.get("oldPosition_y")), (float) ((double) updatePosition.get("oldPosition_z")));
 
-                    Vector3 newPosition = new Vector3((float) ((double) movePosition.get("moveTo_x")), (float) ((double)movePosition.get("moveTo_y")), (float) ((double)movePosition.get("moveTo_z")));
+                    Vector3 newPosition = new Vector3((float) ((double) updatePosition.get("moveTo_x")), (float) ((double) updatePosition.get("moveTo_y")), (float) ((double) updatePosition.get("moveTo_z")));
 
-                    Vector3 cameraPosition = new Vector3((float) ((double) movePosition.get("camera_x")), (float) ((double)movePosition.get("camera_y")), (float) ((double)movePosition.get("camera_z")));
+                    cameraPosition = new Vector3((float) ((double) updatePosition.get("camera_x")), (float) ((double) updatePosition.get("camera_y")), (float) ((double) updatePosition.get("camera_z")));
+                    if (control.getDragon() != null) {
 
-                    switch (animationState) {
+                        if (control.getBall() != null && !control.getBallBackActivated() && !control.getBallActivated()) control.getBall().setRenderable(null);
 
-                        case WALK:
-                            control.getDragon().setWorldPosition(oldPosition);
-                            control.moveDragon(newPosition);
+                        switch (animationState) {
 
-                            break;
+                            case WALK:
 
-                        case IDLE:
+                                control.getDragon().setWorldPosition(oldPosition);
+                                time = control.moveDragon(newPosition);
 
-                            control.getDragon().updateAnimation(control.getDragon().idle_index);
-                            break;
+                                break;
 
-                        case PET:
+                            case IDLE:
 
-                            control.getDragon().updateAnimation(control.getDragon().getPet_index);
-                            break;
+                                control.getDragon().updateAnimation(control.getDragon().idle_index);
+                                break;
 
-                        case EAT:
+                            case PET:
 
-                            control.getDragon().updateAnimation(control.getDragon().eat_index);
-                            break;
+                                control.getDragon().updateAnimation(control.getDragon().getPet_index);
+                                break;
 
-                        case THROW_MEAT:
-                            // Play Throw Meat Animation
-                            control.setMeatActivated(true);
-                            control.getDragon().setWorldPosition(oldPosition);
+                            case EAT:
 
-                            if (control.getMeat() != null) control.getMeat().setRenderable(null);
-                            control.setMeat(new Meat(arFragment, meatRenderable, control));
+                                control.getDragon().updateAnimation(control.getDragon().eat_index);
+                                break;
 
-                            control.getMeat().setEnabled(true);
+                            case THROW_MEAT:
+                                // Play Throw Meat Animation
+                                control.setMeatActivated(true);
 
-                            control.getMeat().meatThrowAnimation(newPosition, cameraPosition, time);
-                            control.startThread((float) time);
+                                if (control.getMeat() != null)
+                                    control.getMeat().setRenderable(null);
+                                control.setMeat(new Meat(arFragment, meatRenderable, control));
 
-                            break;
+                                control.getMeat().setEnabled(true);
 
-                        case THROW_BALL:
-                            // Play Throw Ball Animation
+                                control.getMeat().meatThrowAnimation(newPosition, cameraPosition, time);
+                                control.startThread((float) time);
 
-                            control.setBall(new Ball(arFragment, ballRenderable, control));
+                                break;
 
-                            control.getBall().setEnabled(true);
+                            case THROW_BALL:
+                                // Play Throw Ball Animation
+                                control.setBallActivated(true);
+                                if (control.getBall() == null) control.setBall(new Ball(arFragment, ballRenderable, control));
+                                else control.getBall().setRenderable(ballRenderable);
+                                control.getBall().setEnabled(true);
 
+                                control.getBall().ballAnimation(newPosition, cameraPosition);
 
-                            control.getBall().ballAnimation(newPosition, cameraPosition);
+                                break;
 
-                            break;
+                            case RESET:
 
-                        case RESET:
-
-                            // Resetting Animation State
+                                // Resetting Animation State
+                        }
                     }
 
                 }
@@ -414,17 +410,18 @@ public class SpectatorActivity extends AppCompatActivity {
             anchorNode.setParent(arFragment.getArSceneView().getScene());
 
             // Delete old dragon
-            if(control.getDragon()!= null) control.getDragon().setRenderable(null);
+            if (control.getDragon() != null) control.getDragon().setRenderable(null);
 
             control.createDragon(null, dragonRenderableOne, dragonRenderableTwo);
 
-            movePosition = firebaseManager.getUpdatePosition();
+            updatePosition = firebaseManager.getUpdatePosition();
 
-            Vector3 oldPosition = new Vector3((float) ((double)movePosition.get("oldPosition_x")),(float) ((double)movePosition.get("oldPosition_y")),(float) ((double)movePosition.get("oldPosition_z")));
+            Vector3 oldPosition = new Vector3((float) ((double) updatePosition.get("moveTo_x")), (float) ((double) updatePosition.get("moveTo_y")), (float) ((double) updatePosition.get("moveTo_z")));
 
 
             // Might cause the dragon to be placed in a wrong position
             control.getDragon().setWorldPosition(oldPosition);
+
 
             currentAnchorId = anchorId;
         }
@@ -455,4 +452,8 @@ public class SpectatorActivity extends AppCompatActivity {
         Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
+
+    public Vector3 getCameraPosition() {
+        return cameraPosition;
+    }
 }

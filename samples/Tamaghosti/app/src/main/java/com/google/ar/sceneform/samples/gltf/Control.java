@@ -34,9 +34,9 @@ public class Control {
     private Boolean tired, hungry, shy, bored, fit, full, friendly, exited;
     private Boolean[] restrictions;
 
-    Dragon dragon;
-    Meat meat;
-    Ball ball;
+    private Dragon dragon;
+    private Meat meat;
+    private Ball ball;
 
     private String dragonName;
 
@@ -78,11 +78,12 @@ public class Control {
         // Skip these steps for spectator mode
 
 
-                setButtonListeners();
-                updateRestrictions();
+        setButtonListeners();
+        updateRestrictions();
 
         showHint("call");
     }
+
     public Control(SpectatorActivity spectatorActivity, User user) {
 
         this.spectatorActivity = spectatorActivity;
@@ -96,9 +97,6 @@ public class Control {
     }
 
 
-
-
-
     public void updateRestrictions() {
 
         setBooleans();
@@ -107,7 +105,7 @@ public class Control {
 
         energy.setEnabled(restrictions[0]);
         hunger.setEnabled(restrictions[1]);
-      if (dragon != null)  dragon.setSocial(restrictions[2]);
+        if (dragon != null) dragon.setSocial(restrictions[2]);
         fun.setEnabled(restrictions[3]);
 
     }
@@ -170,7 +168,7 @@ public class Control {
 
     public void calculateRestrictions() {
 
-       restrictions = new Boolean[4];
+        restrictions = new Boolean[4];
 
         // Status
         if (!tired && full && friendly && exited) {
@@ -181,8 +179,7 @@ public class Control {
             restrictions[1] = false;
             restrictions[2] = true;
             restrictions[3] = true;
-        }
-        else {
+        } else {
             happyAnimation = false;
             if (tired) {
                 restrictions[0] = true;
@@ -228,7 +225,7 @@ public class Control {
 
     public void setButtonListeners() {
 
-        items=arActivity.findViewById(R.id.Items);
+        items = arActivity.findViewById(R.id.Items);
         card = arActivity.findViewById(R.id.cardViewNeeds);
 
         showNeeds.setOnClickListener(v -> {
@@ -236,12 +233,12 @@ public class Control {
                 needsShown = false;
                 items.setTranslationY(240);
                 card.setTranslationY(240);
-               //card.setVisibility(View.INVISIBLE);
+                //card.setVisibility(View.INVISIBLE);
             } else {
                 needsShown = true;
                 items.setTranslationY(0);
                 card.setTranslationY(0);
-               // card.setVisibility(View.VISIBLE);
+                // card.setVisibility(View.VISIBLE);
             }
         });
 
@@ -251,7 +248,7 @@ public class Control {
 
                     this.meatActivated = !this.meatActivated; // always true?
 
-                    if (ballActivated)  {
+                    if (ballActivated) {
                         ball.stopAnimation();
                         ballActivated = false;
                     }
@@ -279,8 +276,10 @@ public class Control {
         energy.setOnClickListener(v -> {
 
             if (dragon != null) {
-                Intent intent = new Intent(arActivity, SleepActivity.class);
-                arActivity.startActivityForResult(intent, 1);
+                if (!dragon.moving) {
+                    Intent intent = new Intent(arActivity, SleepActivity.class);
+                    arActivity.startActivityForResult(intent, 1);
+                }
             }
 
         });
@@ -300,9 +299,9 @@ public class Control {
 
                     if (ballActivated) {
 
-                        if (ball == null)
-                            ball = new Ball(arActivity.getArFragment(), arActivity.getBallRenderable(), this);
+                        if (ball == null) ball = new Ball(arActivity.getArFragment(), arActivity.getBallRenderable(), this);
 
+                        ball.setRenderable(arActivity.getBallRenderable());
                         ball.setBallToCamera();
                         ball.setEnabled(true);
                         ball.startAnimation(false);
@@ -318,12 +317,11 @@ public class Control {
                 setNeed("hunger", -10);
                 setNeed("energy", -5);
                 showPlus(3000);
-                updateRestrictions();;
+                updateRestrictions();
+                ;
             }
         });
     }
-
-
 
 
     @SuppressLint("SetTextI18n")
@@ -350,7 +348,6 @@ public class Control {
             dragon = new Dragon(spectatorActivity.getArFragment(), anchorNode, dragonRenderableOne, dragonRenderableTwo, this);
 
 
-
         } else {
 
             AnchorNode anchorNode = arActivity.createAnchor(hitResult);
@@ -358,6 +355,8 @@ public class Control {
             dragon = new Dragon(arActivity.getArFragment(), anchorNode, dragonRenderableOne, dragonRenderableTwo, this);
 
             updatePositions(anchorNode.getWorldPosition());
+
+            Log.d("Anchor", "AnchorNode.Worldposition: " + anchorNode.getWorldPosition());
 
             updateRestrictions();
 
@@ -367,30 +366,26 @@ public class Control {
         }
 
 
-
     }
 
     long moveDragon(HitResult hitResult) {
 
         AnchorNode moveToNode = new AnchorNode(hitResult.createAnchor());
 
-        // Upload World Position
-
-        updatePositions(moveToNode.getWorldPosition());
-
-
         Vector3 dragonPosition = dragon.getWorldPosition();
         Vector3 rotationVect = new Vector3().subtract(moveToNode.getWorldPosition(), dragonPosition);
         double distance = Math.sqrt(Math.pow(dragonPosition.x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragonPosition.y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragonPosition.z - moveToNode.getWorldPosition().z, 2));
 
-
+        // Upload World Position
+        updatePositions(moveToNode.getWorldPosition());
         long time = dragon.moveTo(moveToNode.getWorldPosition(), distance, rotationVect);
+
         return time;
     }
 
     void updatePositions(Vector3 newPosition) {
 
-        arActivity.getFirebaseManager().uploadUpdatePosition(dragon.getWorldPosition(),newPosition,arActivity.getArFragment().getArSceneView().getScene().getCamera().getWorldPosition());
+        arActivity.getFirebaseManager().uploadUpdatePosition(dragon.getWorldPosition(), newPosition, arActivity.getArFragment().getArSceneView().getScene().getCamera().getWorldPosition());
     }
 
     // Created for Spectator Activity
@@ -416,14 +411,15 @@ public class Control {
     }
 
     public void setProcessBars() {
-        prgHunger.setProgress(pm.getInt("hunger",0));
-        prgEnergy.setProgress(pm.getInt("energy",0));
-        prgSocial.setProgress(pm.getInt("social",0));
-        prgFun.setProgress(pm.getInt("fun",0));
+        prgHunger.setProgress(pm.getInt("hunger", 0));
+        prgEnergy.setProgress(pm.getInt("energy", 0));
+        prgSocial.setProgress(pm.getInt("social", 0));
+        prgFun.setProgress(pm.getInt("fun", 0));
     }
 
 
     public void startThread(float duration) {
+
 
 
         float d = duration + dragon.getAnimationDuration() * 1000;
@@ -446,7 +442,7 @@ public class Control {
 
             // Nullpointer exception
 
-            if(user == User.CREATOR) {
+            if (user == User.CREATOR) {
 
                 hunger.post(() -> {
 
@@ -461,45 +457,46 @@ public class Control {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if(user == User.CREATOR) {
-            arActivity.runOnUiThread(() -> {
+            if (user == User.CREATOR) {
+                arActivity.runOnUiThread(() -> {
 
-
-                FirebaseManager firebaseManager = arActivity.getFirebaseManager();
-                firebaseManager.uploadAnimationState(FirebaseManager.AnimationState.IDLE);
 
                     showPlus(2000);
                     // Value Change
-                    setNeed("hunger",20);
-                    setNeed("energy",-5);
+                    setNeed("hunger", 20);
+                    setNeed("energy", -5);
 
-            if (meatActivated) {
-                meatActivated = false;
+                    if (meatActivated) {
+                        meatActivated = false;
+                        dragon.updateAnimation(dragon.idle_index);
+                        meat.setRenderable(null);
+                        dragon.moving = false;
+                    }
 
-                dragon.updateAnimation(dragon.idle_index);
+                    if (ballActivated) {
+                        dragon.bringBackBall();
+                    }
 
-                meat.setRenderable(null);
-            }
-            if (ballActivated) {
-                dragon.bringBackBall();
-            }
-            });
+
+                });
+
+             // Spectator
             } else {
 
                 spectatorActivity.runOnUiThread(() -> {
-
-                    spectatorActivity.getFirebaseManager().uploadAnimationState(FirebaseManager.AnimationState.IDLE);
 
                     if (meatActivated) {
                         meatActivated = false;
 
                         dragon.updateAnimation(dragon.idle_index);
-
                         meat.setRenderable(null);
                     }
+
                     if (ballActivated) {
                         dragon.bringBackBall();
                     }
+
+
                 });
 
             }
@@ -596,5 +593,14 @@ public class Control {
 
     public Ball getBall() {
         return ball;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Vector3 getCameraPosition() {
+        if (user == User.SPECTATOR) return spectatorActivity.getCameraPosition();
+        else return null;
     }
 }
