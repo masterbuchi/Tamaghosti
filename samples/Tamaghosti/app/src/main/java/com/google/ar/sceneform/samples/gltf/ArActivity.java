@@ -112,91 +112,10 @@ public class ArActivity extends AppCompatActivity {
 
         WeakReference<ArActivity> weakActivity = new WeakReference<>(this);
 
-
-        ModelRenderable.builder()
-                .setSource(
-                        this, R.raw.meat)
-                .setIsFilamentGltf(true)
-                .build()
-                .thenAccept(
-                        modelRenderable -> {
-                            ArActivity activity = weakActivity.get();
-                            if (activity != null) {
-                                activity.meatRenderable = modelRenderable;
-                            }
-                        })
-                .exceptionally(
-                        throwable -> {
-
-                            showToast("while loading an error occurred.");
-
-                            return null;
-                        });
-
-        ModelRenderable.builder()
-                .setSource(
-                        this, R.raw.ball)
-                .setIsFilamentGltf(true)
-                .build()
-                .thenAccept(
-                        modelRenderable -> {
-                            ArActivity activity = weakActivity.get();
-                            if (activity != null) {
-                                activity.ballRenderable = modelRenderable;
-                            }
-                        })
-                .exceptionally(
-                        throwable -> {
-
-                            showToast("while loading an error occurred.");
-
-                            return null;
-                        });
-
-
-        ModelRenderable.builder()
-                .setSource(
-                        this, R.raw.dragon66_one)
-                .setIsFilamentGltf(true)
-                .build()
-                .thenAccept(
-                        modelRenderable -> {
-                            ArActivity activity = weakActivity.get();
-                            if (activity != null) {
-                                activity.dragonRenderableOne = modelRenderable;
-                            }
-                        })
-                .exceptionally(
-                        throwable -> {
-
-                            showToast("while loading an error occurred.");
-
-                            return null;
-                        });
-
-        ModelRenderable.builder()
-                .setSource(
-                        this, R.raw.dragon65_two)
-                .setIsFilamentGltf(true)
-                .build()
-                .thenAccept(
-                        modelRenderable -> {
-                            ArActivity activity = weakActivity.get();
-                            if (activity != null) {
-                                activity.dragonRenderableTwo = modelRenderable;
-                            }
-                        })
-                .exceptionally(
-                        throwable -> {
-
-                            showToast("while loading an error occurred.");
-
-                            return null;
-                        });
-
-
-
-
+        renderer(R.raw.meat, "meat", weakActivity);
+        renderer(R.raw.ball, "ball", weakActivity);
+        renderer(R.raw.dragon66_one, "dragon_one", weakActivity);
+        renderer(R.raw.dragon65_two, "dragon_two", weakActivity);
 
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
@@ -251,8 +170,6 @@ public class ArActivity extends AppCompatActivity {
                 });
 
 
-
-
         // Cloud Anchor Update Loop
         arFragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
 
@@ -262,14 +179,50 @@ public class ArActivity extends AppCompatActivity {
 
     }
 
+    public void renderer(int id, String renderable, WeakReference<ArActivity> weakActivity) {
+
+        ModelRenderable.builder()
+                .setSource(
+                        this, id)
+                .setIsFilamentGltf(true)
+                .build()
+                .thenAccept(
+                        modelRenderable -> {
+                            ArActivity activity = weakActivity.get();
+                            if (activity != null) {
+                                switch (renderable) {
+                                    case "meat":
+                                        activity.meatRenderable = modelRenderable;
+                                        break;
+                                    case "ball":
+                                        activity.ballRenderable = modelRenderable;
+                                        break;
+                                    case "dragon_one":
+                                        activity.dragonRenderableOne = modelRenderable;
+                                        break;
+                                    case "dragon_two":
+                                        activity.dragonRenderableTwo = modelRenderable;
+                                        break;
+                                }
+                            }
+                        })
+                .exceptionally(
+                        throwable -> {
+
+                            showToast("while loading an error occurred.");
+
+                            return null;
+                        });
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_CANCELED) {
-             control.updateRestrictions();
-             control.setProcessBars();
+                control.updateRestrictions();
+                control.setProcessBars();
             }
         }
     }//onActivityResult
@@ -298,7 +251,7 @@ public class ArActivity extends AppCompatActivity {
     }
 
 
-        // Create Cloud Anchor
+    // Create Cloud Anchor
     AnchorNode createAnchor(HitResult hitResult) {
         anchor = arFragment.getArSceneView().getSession() != null ? arFragment.getArSceneView().getSession().hostCloudAnchor(hitResult.createAnchor()) : null;
         appAnchorState = AppAnchorState.HOSTING;

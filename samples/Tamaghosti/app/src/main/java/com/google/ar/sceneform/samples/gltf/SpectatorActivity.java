@@ -105,84 +105,11 @@ public class SpectatorActivity extends AppCompatActivity {
 
         WeakReference<SpectatorActivity> weakActivity = new WeakReference<>(this);
 
-        ModelRenderable.builder()
-                .setSource(
-                        this, R.raw.ball)
-                .setIsFilamentGltf(true)
-                .build()
-                .thenAccept(
-                        modelRenderable -> {
-                            SpectatorActivity activity = weakActivity.get();
-                            if (activity != null) {
-                                activity.ballRenderable = modelRenderable;
-                            }
-                        })
-                .exceptionally(
-                        throwable -> {
+        renderer(R.raw.meat, "meat", weakActivity);
+        renderer(R.raw.ball, "ball", weakActivity);
+        renderer(R.raw.dragon66_one, "dragon_one", weakActivity);
+        renderer(R.raw.dragon65_two, "dragon_two", weakActivity);
 
-                            showToast("while loading an error occurred.");
-
-                            return null;
-                        });
-
-        ModelRenderable.builder()
-                .setSource(
-                        this, R.raw.dragon66_one)
-                .setIsFilamentGltf(true)
-                .build()
-                .thenAccept(
-                        modelRenderable -> {
-                            SpectatorActivity activity = weakActivity.get();
-                            if (activity != null) {
-                                activity.dragonRenderableOne = modelRenderable;
-                            }
-                        })
-                .exceptionally(
-                        throwable -> {
-
-                            // showToast("while loading an error occurred.");
-
-                            return null;
-                        });
-
-        ModelRenderable.builder()
-                .setSource(
-                        this, R.raw.dragon65_two)
-                .setIsFilamentGltf(true)
-                .build()
-                .thenAccept(
-                        modelRenderable -> {
-                            SpectatorActivity activity = weakActivity.get();
-                            if (activity != null) {
-                                activity.dragonRenderableTwo = modelRenderable;
-                            }
-                        })
-                .exceptionally(
-                        throwable -> {
-
-                            // showToast("while loading an error occurred.");
-
-                            return null;
-                        });
-        ModelRenderable.builder()
-                .setSource(
-                        this, R.raw.meat)
-                .setIsFilamentGltf(true)
-                .build()
-                .thenAccept(
-                        modelRenderable -> {
-                            SpectatorActivity activity = weakActivity.get();
-                            if (activity != null) {
-                                activity.meatRenderable = modelRenderable;
-                            }
-                        })
-                .exceptionally(
-                        throwable -> {
-
-                            // showToast("while loading an error occurred.");
-
-                            return null;
-                        });
 
 
         // Resolve Button Listener
@@ -385,6 +312,41 @@ public class SpectatorActivity extends AppCompatActivity {
         });
     }
 
+    public void renderer(int id, String renderable, WeakReference<SpectatorActivity> weakActivity) {
+
+        ModelRenderable.builder()
+                .setSource(
+                        this, id)
+                .setIsFilamentGltf(true)
+                .build()
+                .thenAccept(
+                        modelRenderable -> {
+                            SpectatorActivity activity = weakActivity.get();
+                            if (activity != null) {
+                                switch (renderable) {
+                                    case "meat":
+                                        activity.meatRenderable = modelRenderable;
+                                        break;
+                                    case "ball":
+                                        activity.ballRenderable = modelRenderable;
+                                        break;
+                                    case "dragon_one":
+                                        activity.dragonRenderableOne = modelRenderable;
+                                        break;
+                                    case "dragon_two":
+                                        activity.dragonRenderableTwo = modelRenderable;
+                                        break;
+                                }
+                            }
+                        })
+                .exceptionally(
+                        throwable -> {
+
+                            showToast("while loading an error occurred.");
+
+                            return null;
+                        });
+    }
 
     private void CheckIfUploaded(Anchor anchor, AppAnchorState state) {
 
