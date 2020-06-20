@@ -48,18 +48,6 @@
         app:layout_constraintTop_toBottomOf="@+id/continueGameButton" />
 
     <Button
-        android:id="@+id/settingsGameButton"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:text="@string/settings_game"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spectatorGameButton" />
-
-    <Button
         android:id="@+id/continueGameButton"
         android:layout_width="0dp"
         android:layout_height="48dp"

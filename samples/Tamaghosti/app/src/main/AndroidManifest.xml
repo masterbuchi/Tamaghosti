@@ -32,12 +32,6 @@
         <activity android:name=".SpectatorActivity"></activity>
 
         <activity
-            android:name=".SettingsActivity"
-            android:configChanges="orientation|screenSize"
-            android:screenOrientation="locked"
-            android:theme="@style/Theme.AppCompat.NoActionBar"></activity>
-
-        <activity
             android:name=".StoryActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="locked"

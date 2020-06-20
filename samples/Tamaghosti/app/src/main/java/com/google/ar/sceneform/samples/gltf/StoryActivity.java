@@ -63,7 +63,7 @@ public class StoryActivity extends AppCompatActivity {
                 persistenceManager.saveInt("social", socialValue);
                 persistenceManager.saveInt("fun", funValue);
 
-                // Open GLTFActivity
+                // Open ArActivity
                 Intent intent = new Intent(StoryActivity.this, ArActivity.class);
 
                 WorkManager workManager = WorkManager.getInstance(getApplicationContext());

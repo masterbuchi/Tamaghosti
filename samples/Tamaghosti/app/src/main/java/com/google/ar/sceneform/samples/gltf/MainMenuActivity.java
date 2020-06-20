@@ -59,15 +59,6 @@ public class MainMenuActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Settings OnClick Logic
-        Button settingsButton = findViewById(R.id.settingsGameButton);
-        settingsButton.setOnClickListener(view -> {
-
-            Intent intent = new Intent(MainMenuActivity.this, SettingsActivity.class);
-            startActivity(intent);
-
-        });
-
         // Spectator OnClick Logic
         Button spectatorButton = findViewById(R.id.spectatorGameButton);
         spectatorButton.setOnClickListener(view -> {
