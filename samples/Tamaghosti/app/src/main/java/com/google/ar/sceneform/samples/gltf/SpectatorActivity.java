@@ -313,8 +313,6 @@ public class SpectatorActivity extends AppCompatActivity {
 
                 animationState = dataSnapshot.getValue(FirebaseManager.AnimationState.class);
 
-
-
                 if (initAnimationStateListener) {
                     initAnimationStateListener = false;
                 } else {
@@ -424,6 +422,8 @@ public class SpectatorActivity extends AppCompatActivity {
 
             Vector3 oldPosition = new Vector3((float) ((double)movePosition.get("oldPosition_x")),(float) ((double)movePosition.get("oldPosition_y")),(float) ((double)movePosition.get("oldPosition_z")));
 
+
+            // Might cause the dragon to be placed in a wrong position
             control.getDragon().setWorldPosition(oldPosition);
 
             currentAnchorId = anchorId;
