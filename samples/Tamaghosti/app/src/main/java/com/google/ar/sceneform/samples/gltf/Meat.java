@@ -45,7 +45,7 @@ ObjectAnimator meatRotationAnimation = null;
 
     }
 
-    void meatThrowAnimation(HitResult hitResult, long dragontime) {
+    void meatThrowAnimation(HitResult hitResult, float dragonTime) {
         stopAnimation();
         Vector3 cameraPosition = getWorldPosition();
 
@@ -61,7 +61,7 @@ ObjectAnimator meatRotationAnimation = null;
         // calculate curve
         Vector3 directionVector = new Vector3().subtract(newPosition, cameraPosition);
 
-        Vector3 middlePoint = cameraPosition.add(cameraPosition,directionVector.scaled(0.5f));
+        Vector3 middlePoint = Vector3.add(cameraPosition,directionVector.scaled(0.5f));
 
         float x_1 = cameraPosition.x;
         float x_2 = newPosition.x;
@@ -77,9 +77,9 @@ ObjectAnimator meatRotationAnimation = null;
         float distance = directionVector.length();
 
         double velocity = 1;
-        long time = (long) ((distance / velocity) * 1000);
+        float time = (long) ((distance / velocity) * 1000);
 
-        if (time > dragontime) time = dragontime;
+        if (time > dragonTime) time = dragonTime;
 
         int steps = 200;
 
@@ -121,7 +121,7 @@ ObjectAnimator meatRotationAnimation = null;
         objectAnimation.setInterpolator(new LinearInterpolator());
 
         // Duration in ms of the animation.
-        objectAnimation.setDuration(time);
+        objectAnimation.setDuration((long)time);
         objectAnimation.start();
 
 
@@ -166,7 +166,7 @@ ObjectAnimator meatRotationAnimation = null;
         // calculate curve
         Vector3 directionVector = new Vector3().subtract(newPosition, cameraPosition);
 
-        Vector3 middlePoint = cameraPosition.add(cameraPosition,directionVector.scaled(0.5f));
+        Vector3 middlePoint = Vector3.add(cameraPosition,directionVector.scaled(0.5f));
 
         float x_1 = cameraPosition.x;
         float x_2 = newPosition.x;
@@ -292,7 +292,7 @@ ObjectAnimator meatRotationAnimation = null;
 
         ObjectAnimator orbitAnimation = new ObjectAnimator();
         // Cast to Object[] to make sure the varargs overload is called.
-        orbitAnimation.setObjectValues((Object[]) orientations);
+        orbitAnimation.setObjectValues(orientations);
 
         // Next, give it the localRotation property.
         orbitAnimation.setPropertyName("localRotation");

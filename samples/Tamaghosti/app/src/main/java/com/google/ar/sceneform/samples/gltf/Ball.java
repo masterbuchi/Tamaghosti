@@ -22,6 +22,12 @@ public class Ball extends Node {
     Control control;
     ObjectAnimator ballRotationAnimation;
 
+    /**
+     * Constructor Ball-object
+     * @param arFragment
+     * @param renderable
+     * @param control
+     */
     public Ball(ArFragment arFragment, Renderable renderable, Control control) {
 
         this.arFragment = arFragment;
@@ -29,23 +35,28 @@ public class Ball extends Node {
         this.control = control;
     }
 
+    /**
+     * Set the ball to the camera and corrects the position
+     * The ball now moves with the camera
+     */
+    void setBallToCamera() {
 
-    public void setBallToCamera() {
-
+        // set Parent
         setParent(arFragment.getArSceneView().getScene().getCamera());
-
-        Log.d("Ball", "Position: " + getWorldPosition());
-
-
+        //makes ball visible (if not visible)
         setRenderable(renderable);
 
-
+        // corrects Position, Rotation and Scale to fitting size
         setLocalRotation(new Quaternion(0, 180, 250, 0));
         setLocalPosition(new Vector3(0, -0.3f, -1));
         setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
 
     }
 
+    /**
+     *
+     * @param hitResult
+     */
     void ballAnimation(HitResult hitResult) {
 
 
@@ -63,7 +74,7 @@ public class Ball extends Node {
 
         Vector3 directionVector = new Vector3().subtract(newPosition, oldPosition);
 
-        Vector3 middlePosition = oldPosition.add(oldPosition,directionVector.scaled(0.5f));
+        Vector3 middlePosition = Vector3.add(oldPosition,directionVector.scaled(0.5f));
 
         setParent(anchorNode);
 
@@ -87,7 +98,7 @@ public class Ball extends Node {
 
         Vector3 directionVector = new Vector3().subtract(newPosition, oldPosition);
 
-        Vector3 middlePosition = oldPosition.add(oldPosition,directionVector.scaled(0.5f));
+        Vector3 middlePosition = Vector3.add(oldPosition,directionVector.scaled(0.5f));
 
         setParent(anchorNode);
 
@@ -173,11 +184,11 @@ public class Ball extends Node {
 
                 Vector3 oldPosition = getWorldPosition();
                 Vector3 newdirectionVector = new Vector3(directionVector.scaled(0.5f).x,0,directionVector.scaled(0.5f).z);
-                Vector3 newPosition = oldPosition.add(oldPosition,newdirectionVector);
+                Vector3 newPosition = Vector3.add(oldPosition,newdirectionVector);
                 Vector3 directionVector = new Vector3().subtract(newPosition, oldPosition);
 
 
-                Vector3 middlePosition = oldPosition.add(oldPosition,directionVector.scaled(0.5f));
+                Vector3 middlePosition = Vector3.add(oldPosition,directionVector.scaled(0.5f));
 
                 if (directionVector.length() > 0.05) {
                     throwAnimation(oldPosition,newPosition,directionVector,middlePosition);
@@ -250,7 +261,7 @@ else      orientation = Quaternion.axisAngle(new Vector3(0f, 1f, 0f), angle);
 
         ObjectAnimator orbitAnimation = new ObjectAnimator();
         // Cast to Object[] to make sure the varargs overload is called.
-        orbitAnimation.setObjectValues((Object[]) orientations);
+        orbitAnimation.setObjectValues(orientations);
 
         // Next, give it the localRotation property.
         orbitAnimation.setPropertyName("localRotation");

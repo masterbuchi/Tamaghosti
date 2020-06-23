@@ -318,7 +318,6 @@ public class Control {
                 setNeed("energy", -5);
                 showPlus(3000);
                 updateRestrictions();
-                ;
             }
         });
     }
@@ -368,7 +367,7 @@ public class Control {
 
     }
 
-    long moveDragon(HitResult hitResult) {
+    float moveDragon(HitResult hitResult) {
 
         AnchorNode moveToNode = new AnchorNode(hitResult.createAnchor());
 
@@ -378,7 +377,7 @@ public class Control {
 
         // Upload World Position
         updatePositions(moveToNode.getWorldPosition());
-        long time = dragon.moveTo(moveToNode.getWorldPosition(), distance, rotationVect);
+        float time = dragon.moveTo(moveToNode.getWorldPosition(), distance, rotationVect);
 
         return time;
     }
@@ -399,6 +398,15 @@ public class Control {
 
         long time = dragon.moveTo(position, distance, rotationVect);
         return time;
+    }
+
+    public void throwMeat(HitResult hitResult, float time) {
+       meat.meatThrowAnimation(hitResult, time);
+        startThread((float) time);
+    }
+    public void animateBall(HitResult hitResult, Renderable ballRenderable) {
+        ball.ballAnimation(hitResult);
+        ball.setRenderable(ballRenderable);
     }
 
 
