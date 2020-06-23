@@ -12,11 +12,7 @@ public class FirebaseManager {
     private String anchorId;
     private AnimationState animationState;
     private HashMap<String, Object> updatePosition;
-
-
-
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
-
     private DatabaseReference anchorReference = createReference("Cloud Anchor");
     private DatabaseReference animationReference = createReference("Animation");
     private DatabaseReference updatePositionReference = createReference("Move Position");

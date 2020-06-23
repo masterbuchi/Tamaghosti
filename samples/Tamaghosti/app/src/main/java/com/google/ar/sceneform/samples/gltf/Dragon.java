@@ -77,7 +77,6 @@ public class Dragon extends TransformableNode {
         // Deactivate Rotation and Translation
         getTranslationController().setEnabled(false);
         getRotationController().setEnabled(false);
-        //     model.getScaleController().setEnabled(false);
 
         DragPettingController dragPettingController = new DragPettingController(this, this, arFragment.getTransformationSystem().getDragRecognizer(), control);
         addTransformationController(dragPettingController);

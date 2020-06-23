@@ -19,36 +19,41 @@ import com.google.ar.sceneform.rendering.Renderable;
 import androidx.cardview.widget.CardView;
 
 public class Control {
+
+    // Parent Activity (Either Normal, oder Spectator)
     private ArActivity arActivity;
     private SpectatorActivity spectatorActivity;
 
     private PersistenceManager pm;
 
+    // Booleans for some States of meat, ball etc.
     private Boolean happyAnimation = false;
-
     private Boolean meatActivated = false;
     private Boolean ballActivated = false;
     private Boolean ballBackActivated = false;
+    private Boolean needsShown = true;
 
     // StatusBooleans
     private Boolean tired, hungry, shy, bored, fit, full, friendly, exited;
+
+    // A simple "What is allowed?"-Array with four Booleans for hunger, sleep, fun and social
     private Boolean[] restrictions;
 
+    // The objects of the game
     private Dragon dragon;
     private Meat meat;
     private Ball ball;
 
     private String dragonName;
 
+    // Object on the Screen
     private ProgressBar prgHunger, prgEnergy, prgSocial, prgFun;
-
     private ImageButton showNeeds, hunger, energy, fun;
-
     private ImageView plus;
     private CardView card;
     private CardView items;
-    private boolean needsShown = true;
 
+    // Two Types of Users, Creator (Main player) and Spectator (can only watch)
     public enum User {
 
         CREATOR,
@@ -56,15 +61,25 @@ public class Control {
 
     }
 
-    User user;
+    private User user;
 
-
+    /**
+     * Constructor for the Creator
+     * The Spectator hast a different constructor
+     *
+     * @param arActivity
+     * @param user
+     */
     public Control(ArActivity arActivity, User user) {
         this.arActivity = arActivity;
+
+        // Get the PersistenceManager of the app
         pm = new PersistenceManager(arActivity.getApplicationContext());
 
+        // Get the name of the dragon
         dragonName = pm.getString("dragon_name", null);
 
+        // Get the References to the Objects on the screen
         energy = arActivity.findViewById(R.id.sleepControl);
         hunger = arActivity.findViewById(R.id.meatButton);
         fun = arActivity.findViewById(R.id.playControl);
@@ -73,36 +88,61 @@ public class Control {
         prgEnergy = arActivity.findViewById(R.id.progressEnergy);
         prgSocial = arActivity.findViewById(R.id.progressSocial);
         prgFun = arActivity.findViewById(R.id.progressFun);
+
+        // Set User to Creator
         this.user = user;
 
-        // Skip these steps for spectator mode
-
-
+        // Set all the Button Listeners
         setButtonListeners();
+
+        // Set restrictions to a four Boolean-Array
+        restrictions = new Boolean[4];
+
+        // Sets the Activation of the Need-Buttons, that are allowed with the current stats of the dragon
         updateRestrictions();
+
 
         showHint("call");
     }
 
+    /**
+     * Constructor for the Spectator
+     *
+     * @param spectatorActivity
+     * @param user
+     */
     public Control(SpectatorActivity spectatorActivity, User user) {
 
         this.spectatorActivity = spectatorActivity;
+        // Get the PersistenceManager of the app
         pm = new PersistenceManager(spectatorActivity.getApplicationContext());
 
+        // Get the name of the dragon (why though?)
         dragonName = pm.getString("dragon_name", null);
 
+        // Set User to Spectator
         this.user = user;
 
 
     }
 
-
+    /**
+     * Update the Restrictions, meaning what Need-Button is allowed to be pressed
+     * That means for example, if the dragon is not friendly enough or is hungry, he can not play with you
+     * So you can not press the Ball button
+     */
     public void updateRestrictions() {
 
+        // Set the Booleans of the needs, calculated by the values of the needs
         setBooleans();
+
+        // With the Booleans set the four parameters of the needs
         calculateRestrictions();
+
+        // Update the values of the needs
         setProcessBars();
 
+        // Set the Button-Activations with the current restrictions
         energy.setEnabled(restrictions[0]);
         hunger.setEnabled(restrictions[1]);
         if (dragon != null) dragon.setSocial(restrictions[2]);
@@ -110,17 +150,18 @@ public class Control {
 
     }
 
-    public Boolean[] getRestrictions() {
-        return restrictions;
-    }
 
-
+    /**
+     * Set the Booleans of the needs, calculated by the values of the needs
+     */
     public void setBooleans() {
 
         // Energy
+        // if Energy too low
         if (pm.getInt("energy", 0) <= 20) {
             tired = true;
             fit = false;
+            // if Energy very high
         } else if (pm.getInt("energy", 0) >= 70) {
             tired = false;
             fit = true;
@@ -129,9 +170,11 @@ public class Control {
             fit = false;
         }
         //Hunger
+        // if Hunger too low
         if (pm.getInt("hunger", 0) <= 20) {
             hungry = true;
             full = false;
+            // if Hunger very high
         } else if (pm.getInt("hunger", 0) >= 90) {
             hungry = false;
             full = true;
@@ -141,9 +184,11 @@ public class Control {
         }
 
         //Social
+        // if Social too low
         if (pm.getInt("social", 0) <= 40) {
             shy = true;
             friendly = false;
+            // if Social very high
         } else if (pm.getInt("social", 0) >= 90) {
             shy = false;
             friendly = true;
@@ -153,9 +198,11 @@ public class Control {
         }
 
         //Fun
+        // if Fun too low
         if (pm.getInt("fun", 0) <= 20) {
             bored = true;
             exited = false;
+            // if Fun very high
         } else if (pm.getInt("fun", 0) >= 80) {
             bored = false;
             exited = true;
@@ -166,19 +213,23 @@ public class Control {
 
     }
 
+    /**
+     * With the Booleans set the four parameters of the needs
+     */
     public void calculateRestrictions() {
 
-        restrictions = new Boolean[4];
-
-        // Status
+        // Status 2 Other Renderable and other Animations
         if (!tired && full && friendly && exited) {
 
+            // Boolean to get the information what Renderable is needed
             happyAnimation = true;
 
+            // Example: Petting, Playing and Sleep is allowed, Feeding is not, because the dragon is full
             restrictions[0] = true;
             restrictions[1] = false;
             restrictions[2] = true;
             restrictions[3] = true;
+            // Status 1 "Normal" Animations
         } else {
             happyAnimation = false;
             if (tired) {
@@ -223,107 +274,111 @@ public class Control {
 
     }
 
+    /**
+     * Set the Button Listeners, including
+     */
     public void setButtonListeners() {
 
         items = arActivity.findViewById(R.id.Items);
         card = arActivity.findViewById(R.id.cardViewNeeds);
 
+        // Move the Items and cards up and down to show or hide the needs
         showNeeds.setOnClickListener(v -> {
             if (needsShown) {
                 needsShown = false;
                 items.setTranslationY(240);
                 card.setTranslationY(240);
-                //card.setVisibility(View.INVISIBLE);
             } else {
                 needsShown = true;
                 items.setTranslationY(0);
                 card.setTranslationY(0);
-                // card.setVisibility(View.VISIBLE);
             }
         });
 
         hunger.setOnClickListener(v -> {
+
+            // If the Dragon exists and not moving
             if (dragon != null) {
                 if (!dragon.moving) {
 
-                    this.meatActivated = !this.meatActivated; // always true?
+                    // Switching the Status of the MeatActivated
+                    this.meatActivated = !this.meatActivated;
 
+                    // If the Ball is activated, stop the animation and deactivate it
                     if (ballActivated) {
                         ball.stopAnimation();
                         ballActivated = false;
                     }
 
+                    // If the Meat should be shown
                     if (meatActivated) {
+                        // if the meat doesn't exist, create it
+                        if (meat == null) meat = new Meat(arActivity.getArFragment(), arActivity.getMeatRenderable(), this);
 
-                        if (meat == null)
-                            meat = new Meat(arActivity.getArFragment(), arActivity.getMeatRenderable(), this);
-
+                        // Set Meat to Camera, make it visible and activate Rotation
                         meat.setMeatToCamera();
                         meat.setEnabled(true);
                         meat.startAnimation();
 
                     } else {
+                        // Stop the Animation and deactivate it
                         meat.stopAnimation();
                         meat.setEnabled(false);
-
                     }
-
                 }
             }
-
         });
 
         energy.setOnClickListener(v -> {
-
+            // If the Dragon exists and not moving
             if (dragon != null) {
                 if (!dragon.moving) {
+                    // Start Sleeping actvity with Result to update the need-values after sleeping
                     Intent intent = new Intent(arActivity, SleepActivity.class);
                     arActivity.startActivityForResult(intent, 1);
                 }
             }
-
         });
 
         fun.setOnClickListener(v -> {
-
+            // If the Dragon exists and not moving
             if (dragon != null) {
                 if (!dragon.moving) {
-
+                    // Switching the Status of the BallActivated
                     this.ballActivated = !this.ballActivated;
 
+                    // If the Meat is activated, stop the animation and deactivate it
                     if (meatActivated) {
                         meat.stopAnimation();
                         meatActivated = false;
                     }
 
-
+                    // If the Ball should be shown
                     if (ballActivated) {
-
+                        // If the Ball doesn't exist, create it
                         if (ball == null) ball = new Ball(arActivity.getArFragment(), arActivity.getBallRenderable(), this);
 
+                        // Set Renderable, set it to Camera and stop the "throwRotationAnimation"
                         ball.setRenderable(arActivity.getBallRenderable());
                         ball.setBallToCamera();
                         ball.setEnabled(true);
                         ball.startAnimation(false);
 
                     } else {
+                        // Stop the Animation and deactivate it
                         ball.stopAnimation();
                         ball.setEnabled(false);
                     }
-
                 }
-                // Value Change theoretisch lieber in Ball damit die needs erst nach der aktion geupdatet werden?
-                setNeed("fun", 10);
-                setNeed("hunger", -10);
-                setNeed("energy", -5);
-                showPlus(3000);
-                updateRestrictions();
             }
         });
     }
 
 
     @SuppressLint("SetTextI18n")
+    /**
+     * Shows the Position of the Dragon in the Window in the upper corner. Not needed anymore
+     */
     void updateCurrentDragonPositionWindow() {
 
         Vector3 dragonPosition = dragon.getWorldPosition();
@@ -354,9 +409,6 @@ public class Control {
             dragon = new Dragon(arActivity.getArFragment(), anchorNode, dragonRenderableOne, dragonRenderableTwo, this);
 
             updatePositions(anchorNode.getWorldPosition());
-
-            Log.d("Anchor", "AnchorNode.Worldposition: " + anchorNode.getWorldPosition());
-
             updateRestrictions();
 
             updateCurrentDragonPositionWindow();
@@ -401,9 +453,10 @@ public class Control {
     }
 
     public void throwMeat(HitResult hitResult, float time) {
-       meat.meatThrowAnimation(hitResult, time);
+        meat.meatThrowAnimation(hitResult, time);
         startThread((float) time);
     }
+
     public void animateBall(HitResult hitResult, Renderable ballRenderable) {
         ball.ballAnimation(hitResult);
         ball.setRenderable(ballRenderable);
@@ -429,7 +482,6 @@ public class Control {
     public void startThread(float duration) {
 
 
-
         float d = duration + dragon.getAnimationDuration() * 1000;
         int e = (int) d;
         ExampleRunnable runnable = new ExampleRunnable(e);
@@ -446,21 +498,17 @@ public class Control {
         @Override
         public void run() {
 
-            Log.d("ANIMATION", "new thread count: " + milliseconds);
-
-            // Nullpointer exception
 
             if (user == User.CREATOR) {
-
+                // Deactivate the hunger-Button while this thread is active
                 hunger.post(() -> {
-
                     hunger.setEnabled(false);
                 });
-
             }
 
 
             try {
+                // Set the Thread sleep
                 Thread.sleep(milliseconds);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -482,13 +530,18 @@ public class Control {
                     }
 
                     if (ballActivated) {
+                        setNeed("fun", 10);
+                        setNeed("hunger", -10);
+                        setNeed("energy", -5);
+                        showPlus(3000);
+                        updateRestrictions();
                         dragon.bringBackBall();
                     }
 
 
                 });
 
-             // Spectator
+                // Spectator
             } else {
 
                 spectatorActivity.runOnUiThread(() -> {

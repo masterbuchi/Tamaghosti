@@ -229,6 +229,7 @@ public class Ball extends Node {
                     throwAnimation(oldPosition, newPosition, directionVector, middlePosition);
                 } else {
 
+
                     // set the position, where the dragon should go to
                     Vector3 dragonPosition = control.getDragon().getWorldPosition();
                     Vector3 rotationVect = new Vector3().subtract(oldPosition, dragonPosition);
@@ -244,6 +245,7 @@ public class Ball extends Node {
 
                     // start Thread that starts other actions after Picking up ball
                     control.startThread((float) time);
+
 
                     // stop ball rotation of the Throw
                     stopAnimation();
