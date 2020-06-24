@@ -2,6 +2,7 @@ package com.google.ar.sceneform.samples.gltf;
 
 import android.content.Intent;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -76,7 +77,6 @@ public class Control {
         prgEnergy = arActivity.findViewById(R.id.progressEnergy);
         prgSocial = arActivity.findViewById(R.id.progressSocial);
         prgFun = arActivity.findViewById(R.id.progressFun);
-        plus = arActivity.findViewById(R.id.plusImage);
 
         // Set User to Creator
         this.user = user;
@@ -89,8 +89,6 @@ public class Control {
 
         // Sets the Activation of the Need-Buttons, that are allowed with the current stats of the dragon
         updateRestrictions();
-
-
         showHint("call");
     }
 
@@ -136,6 +134,7 @@ public class Control {
         hunger.setEnabled(restrictions[1]);
         if (dragon != null) dragon.setSocial(restrictions[2]);
         fun.setEnabled(restrictions[3]);
+
 
     }
 
@@ -266,7 +265,6 @@ public class Control {
      * Set the Button Listeners, including
      */
     public void setButtonListeners() {
-
         items = arActivity.findViewById(R.id.Items);
         card = arActivity.findViewById(R.id.cardViewNeeds);
 
@@ -464,8 +462,9 @@ public class Control {
      * @param duration
      */
     public void showPlus(int duration) {
+        plus = arActivity.findViewById(R.id.plusImage);
+        Log.d("Plus", String.valueOf(plus));
         plus.setVisibility(View.VISIBLE);
-
         // after a set Duration deactivate the Plus again
         Handler handler = new Handler();
         handler.postDelayed(() -> plus.setVisibility(View.INVISIBLE), duration);
@@ -599,6 +598,7 @@ public class Control {
      * @return
      */
     public Dragon getDragon() {
+
         return dragon;
     }
 

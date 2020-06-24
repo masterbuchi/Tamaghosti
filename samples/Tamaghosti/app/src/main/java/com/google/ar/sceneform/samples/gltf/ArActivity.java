@@ -91,14 +91,17 @@ public class ArActivity extends AppCompatActivity {
         // Necessary for initialising the Scene
         setContentView(R.layout.activity_ux);
 
-        //Create the Control-Object, that handles the movement of the Dragon, the objects and the Needs. Set User to Creator
-        control = new Control(this, Control.User.CREATOR);
-
         /*
          Implements AR Required ArFragment. The Settings (like ENVIRONMENTAL_HDR-Lighting, Cloud-Anchor-Mode and Updatemode are set in the class
          We changed a few of the settings like the Lighting to get realistic lighting
          */
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
+
+
+        //Create the Control-Object, that handles the movement of the Dragon, the objects and the Needs. Set User to Creator
+        control = new Control(this, Control.User.CREATOR);
+
+
 
         // Only using WeakReferences to avoid memory leaks
         WeakReference<ArActivity> weakActivity = new WeakReference<>(this);

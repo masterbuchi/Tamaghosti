@@ -12,23 +12,10 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       tools:layout_editor_absoluteX="-16dp"
-      tools:layout_editor_absoluteY="0dp"
-      tools:layout="@layout/activity_ux" />
+      tools:layout_editor_absoluteY="16dp"
+      />
 
-  <ImageView
-      android:id="@+id/plusImage"
-      android:layout_width="83dp"
-      android:layout_height="67dp"
-      android:clickable="false"
-      android:visibility="invisible"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="@+id/ux_fragment"
-      app:layout_constraintHorizontal_bias="0.88"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintVertical_bias="0.29000002"
-      app:srcCompat="@android:drawable/ic_input_add"
-      android:contentDescription="@string/plus_sign" />
+
 
   <androidx.cardview.widget.CardView
       android:id="@+id/cardViewNeeds"
@@ -251,6 +238,18 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
   </androidx.cardview.widget.CardView>
+
+  <ImageView
+      android:id="@+id/plusImage"
+      android:layout_width="83dp"
+      android:layout_height="67dp"
+      android:layout_marginStart="292dp"
+      android:layout_marginBottom="324dp"
+      android:clickable="false"
+      android:contentDescription="@string/plus_sign"
+      app:layout_constraintBottom_toTopOf="@+id/Items"
+      app:layout_constraintStart_toStartOf="@+id/Items"
+      app:srcCompat="@android:drawable/ic_input_add" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
