@@ -2,21 +2,10 @@ package com.google.ar.sceneform.samples.gltf;
 
 import android.content.Intent;
 
-import androidx.annotation.IdRes;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
-import androidx.work.WorkerParameters;
-
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
-
-import java.util.concurrent.TimeUnit;
 
 public class MainMenuActivity extends AppCompatActivity {
 

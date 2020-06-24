@@ -24,18 +24,16 @@ public class StoryActivity extends AppCompatActivity {
 
         Button startGameButton = findViewById(R.id.storyButton);
 
+        // Creating a persistence manager to define the start values of the dragon "need bars"
         PersistenceManager persistenceManager = new PersistenceManager(getApplicationContext());
-
-
 
         startGameButton.setOnClickListener(view -> {
 
-            // Name
             TextView nameField = findViewById(R.id.storyTextField);
 
             String name = nameField.getText().toString();
 
-            // Input abfangen
+            // Check if the user did any inputs into the textfield
             if (name.length() == 0) {
 
                 Context context = getApplicationContext();
@@ -48,11 +46,13 @@ public class StoryActivity extends AppCompatActivity {
 
             } else {
 
+                // If the user entered a name, the persistenceManager will save the name and change the firstStart bool flag
+                // to false, which will trigger that the continue button will appear the next time that we open the app
+
                 persistenceManager.saveString("dragon_name", nameField.getText().toString());
                 persistenceManager.saveBoolean("first_start", false);
 
-
-                // Save for the first time
+                // Save for the first time and initializing values
                 int hungerValue = 50;
                 int energyValue = 70;
                 int socialValue = 10;
@@ -65,6 +65,10 @@ public class StoryActivity extends AppCompatActivity {
 
                 // Open ArActivity
                 Intent intent = new Intent(StoryActivity.this, ArActivity.class);
+
+                // When the player is pressing the start button, the game has officially started. This means that we
+                // will also start our background logic with the code below. The so called Worker is getting triggered
+                // every 15 minutes and it doesn't matter if the app is fully closed. It will stop working when the app is active
 
                 WorkManager workManager = WorkManager.getInstance(getApplicationContext());
 
