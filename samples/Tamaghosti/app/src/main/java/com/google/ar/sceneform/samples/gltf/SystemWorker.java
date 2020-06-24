@@ -46,6 +46,7 @@ public class SystemWorker extends Worker {
             int hunger = persistenceManager.getInt("hunger", 0);
             int social = persistenceManager.getInt("social", 0);
             int sleep = persistenceManager.getInt("sleep", 0);
+            int fun = persistenceManager.getInt("fun", 0);
 
             // Background Logic
 
@@ -68,6 +69,11 @@ public class SystemWorker extends Worker {
             }
 
             if(social < 0) {
+
+                social = 0;
+
+            }
+            if(fun < 0) {
 
                 social = 0;
 
@@ -116,6 +122,22 @@ public class SystemWorker extends Worker {
 
             }
 
+            if (fun <= 50){
+                if(fun <= 20){
+                    // Send urgend notification
+
+                    notifyManager.sendNotification(notificationId, dragonName + " " + "is bored" , "Better play a little with your dragon");
+
+                } else {
+                    //Send normal notification
+                    notifyManager.sendNotification(notificationId, dragonName + " " + "is bored", "Wanna play a little with your dragon?");
+
+                }
+
+                notificationId++;
+
+            }
+
 
             if(sleep >= 100) {
 
@@ -132,6 +154,7 @@ public class SystemWorker extends Worker {
             persistenceManager.saveInt("hunger", hunger);
             persistenceManager.saveInt("social", social);
             persistenceManager.saveInt("sleep", sleep);
+            persistenceManager.saveInt("fun", fun);
 
             // Saving the unique id. So that we can start with the newest value again when the app is triggering this logic
             persistenceManager.saveInt("notification_id", notificationId);
@@ -141,6 +164,7 @@ public class SystemWorker extends Worker {
             Log.i("Dragon Update", "Hunger: " + hunger);
             Log.i("Dragon Update", "Social: " + social);
             Log.i("Dragon Update", "Sleep: " + sleep);
+            Log.i("Dragon Update", "Fun: " + fun);
 
 
 
