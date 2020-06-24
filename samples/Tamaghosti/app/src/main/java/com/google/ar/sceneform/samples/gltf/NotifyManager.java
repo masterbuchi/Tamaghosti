@@ -12,12 +12,6 @@ import androidx.core.app.NotificationManagerCompat;
 
 public class NotifyManager {
 
-
-    // First send a notification
-
-
-    // Then create Background System with the help of the SystemWorker
-
     private Context context;
 
     public NotifyManager(Context context) {
@@ -29,34 +23,42 @@ public class NotifyManager {
 
     public void sendNotification(int id, String title, String text) {
 
+        // https://developer.android.com/training/notify-user/build-notification
+
         // Create an explicit intent for an Activity in your app
         Intent intent = new Intent(context, ArActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        // Opens Ar Activity by tapping on the notification
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-        // Opens Ar Activity on Tap
+
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "Tamagotchi Channel")
-                .setSmallIcon(R.drawable.dragontransparent)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setAutoCancel(true)    // Deletes the notification when the user taps on it
-                .setContentIntent(pendingIntent)
+                .setSmallIcon(R.drawable.dragontransparent)     // Icon Logo
+                .setContentTitle(title)                         // Initialize Title
+                .setContentText(text)                           // Initialize Text
+                .setAutoCancel(true)                            // Deletes the notification when the user taps on it
+                .setContentIntent(pendingIntent)                // Adding On Tap Logic
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         showNotification(id, builder);
     }
 
     public void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
+
+        // https://developer.android.com/training/notify-user/build-notification
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Channel Name";
             String description = "Channel Description";
+
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            // Creating a notification channel, which allows us to send notifications there
             NotificationChannel channel = new NotificationChannel("Tamagotchi Channel", name, importance);
             channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
+
+            // Register the notificationChannel at the notificationManager
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
@@ -65,7 +67,7 @@ public class NotifyManager {
     private void showNotification(int id, NotificationCompat.Builder builder) {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
-        // notificationId is a unique int for each notification that you must define
+        // Notification id must be unique. Therefore we have an id that gets incremented and saved afterwards each time it is called
         notificationManager.notify(id, builder.build());
     }
 

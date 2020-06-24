@@ -27,24 +27,27 @@ public class SystemWorker extends Worker {
     @Override
     public Result doWork() {
 
+        // Making sure that the app isn't in the foreground
         if(!checkAppActive("com.google.ar.sceneform.samples.gltf")) {
 
-            // Making sure that the app isn't in the foreground
-
+            // Creating a new notifyManager which allows us to send notifications
             NotifyManager notifyManager = new NotifyManager(context);
 
             notifyManager.createNotificationChannel();
 
+            // Creating the persistanceManager because we need to have an unique notification id for each message
             PersistenceManager persistenceManager = new PersistenceManager(context);
 
             int notificationId = persistenceManager.getInt("notification_id", 0);
 
+            // Dragon name is required for sending nice messages
             String dragonName = persistenceManager.getString("dragon_name", "Error");
 
             int hunger = persistenceManager.getInt("hunger", 0);
             int social = persistenceManager.getInt("social", 0);
             int sleep = persistenceManager.getInt("sleep", 0);
 
+            // Background Logic
 
             if(hunger > 0) {
 
@@ -69,6 +72,10 @@ public class SystemWorker extends Worker {
                 social = 0;
 
             }
+
+            // Send notification if certain values are passed
+
+            // We are incrementing the values, because each notification requires an unique id
 
             if(hunger <= 50) {
 
@@ -125,6 +132,8 @@ public class SystemWorker extends Worker {
             persistenceManager.saveInt("hunger", hunger);
             persistenceManager.saveInt("social", social);
             persistenceManager.saveInt("sleep", sleep);
+
+            // Saving the unique id. So that we can start with the newest value again when the app is triggering this logic
             persistenceManager.saveInt("notification_id", notificationId);
 
             Log.i("Dragon Update", "Updated Needs");
@@ -146,6 +155,11 @@ public class SystemWorker extends Worker {
 
 
     private boolean checkAppActive(String appPackageName) {
+
+        // Checks if the app is active or not
+        // We didn't rely on the lifecycle method onDestroy(), because I read multiple articles that said that android might struggle to
+        // call onDestroy when the app is closed rapidly or the suddenly restarts. With this function however we get the list of running processes
+        // and check by the unique name of the app if it is running or not
 
         // https://stackoverflow.com/questions/26879951/how-to-know-if-my-application-is-in-foreground-or-background-android/30882260
 

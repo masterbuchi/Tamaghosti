@@ -19,18 +19,12 @@ public class PersistenceManager {
     public PersistenceManager(Context context) {
 
         this.context = context;
-        preferences  = context.getSharedPreferences("preferences", MODE_PRIVATE);
+        preferences  = context.getSharedPreferences("preferences", MODE_PRIVATE); // Data can only be accessed in the app
         editor = preferences.edit();
 
     }
 
-    enum SaveType {
-
-        String,
-        Int,
-        Bool
-
-    }
+    // Save Values on the local device
 
     public void saveString(String key, String value) {
 
