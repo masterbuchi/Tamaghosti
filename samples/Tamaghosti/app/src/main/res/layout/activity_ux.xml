@@ -30,17 +30,6 @@
       app:srcCompat="@android:drawable/ic_input_add"
       android:contentDescription="@string/plus_sign" />
 
-  <TextView
-      android:id="@+id/modelPosition"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="8dp"
-      android:text="@string/model_position"
-      android:textColor="@android:color/primary_text_dark"
-      android:visibility="invisible"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="@+id/ux_fragment" />
-
   <androidx.cardview.widget.CardView
       android:id="@+id/cardViewNeeds"
       android:layout_width="0dp"

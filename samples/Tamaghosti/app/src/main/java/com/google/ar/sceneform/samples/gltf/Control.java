@@ -1,14 +1,11 @@
 package com.google.ar.sceneform.samples.gltf;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
@@ -52,15 +49,6 @@ public class Control {
     private ImageView plus;
     private CardView card;
     private CardView items;
-
-    // Two Types of Users, Creator (Main player) and Spectator (can only watch)
-    public enum User {
-
-        CREATOR,
-        SPECTATOR
-
-    }
-
     private User user;
 
     /**
@@ -88,6 +76,7 @@ public class Control {
         prgEnergy = arActivity.findViewById(R.id.progressEnergy);
         prgSocial = arActivity.findViewById(R.id.progressSocial);
         prgFun = arActivity.findViewById(R.id.progressFun);
+        plus = arActivity.findViewById(R.id.plusImage);
 
         // Set User to Creator
         this.user = user;
@@ -149,7 +138,6 @@ public class Control {
         fun.setEnabled(restrictions[3]);
 
     }
-
 
     /**
      * Set the Booleans of the needs, calculated by the values of the needs
@@ -374,44 +362,29 @@ public class Control {
         });
     }
 
-
-    @SuppressLint("SetTextI18n")
     /**
-     * Shows the Position of the Dragon in the Window in the upper corner. Not needed anymore
+     * Method for Creating the Dragon with a different version for Creator and Spectator
+     * @param hitResult
+     * @param dragonRenderableOne
+     * @param dragonRenderableTwo
      */
-    void updateCurrentDragonPositionWindow() {
-
-        Vector3 dragonPosition = dragon.getWorldPosition();
-        TextView textView = arActivity.findViewById(R.id.modelPosition);
-        textView.setText("");
-        textView.setText(dragonPosition.x + "\n" + dragonPosition.y + "\n" + dragonPosition.z);
-    }
-
-    Boolean getHappyAnimation() {
-        return happyAnimation;
-    }
-
     public void createDragon(HitResult hitResult, Renderable dragonRenderableOne, Renderable dragonRenderableTwo) {
 
-
+        // As a Spectator the resolved anchor is the needed Anchor
         if (user == User.SPECTATOR) {
 
             Anchor resolvedAnchor = spectatorActivity.getResolvedAnchor();
             AnchorNode anchorNode = new AnchorNode(resolvedAnchor);
             anchorNode.setParent(spectatorActivity.getArFragment().getArSceneView().getScene());
             dragon = new Dragon(spectatorActivity.getArFragment(), anchorNode, dragonRenderableOne, dragonRenderableTwo, this);
-
-
         } else {
-
+            // As a Creator create the Dragon and update the Position of the Dragon in Firebase
+            // Also update the Restrictions
             AnchorNode anchorNode = arActivity.createAnchor(hitResult);
-
             dragon = new Dragon(arActivity.getArFragment(), anchorNode, dragonRenderableOne, dragonRenderableTwo, this);
-
             updatePositions(anchorNode.getWorldPosition());
             updateRestrictions();
 
-            updateCurrentDragonPositionWindow();
 
             showHint("welcome");
         }
@@ -419,58 +392,88 @@ public class Control {
 
     }
 
+    /**
+     * Creator Version to calculate the Vectors for the Movement
+     * @param hitResult
+     * @return
+     */
     float moveDragon(HitResult hitResult) {
 
+        // Create Node, DirectionVector and Distance
         AnchorNode moveToNode = new AnchorNode(hitResult.createAnchor());
-
         Vector3 dragonPosition = dragon.getWorldPosition();
         Vector3 rotationVect = new Vector3().subtract(moveToNode.getWorldPosition(), dragonPosition);
-        double distance = Math.sqrt(Math.pow(dragonPosition.x - moveToNode.getWorldPosition().x, 2) + Math.pow(dragonPosition.y - moveToNode.getWorldPosition().y, 2) + Math.pow(dragonPosition.z - moveToNode.getWorldPosition().z, 2));
+        double distance = rotationVect.length();
 
-        // Upload World Position
+        // Upload new Position
         updatePositions(moveToNode.getWorldPosition());
+
+        // Move the Dragon
         float time = dragon.moveTo(moveToNode.getWorldPosition(), distance, rotationVect);
 
         return time;
     }
 
+    /**
+     * Send new Position to FirebaseCloud
+     * @param newPosition
+     */
     void updatePositions(Vector3 newPosition) {
-
         arActivity.getFirebaseManager().uploadUpdatePosition(dragon.getWorldPosition(), newPosition, arActivity.getArFragment().getArSceneView().getScene().getCamera().getWorldPosition());
     }
 
-    // Created for Spectator Activity
+    /**
+     *  Spectator Version to calculate the Vectors for the Movement
+     * @param position
+     * @return
+     */
     long moveDragon(Vector3 position) {
 
-
+        // Create Node, DirectionVector and Distance
         Vector3 dragonPosition = dragon.getWorldPosition();
         Vector3 rotationVect = new Vector3().subtract(position, dragonPosition);
-        double distance = Math.sqrt(Math.pow(dragonPosition.x - position.x, 2) + Math.pow(dragonPosition.y - position.y, 2) + Math.pow(dragonPosition.z - position.z, 2));
+        double distance = rotationVect.length();
 
-
+        // Move the Dragon
         long time = dragon.moveTo(position, distance, rotationVect);
         return time;
     }
 
+    /**
+     * Method for ThrowMeatAnimation from ArActivity
+     * @param hitResult
+     * @param time
+     */
     public void throwMeat(HitResult hitResult, float time) {
         meat.meatThrowAnimation(hitResult, time);
-        startThread((float) time);
+        startThread(time);
     }
 
+    /**
+     *  Method for BallAnimation from ArActivity
+     * @param hitResult
+     * @param ballRenderable
+     */
     public void animateBall(HitResult hitResult, Renderable ballRenderable) {
         ball.ballAnimation(hitResult);
         ball.setRenderable(ballRenderable);
     }
 
-
+    /**
+     * Show the Plus, when the Dragon gets a plus for the needs
+     * @param duration
+     */
     public void showPlus(int duration) {
-        plus = arActivity.findViewById(R.id.plusImage);
         plus.setVisibility(View.VISIBLE);
 
+        // after a set Duration deactivate the Plus again
         Handler handler = new Handler();
         handler.postDelayed(() -> plus.setVisibility(View.INVISIBLE), duration);
     }
 
+    /**
+     * Set the current needs in ProcessBars
+     */
     public void setProcessBars() {
         prgHunger.setProgress(pm.getInt("hunger", 0));
         prgEnergy.setProgress(pm.getInt("energy", 0));
@@ -478,92 +481,22 @@ public class Control {
         prgFun.setProgress(pm.getInt("fun", 0));
     }
 
-
+    /**
+     * Start Thread that activates different Animations after a set duration
+     * @param duration
+     */
     public void startThread(float duration) {
-
 
         float d = duration + dragon.getAnimationDuration() * 1000;
         int e = (int) d;
-        ExampleRunnable runnable = new ExampleRunnable(e);
+        EatingAndBallRunnable runnable = new EatingAndBallRunnable(e);
         new Thread(runnable).start();
     }
 
-    class ExampleRunnable implements Runnable {
-        int milliseconds;
-
-        ExampleRunnable(int seconds) {
-            this.milliseconds = seconds;
-        }
-
-        @Override
-        public void run() {
-
-
-            if (user == User.CREATOR) {
-                // Deactivate the hunger-Button while this thread is active
-                hunger.post(() -> {
-                    hunger.setEnabled(false);
-                });
-            }
-
-
-            try {
-                // Set the Thread sleep
-                Thread.sleep(milliseconds);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (user == User.CREATOR) {
-                arActivity.runOnUiThread(() -> {
-
-
-                    showPlus(2000);
-                    // Value Change
-                    setNeed("hunger", 20);
-                    setNeed("energy", -5);
-
-                    if (meatActivated) {
-                        meatActivated = false;
-                        dragon.updateAnimation(dragon.idle_index);
-                        meat.setRenderable(null);
-                        dragon.moving = false;
-                    }
-
-                    if (ballActivated) {
-                        setNeed("fun", 10);
-                        setNeed("hunger", -10);
-                        setNeed("energy", -5);
-                        showPlus(3000);
-                        updateRestrictions();
-                        dragon.bringBackBall();
-                    }
-
-
-                });
-
-                // Spectator
-            } else {
-
-                spectatorActivity.runOnUiThread(() -> {
-
-                    if (meatActivated) {
-                        meatActivated = false;
-
-                        dragon.updateAnimation(dragon.idle_index);
-                        meat.setRenderable(null);
-                    }
-
-                    if (ballActivated) {
-                        dragon.bringBackBall();
-                    }
-
-
-                });
-
-            }
-        }
-    }
-
+    /**
+     * Show Longer Messages then normal Toasts
+     * @param value
+     */
     public void showHint(String value) {
         //hint is Checked text view and can disappear when checked. not implemented yet
 
@@ -598,6 +531,11 @@ public class Control {
 
     }
 
+    /**
+     * Update the Need in the Persistence with a new value, capped at 0 and 100
+     * @param key
+     * @param value
+     */
     public void setNeed(String key, int value) {
 
         if (pm.getInt(key, 0) + value < 0) pm.saveInt(key, 0);
@@ -608,60 +546,202 @@ public class Control {
 
     }
 
-    public int getNeed(String key) {
-        return pm.getInt(key, 0);
-    }
-
+    /**
+     * Getter MeatActivated
+     * @return
+     */
     public Boolean getMeatActivated() {
         return meatActivated;
     }
 
+    /**
+     * Setter MeatActivated
+     * @param meatActivated
+     */
     public void setMeatActivated(Boolean meatActivated) {
         this.meatActivated = meatActivated;
     }
 
+    /**
+     * Getter BallActivated
+     * @return
+     */
     public Boolean getBallActivated() {
         return ballActivated;
     }
 
-    public void setBallBackActivated(Boolean ballBackActivated) {
-        this.ballBackActivated = ballBackActivated;
-    }
-
-    public Boolean getBallBackActivated() {
-        return ballBackActivated;
-    }
-
+    /**
+     * Setter BallActivated
+     * @param ballActivated
+     */
     public void setBallActivated(Boolean ballActivated) {
         this.ballActivated = ballActivated;
     }
 
+    /**
+     * Getter BallBackActivated
+     * @return
+     */
+    public Boolean getBallBackActivated() {
+        return ballBackActivated;
+    }
+
+    /**
+     * Setter BallBackActivated
+     * @param ballBackActivated
+     */
+    public void setBallBackActivated(Boolean ballBackActivated) {
+        this.ballBackActivated = ballBackActivated;
+    }
+
+    /**
+     * Getter Dragon
+     * @return
+     */
     public Dragon getDragon() {
         return dragon;
     }
 
+    /**
+     * Getter Meat
+     * @return
+     */
     public Meat getMeat() {
         return meat;
     }
 
+    /**
+     * Setter Meat
+     * @param meat
+     */
     public void setMeat(Meat meat) {
         this.meat = meat;
     }
 
-    public void setBall(Ball ball) {
-        this.ball = ball;
-    }
-
+    /**
+     * Getter Ball
+     * @return
+     */
     public Ball getBall() {
         return ball;
     }
 
+    /**
+     * Setter Ball
+     * @param ball
+     */
+    public void setBall(Ball ball) {
+        this.ball = ball;
+    }
+
+    /**
+     * Getter HappyAnimation
+     * @return
+     */
+    Boolean getHappyAnimation() {
+        return happyAnimation;
+    }
+
+    /**
+     * Getter User
+     * @return
+     */
     public User getUser() {
         return user;
     }
 
+    /**
+     * Getter CameraPosition, only for Spectator
+     * @return
+     */
     public Vector3 getCameraPosition() {
         if (user == User.SPECTATOR) return spectatorActivity.getCameraPosition();
         else return null;
+    }
+
+    /**
+     * Two Types of Users, Creator (Main player) and Spectator (can only watch)
+     */
+    public enum User {
+
+        CREATOR,
+        SPECTATOR
+
+    }
+
+    /**
+     * Runnable that sets Animations after duration, sleeps before that
+     */
+    class EatingAndBallRunnable implements Runnable {
+        int milliseconds;
+
+        EatingAndBallRunnable(int seconds) {
+            this.milliseconds = seconds;
+        }
+
+        @Override
+        public void run() {
+
+
+            if (user == User.CREATOR) {
+                // Deactivate the hunger-Button while this thread is active
+                hunger.post(() -> {
+                    hunger.setEnabled(false);
+                });
+            }
+
+
+            try {
+                // Set the Thread sleep
+                Thread.sleep(milliseconds);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // After the Thread is finished
+            if (user == User.CREATOR) {
+                arActivity.runOnUiThread(() -> {
+                    // With Meat Activated set Meat to null, update Needs and set Dragon to idle
+                    if (meatActivated) {
+                        showPlus(2000);
+                        setNeed("hunger", 20);
+                        setNeed("energy", -5);
+                        meatActivated = false;
+                        dragon.updateAnimation(dragon.idle_index);
+                        meat.setRenderable(null);
+                        dragon.moving = false;
+                    }
+                    // With Ball Activated, update Needs and let the Dragon bring the ball back
+                    if (ballActivated) {
+                        setNeed("fun", 10);
+                        setNeed("hunger", -10);
+                        setNeed("energy", -5);
+                        showPlus(3000);
+                        updateRestrictions();
+                        dragon.bringBackBall();
+                    }
+                });
+
+                // Spectator
+            } else {
+                spectatorActivity.runOnUiThread(() -> {
+
+                    // Deactivate the meat, let Dragon Idle
+                    if (meatActivated) {
+                        meatActivated = false;
+                        dragon.updateAnimation(dragon.idle_index);
+                        meat.setRenderable(null);
+                    }
+
+                    // Let the Dragon bring the Ball back
+                    if (ballActivated) {
+                        dragon.bringBackBall();
+                    }
+
+
+                });
+
+            }
+        }
     }
 }
