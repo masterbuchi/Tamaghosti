@@ -53,10 +53,10 @@ public class StoryActivity extends AppCompatActivity {
                 persistenceManager.saveBoolean("first_start", false);
 
                 // Save for the first time and initializing values
-                int hungerValue = 90;
-                int energyValue = 100;
-                int socialValue = 80;
-                int funValue = 90;
+                int hungerValue = 50;
+                int energyValue = 70;
+                int socialValue = 10;
+                int funValue = 10;
 
                 persistenceManager.saveInt("hunger", hungerValue);
                 persistenceManager.saveInt("energy", energyValue);

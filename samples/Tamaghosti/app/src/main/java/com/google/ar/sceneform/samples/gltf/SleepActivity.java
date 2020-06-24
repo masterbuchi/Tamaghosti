@@ -11,6 +11,10 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+/**
+ * Every Second the Activity updated the Persistence by 1 Energy and Stops at 100 Energy.
+ * You can return with the WakeUp-Button
+ */
 public class SleepActivity extends AppCompatActivity {
 
     private int energy;
