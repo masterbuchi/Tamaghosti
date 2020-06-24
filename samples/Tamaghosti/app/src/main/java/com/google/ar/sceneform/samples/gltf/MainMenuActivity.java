@@ -27,13 +27,13 @@ public class MainMenuActivity extends AppCompatActivity {
 
         PersistenceManager persistenceManager = new PersistenceManager(getApplicationContext());
 
-
         // Def-value: Value to return if this preference does not exist
         boolean firstStart = persistenceManager.getBoolean("first_start", true);
 
-        Log.i("TEST", String.valueOf(firstStart));
-
         if (!firstStart) {
+            // When the user has already played the game, then this flag will create set the visibility of the
+            // continue button to visible. The "firstStart" variable is getting changed to true in the StoryActivity when
+            // the Start button is pressed
 
             Button continueGameButton = findViewById(R.id.continueGameButton);
 
