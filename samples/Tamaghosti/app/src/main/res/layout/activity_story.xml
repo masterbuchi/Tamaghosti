@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/Blue_Secondary_Color"
+    android:backgroundTint="@color/Blue_Secondary_Color"
     tools:context=".StoryActivity">
 
     <TextView
@@ -15,6 +16,7 @@
         android:gravity="center"
         android:text="@string/story_title"
         android:textAlignment="viewStart"
+        android:textColor="@color/cardview_dark_background"
         android:textSize="36sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -31,6 +33,8 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
         android:text="@string/story_text"
+        android:textAlignment="center"
+        android:textColor="@color/cardview_dark_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -44,9 +48,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:autofillHints=""
+        android:backgroundTint="#3C3131"
         android:ems="10"
         android:hint="@string/story_name"
         android:inputType="textPersonName"
+        android:textAlignment="center"
+        android:textColor="@color/cardview_dark_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/storyText" />

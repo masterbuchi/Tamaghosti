@@ -15,15 +15,17 @@ tools:context=".SpectatorActivity">
     tools:layout_editor_absoluteX="-84dp"
     tools:layout_editor_absoluteY="152dp" />
 
-<Button
-    android:id="@+id/resolve"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:layout_marginTop="80dp"
-    android:text="@string/resolve"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/resolve"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="56dp"
+        android:backgroundTint="@color/Blue_Secondary_Color"
+        android:text="@string/resolve"
+        android:textColor="@color/cardview_dark_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
