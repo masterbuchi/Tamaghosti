@@ -12,11 +12,16 @@ public class FirebaseManager {
     private String anchorId;
     private AnimationState animationState;
     private HashMap<String, Object> updatePosition;
+
+    // Connecting to Firebase
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+    // Creating Reference Points which allow us to access their corresponding values
     private DatabaseReference anchorReference = createReference("Cloud Anchor");
     private DatabaseReference animationReference = createReference("Animation");
     private DatabaseReference updatePositionReference = createReference("Move Position");
 
+    // Types of AnimationStates that can be uploaded to Firebase
     public enum AnimationState {
 
         WALK,
@@ -28,20 +33,24 @@ public class FirebaseManager {
         THROW_BALL
     }
 
+
     public void uploadAnimationState(AnimationState type) {
 
+        // Sets Value in Firebase, triggers onDataChange in the Reference Listener
         animationReference.setValue(type);
 
     }
 
     public void uploadAnchor(String id) {
 
+        // Sets Value in Firebase, triggers onDataChange in the Reference Listener
         anchorReference.setValue(id);
 
     }
 
     public void uploadUpdatePosition(Vector3 oldPosition, Vector3 movePosition, Vector3 cameraPosition) {
 
+        // Uploading a Hash Map with Old Position, New (Move To) Position) and the Camera Position
         Map<String,Object> taskMap = new HashMap<>();
         taskMap.put("oldPosition_x", oldPosition.x);
         taskMap.put("oldPosition_y", oldPosition.y);
@@ -92,7 +101,7 @@ public class FirebaseManager {
         return anchorReference;
     }
 
-       public DatabaseReference getAnimationReference() {
+    public DatabaseReference getAnimationReference() {
         return animationReference;
     }
 
