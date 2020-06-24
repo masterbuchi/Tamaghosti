@@ -20,10 +20,13 @@ public class NotifyManager {
 
     }
 
-
+    /**
+     * https://developer.android.com/training/notify-user/build-notification
+     * @param id
+     * @param title
+     * @param text
+     */
     public void sendNotification(int id, String title, String text) {
-
-        // https://developer.android.com/training/notify-user/build-notification
 
         // Create an explicit intent for an Activity in your app
         Intent intent = new Intent(context, ArActivity.class);
@@ -44,9 +47,10 @@ public class NotifyManager {
         showNotification(id, builder);
     }
 
+    /**
+     * https://developer.android.com/training/notify-user/build-notification
+     */
     public void createNotificationChannel() {
-
-        // https://developer.android.com/training/notify-user/build-notification
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Channel Name";

@@ -21,7 +21,9 @@ public class FirebaseManager {
     private DatabaseReference animationReference = createReference("Animation");
     private DatabaseReference updatePositionReference = createReference("Move Position");
 
-    // Types of AnimationStates that can be uploaded to Firebase
+    /**
+     * Types of AnimationStates that can be uploaded to Firebase
+     */
     public enum AnimationState {
 
         WALK,
@@ -33,24 +35,30 @@ public class FirebaseManager {
         THROW_BALL
     }
 
-
+    /**
+     * Sets Value in Firebase, triggers onDataChange in the Reference Listener
+     * @param type
+     */
     public void uploadAnimationState(AnimationState type) {
-
-        // Sets Value in Firebase, triggers onDataChange in the Reference Listener
         animationReference.setValue(type);
-
     }
 
+    /**
+     * Sets Value in Firebase, triggers onDataChange in the Reference Listener
+     * @param id
+     */
     public void uploadAnchor(String id) {
-
-        // Sets Value in Firebase, triggers onDataChange in the Reference Listener
-        anchorReference.setValue(id);
-
+            anchorReference.setValue(id);
     }
 
+    /**
+     * Uploading a Hash Map with Old Position, New (Move To) Position) and the Camera Position
+     * @param oldPosition
+     * @param movePosition
+     * @param cameraPosition
+     */
     public void uploadUpdatePosition(Vector3 oldPosition, Vector3 movePosition, Vector3 cameraPosition) {
 
-        // Uploading a Hash Map with Old Position, New (Move To) Position) and the Camera Position
         Map<String,Object> taskMap = new HashMap<>();
         taskMap.put("oldPosition_x", oldPosition.x);
         taskMap.put("oldPosition_y", oldPosition.y);
@@ -66,45 +74,83 @@ public class FirebaseManager {
 
     }
 
-
+    /**
+     *
+     * @return
+     */
     public AnimationState getAnimationState() {
         return animationState;
     }
 
+    /**
+     *
+     * @param updatePosition
+     */
     public void setUpdatePosition(HashMap<String, Object> updatePosition) {
         this.updatePosition = updatePosition;
     }
 
-
+    /**
+     *
+     * @param anchorId
+     */
     public void setAnchorId(String anchorId) {
         this.anchorId = anchorId;
     }
 
+    /**
+     *
+     * @param animationState
+     */
     public void setAnimationState(AnimationState animationState) {
         this.animationState = animationState;
     }
 
-
+    /**
+     *
+     * @return
+     */
     public String getAnchorId() {
 
         return anchorId;
 
     }
 
+    /**
+     *
+     * @return
+     */
     public HashMap<String, Object> getUpdatePosition() {
         return updatePosition;
     }
 
+    /**
+     *
+     * @return
+     */
     public DatabaseReference getUpdatePositionReference() { return updatePositionReference; }
 
+    /**
+     *
+     * @return
+     */
     public DatabaseReference getAnchorReference() {
         return anchorReference;
     }
 
+    /**
+     *
+     * @return
+     */
     public DatabaseReference getAnimationReference() {
         return animationReference;
     }
 
+    /**
+     *
+     * @param path
+     * @return
+     */
     private DatabaseReference createReference(String path) {
 
         return database.getReference(path);
