@@ -39,17 +39,48 @@ public class Ball extends Node {
     }
 
     /**
+     * Returns an ObjectAnimator that makes the ball rotate.
+     * Some of the code is from the ARCORE-Example of the Solar Star System - Planet Rotation.
+     */
+    private static ObjectAnimator createAnimator(boolean wurf) {
+
+        // set the rotationsPoints of the Animation
+        Quaternion[] orientations = new Quaternion[4];
+
+        // Calculate the rotation-positions
+        for (int i = 0; i < orientations.length; i++) {
+            float angle = i * 360 / (orientations.length - 1);
+            Quaternion orientation;
+            // if the Ball is thrown set the Rotation around the x-axis, otherwise set it around y-axis
+            if (wurf) orientation = Quaternion.axisAngle(new Vector3(1f, 0f, 0f), angle);
+            else orientation = Quaternion.axisAngle(new Vector3(0f, 1f, 0f), angle);
+            orientations[i] = orientation;
+        }
+
+        ObjectAnimator orbitAnimation = new ObjectAnimator();
+        orbitAnimation.setObjectValues(orientations);
+        orbitAnimation.setPropertyName("localRotation");
+        orbitAnimation.setEvaluator(new QuaternionEvaluator());
+        orbitAnimation.setRepeatCount(ObjectAnimator.INFINITE);
+        orbitAnimation.setRepeatMode(ObjectAnimator.RESTART);
+        orbitAnimation.setInterpolator(new LinearInterpolator());
+        orbitAnimation.setAutoCancel(true);
+
+        return orbitAnimation;
+    }
+
+    /**
      * Set the ball to the camera and corrects the position
      * The ball now moves with the camera
      */
     void setBallToCamera() {
 
-        // set Parent
+        // Set Parent
         setParent(arFragment.getArSceneView().getScene().getCamera());
-        //makes ball visible (if not visible)
+        // Makes ball visible (if not visible)
         setRenderable(renderable);
 
-        // corrects Position, Rotation and Scale to fitting size
+        // Corrects Position, Rotation and Scale to fitting size
         setLocalRotation(new Quaternion(0, 180, 250, 0));
         setLocalPosition(new Vector3(0, -0.3f, -1));
         setLocalScale(new Vector3(0.1f, 0.1f, 0.1f));
@@ -63,7 +94,7 @@ public class Ball extends Node {
      */
     void ballAnimation(HitResult hitResult) {
 
-        // creates anchor and node and sets its parent to Scene
+        // Creates anchor and node and sets its parent to Scene
         Anchor anchor = hitResult.createAnchor();
         AnchorNode anchorNode = new AnchorNode(anchor);
         anchorNode.setParent(arFragment.getArSceneView().getScene());
@@ -90,7 +121,6 @@ public class Ball extends Node {
         throwAnimation(oldPosition, newPosition, directionVector, middlePosition);
 
     }
-
 
     /**
      * Spectator Version
@@ -157,7 +187,6 @@ public class Ball extends Node {
         //calculate throwing time
         long time = (long) ((distance / velocity) * 1000);
 
-
         int steps = 200;
 
         // Array of position of the parableThrow
@@ -203,7 +232,7 @@ public class Ball extends Node {
         // Linear Movement, not exactly physically correct, but looks okay
         objectAnimation.setInterpolator(new LinearInterpolator());
 
-        // Duration in ms of the animation.
+        // Duration in ms of the animation
         objectAnimation.setDuration(time);
         objectAnimation.start();
 
@@ -296,37 +325,6 @@ public class Ball extends Node {
         // cancel and set null
         ballRotationAnimation.cancel();
         ballRotationAnimation = null;
-    }
-
-    /**
-     * Returns an ObjectAnimator that makes the ball rotate.
-     * Some of the code is from the ARCORE-Example of the Solar Star System - Planet Rotation.
-     */
-    private static ObjectAnimator createAnimator(boolean wurf) {
-
-        // set the rotationsPoints of the Animation
-        Quaternion[] orientations = new Quaternion[4];
-
-        // Calculate the rotation-positions
-        for (int i = 0; i < orientations.length; i++) {
-            float angle = i * 360 / (orientations.length - 1);
-            Quaternion orientation;
-            // if the Ball is thrown set the Rotation around the x-axis, otherwise set it around y-axis
-            if (wurf) orientation = Quaternion.axisAngle(new Vector3(1f, 0f, 0f), angle);
-            else orientation = Quaternion.axisAngle(new Vector3(0f, 1f, 0f), angle);
-            orientations[i] = orientation;
-        }
-
-        ObjectAnimator orbitAnimation = new ObjectAnimator();
-        orbitAnimation.setObjectValues(orientations);
-        orbitAnimation.setPropertyName("localRotation");
-        orbitAnimation.setEvaluator(new QuaternionEvaluator());
-        orbitAnimation.setRepeatCount(ObjectAnimator.INFINITE);
-        orbitAnimation.setRepeatMode(ObjectAnimator.RESTART);
-        orbitAnimation.setInterpolator(new LinearInterpolator());
-        orbitAnimation.setAutoCancel(true);
-
-        return orbitAnimation;
     }
 
 
