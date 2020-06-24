@@ -6,55 +6,31 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.Calendar;
-
-import static java.lang.Thread.sleep;
-
-
 public class SleepActivity extends AppCompatActivity {
 
     private int energy;
     private ProgressBar prgEnergy;
-    private Calendar currentTime;
-    private volatile int safeEnergy;
     private volatile boolean stopThread = false;
     private TextView progress;
 
-    private PersistenceManager persistenceManager;
+    private PersistenceManager pm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sleep);
+        pm = new PersistenceManager(getApplicationContext());
+        energy =  pm.getInt("energy",0);
 
-        persistenceManager = new PersistenceManager(getApplicationContext());
 
-        //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-
-        final int slValue = persistenceManager.getInt("energy",0);
-
-        Log.d("SLEEP", "sleep value: " + slValue);
-        this.energy = slValue;
         prgEnergy = findViewById(R.id.progressEnergy2);
-        prgEnergy.setProgress(slValue);
+        prgEnergy.setProgress(energy);
         progress = findViewById(R.id.sleepProgress);
-
-        Log.d("SLEEP", "energy first: " + energy);
-
-
-        //Handler handlerSleep = new Handler();
-
-        currentTime = Calendar.getInstance();
-        Calendar updateTime = currentTime;
-        updateTime.add(Calendar.SECOND, 1);
-
-        
 
         Button wakeUp = findViewById(R.id.wakeUpControl);
         wakeUp.setOnClickListener(v -> {
@@ -90,16 +66,9 @@ public class SleepActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     prgEnergy.setProgress(energy);
                     progress.setText(energy + "%");
-                    if (energy % 10 == 0)
-                        safeEnergy = energy;
-                    Log.d("SLEEP", "progress in 10er steps: " + safeEnergy);
-                    Log.d("SLEEP", "progress is growing: " + energy);
                     energy ++;
-
-                    persistenceManager.saveInt("energy", safeEnergy);
-
+                    pm.saveInt("energy", energy);
                 });
-
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
