@@ -110,7 +110,7 @@ public class ArActivity extends AppCompatActivity {
         renderer(R.raw.meat, "meat", weakActivity);
         renderer(R.raw.ball, "ball", weakActivity);
         renderer(R.raw.dragon66_one, "dragon_one", weakActivity);
-        renderer(R.raw.dragon65_two, "dragon_two", weakActivity);
+        renderer(R.raw.dragon67_two, "dragon_two", weakActivity);
 
         // When the detected plane is hit with the finger (only when nothing is in the way)
         arFragment.setOnTapArPlaneListener(
@@ -241,7 +241,6 @@ public class ArActivity extends AppCompatActivity {
     /**
      * This method checks the status of the anchorUpload
      * If the Upload is finished and the cloudAnchor is set, it shows a message and sets the state to HOSTED
-     *
      * @param anchor
      * @param state
      */

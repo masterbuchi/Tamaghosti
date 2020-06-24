@@ -7,6 +7,10 @@ import com.google.ar.sceneform.ux.DragGesture
 import com.google.ar.sceneform.ux.DragGestureRecognizer
 import java.util.concurrent.TimeUnit
 
+/**
+ * Based on a Template for a DragController
+ * It was only available in Kotlin, but I liked it
+ */
 class DragPettingController(private var dragon: Dragon, transformableNode: BaseTransformableNode, gestureRecognizer: DragGestureRecognizer,private var control: Control) :
         BaseTransformationController<DragGesture>(transformableNode, gestureRecognizer) {
 

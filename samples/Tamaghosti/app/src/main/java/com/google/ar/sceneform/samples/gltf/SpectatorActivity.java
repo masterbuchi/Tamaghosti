@@ -115,7 +115,7 @@ public class SpectatorActivity extends AppCompatActivity {
         renderer(R.raw.meat, "meat", weakActivity);
         renderer(R.raw.ball, "ball", weakActivity);
         renderer(R.raw.dragon66_one, "dragon_one", weakActivity);
-        renderer(R.raw.dragon65_two, "dragon_two", weakActivity);
+        renderer(R.raw.dragon67_two, "dragon_two", weakActivity);
 
 
         // Resolve Button Listener
@@ -144,9 +144,6 @@ public class SpectatorActivity extends AppCompatActivity {
 
                 // If there is no dragon yet, control.createDragon will create a new one
                 Toast.makeText(getApplicationContext(), "Dragon created", Toast.LENGTH_SHORT).show();
-
-                // Why is this getting triggered
-                control.createDragon(null, dragonRenderableOne, dragonRenderableTwo);
 
                 // Initializing currentAnchorId with the current anchor Id
                 currentAnchorId = anchorId;
@@ -326,6 +323,11 @@ public class SpectatorActivity extends AppCompatActivity {
                                 // Play Throw Ball Animation
                                 control.getBall().ballAnimation(newPosition, cameraPosition);
                                 break;
+                            case HAPPY:
+                                control.getDragon().setRenderable(dragonRenderableTwo);
+
+                            case SAD:
+                                control.getDragon().setRenderable(dragonRenderableOne);
 
                             case RESET:
 

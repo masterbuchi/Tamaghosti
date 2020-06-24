@@ -32,7 +32,9 @@ public class FirebaseManager {
         EAT,
         RESET,
         THROW_MEAT,
-        THROW_BALL
+        THROW_BALL,
+        HAPPY,
+        SAD
     }
 
     /**

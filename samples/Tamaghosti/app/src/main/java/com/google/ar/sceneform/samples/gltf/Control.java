@@ -717,7 +717,7 @@ public class Control {
                     }
                     // With Ball Activated, update Needs and let the Dragon bring the ball back
                     if (ballActivated) {
-                        setNeed("fun", 10);
+                        setNeed("fun", 20);
                         setNeed("hunger", -10);
                         setNeed("energy", -5);
                         showPlus(3000);
