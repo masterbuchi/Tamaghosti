@@ -243,10 +243,11 @@
       android:id="@+id/plusImage"
       android:layout_width="83dp"
       android:layout_height="67dp"
-      android:layout_marginStart="292dp"
-      android:layout_marginBottom="324dp"
+      android:layout_marginStart="256dp"
+      android:layout_marginBottom="340dp"
       android:clickable="false"
       android:contentDescription="@string/plus_sign"
+      android:visibility="visible"
       app:layout_constraintBottom_toTopOf="@+id/Items"
       app:layout_constraintStart_toStartOf="@+id/Items"
       app:srcCompat="@android:drawable/ic_input_add" />

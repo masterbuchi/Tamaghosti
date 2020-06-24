@@ -376,6 +376,10 @@ public class Control {
             anchorNode.setParent(spectatorActivity.getArFragment().getArSceneView().getScene());
             dragon = new Dragon(spectatorActivity.getArFragment(), anchorNode, dragonRenderableOne, dragonRenderableTwo, this);
         } else {
+
+            // For whatever Reason, setting the Plus Image to invisible before that point makes it impossible to set it to visible again. From here on out, it works to switch
+            plus = arActivity.findViewById(R.id.plusImage);
+            plus.setVisibility(View.INVISIBLE);
             // As a Creator create the Dragon and update the Position of the Dragon in Firebase
             // Also update the Restrictions
             AnchorNode anchorNode = arActivity.createAnchor(hitResult);
@@ -463,8 +467,8 @@ public class Control {
      */
     public void showPlus(int duration) {
         plus = arActivity.findViewById(R.id.plusImage);
-        Log.d("Plus", String.valueOf(plus));
         plus.setVisibility(View.VISIBLE);
+
         // after a set Duration deactivate the Plus again
         Handler handler = new Handler();
         handler.postDelayed(() -> plus.setVisibility(View.INVISIBLE), duration);
