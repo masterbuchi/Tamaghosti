@@ -294,6 +294,7 @@ public class Control {
                     if (ballActivated) {
                         ball.stopAnimation();
                         ballActivated = false;
+                        ball.setEnabled(false);
                     }
 
                     // If the Meat should be shown
@@ -337,6 +338,7 @@ public class Control {
                     if (meatActivated) {
                         meat.stopAnimation();
                         meatActivated = false;
+                        meat.setEnabled(false);
                     }
 
                     // If the Ball should be shown
